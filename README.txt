@@ -11,6 +11,7 @@ Packs:
   + options,      http://stoics.org.uk/~nicos/sware/options
   + os_lib,       http://stoics.org.uk/~nicos/sware/os_lib
   + pack_errors,  http://stoics.org.uk/~nicos/sware/pack_errors
+  + spuds,        http://stoics.org.uk/~nicos/sware/spuds
   + stoics_lib,   http://stoics.org.uk/~nicos/sware/stoics_lib
 
 
