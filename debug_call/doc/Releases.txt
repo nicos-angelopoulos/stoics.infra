@@ -1,0 +1,17 @@
+---   Releases   ---
+--------------------
+TBD @ 17.03.10   debug_call with Success/failure by colour too (see SWI installation)
+
+0.3 @ 17.03.06   More remaing libs to stoics_lib (no local libs) and requires->lib
+    @ 16.12.11   Moved more of libs to pack(stoics_lib) and re-added lib(requires) !
+
+0.2  2016/11/01  Published
+	  2016/11/01  Removed dependency to lib(requires).
+	  2016/11/01  Introduced debug_message/3 as a wrapper for debug/3.
+	  2016/09/13  Added list prepared goal.
+     2016/08/24  Added pwd/1 'Goal'
+     2016/08/24  Added standard 'Goal's start and end.
+     2016/08/22  Added debug_topic/3 and renamed debug_reset/2 debug_set/2.
+	              Also changed some defaultish behaviour.
+
+0.1  2016/03/05   First public release

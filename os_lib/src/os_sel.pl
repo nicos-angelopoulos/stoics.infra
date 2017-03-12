@@ -1,0 +1,94 @@
+
+:- lib(options).
+:- lib( stoics_lib:atom_sub/2 ).
+
+os_sel_defaults( dir('.') ).
+
+/** os_sel( +Oses, +PatternS, -Sel ).
+    os_sel( +Oses, +PatternS, -Sel, +Opts ).
+
+Select a number of entries from Oses according to PatternS.
+Oses can be one of the following tokens: 
+   os_files, os_dirs or os_all or a list of Os objects. 
+Tokens are expanded to the respective Os entries within the current directory.
+PatternS can be a list of 
+
+PatternS, a list of, or one of: 
+
+  * ext(Ext)
+   Oses with extension Ext
+
+  * postfix(Psf)
+   is a postfix of the stem fo Os
+
+  * prefix(Pfx)
+   is a prefix of the stem fo Os
+
+  * sub(Sub)
+   sub_atom/5 succeeds on the stem of the Os
+
+Opts 
+
+  * dir(Dir='.')
+    directory at which the Oses will be sought
+
+==
+% mkdir /tmp/os_sel; cd /tmp/os_sel; touch a.pl b.txt c.pl abc.txt; mkdir abc_sub
+?- os_sel( os_files, ext(pl), Sel, true ).
+Sel = [a.pl, c.pl].
+
+?- os_sel( os_files, ext(txt), Sel, true ).
+Sel = [b.txt, abc.txt].
+
+?- os_sel( os_all, sub(abc), Sel, true ).
+Sel = [abc.txt, abc_sub].
+
+?- working_directory( Old, '..' ), os_sel( os_dirs, os_, Sel, true ), working_directory( _, Old ).
+Old = '/tmp/os_sel/',
+Sel = [os_sel].
+==
+
+@author nicos angelopoulos
+@version  0.1 2016/ 8/24
+@version  0.2 2016/10/18  changed naked atoms to sub(Sub), added prefix and postfix
+@version  0.3 2017/2/8    allow list of patterns 
+
+*/
+os_sel( OsesIn, Pat, Sel ) :-
+	os_sel( OsesIn, Pat, Sel, [] ).
+
+os_sel( OsesIn, PatS, Sel, Args ) :-
+	options_append( os_sel, Args, Opts ),
+	options( dir(Dir), Opts ),
+	os_sel_oses( OsesIn, Dir, Oses ),
+    en_list( PatS, Pats ),
+    os_sel_patterns( Pats, Oses, Sel ).
+
+os_sel_patterns( [], Oses, Oses ).
+os_sel_patterns( [Pat|Ps], Oses, Sel ) :-
+	include( os_sel_pattern(Pat), Oses, Remainder ),
+    os_sel_patterns( Ps, Remainder, Sel ).
+
+os_sel_pattern( ext(Ext), Os ) :-
+	os_ext( Ext, Os ).
+os_sel_pattern( sub(Pat), Os ) :-
+	os_ext( _Ext, Stem, Os ),
+	once( sub_atom(Stem,_,_,_,Pat) ).
+os_sel_pattern( prefix(Pfx), Os ) :-
+	os_ext( _Ext, Stem, Os ),
+	once( sub_atom(Stem,0,_,_,Pfx) ).
+os_sel_pattern( postfix(Psf), Os ) :-
+	os_ext( _Ext, Stem, Os ),
+	once( sub_atom(Stem,_,_,0,Psf) ).
+
+os_sel_oses( os_files, Dir, Oses ) :-
+	!,
+	os_dir_files( Dir, Oses ).
+os_sel_oses( os_dirs, Dir, Oses ) :-
+	!,
+	os_dir_dirs( Dir, Oses ).
+os_sel_oses( os_all, Dir, Oses ) :-
+	!,
+	directory_files( Dir, Oses ).
+os_sel_oses( Other, _Dir, Oses ) :-
+	en_list( Other, Oses ).

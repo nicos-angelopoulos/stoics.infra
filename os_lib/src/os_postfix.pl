@@ -1,0 +1,226 @@
+
+% :- use_module( library(options) ).   % assume
+
+% :- requires( stoics_lib:compound/3 ).  % in module file
+:- lib( os_path/3 ).
+:- lib( os_sep/2 ).
+:- lib( os_name/2 ).
+:- lib( os_type_entity/3 ).
+% :- requires( stoics_lib:at_con/3 ).  % in module file
+
+os_postfix_defaults( Args, Defs ) :-
+	Defs = [ sep(Sep),
+	         replace(false),
+	         ignore_post([]),
+		     ext(_)
+		    ],
+	os_sep( Sep, Args ).
+
+%% os_postfix( -Postfix, +Posted ).
+%% os_postfix( +Postfix, +Fname, -Posted ).
+%% os_postfix( +Postfix, -Fname, +Posted ).
+%% os_postfix( +Postfix, ?Fname, ?Posted, +Opts ).
+%% os_postfix( +Postfix, +Opts, ?Fname, ?Posted ).
+%
+% Append a postfix to a filename without touching its file type extension.
+% Also works for removing a postfix.
+% If Postfix is compound of arity/1 is taken to be an aliased path, 
+% in which case the innermost path is extended.
+% Postfix is mapped to an atom before concatenated.
+%
+% Second argument is allowed to be the options (recognised as such when input is a list)
+% so that it can be used in meta-calls.
+%
+% Opts 
+%  * ext(Ext)
+%    if Ext is ground is assumed to be the strippable part of Fname. When Ext is a variable
+%    the found extension is bound to it.
+% 
+%  * ignore_post(Posts=[])
+%    (separated) parts to ignore at end (see ex. below)
+% 
+%  * postfix(Psfx)
+%    alternative way of defining Postfix, only used when Postfix is a variable
+% 
+%  * replace(Rplc=false)
+%    replace relevant part of filename instead of adding new postfix
+% 
+%  * separator(Sep=Sep)    
+%    expansion of sep(Sep) - canonical is sep(Sep)
+% 
+%  * sep(Sep='_')
+%    shortened separator() separator for stem-file parts (see os_sep/2)
+%
+%==
+% ?- os_postfix( abc, library(x.txt), T ).
+% T = library(x_abc.txt).
+% ?- os_postfix( abc, library(x.txt), T, [separator(-)] ).
+% T = library('x-abc.txt').
+% ?- os_postfix( abc, x.txt, T, sep(.) ).
+% T = x.abc.txt.
+% ?- os_postfix( v1, graph_layout.csv, T, [ignore_post(layout)] ).
+% T = graph_v1_layout.csv.
+% ?- os_postfix( v1, graph_lay_out.csv, T, [ignore_post(layout)] ).
+% T = graph_lay_out_v1.csv.
+% ?- os_postfix( v1, graph_lay_out.csv, T, ignore_post([lay,out]) ).
+% T = graph_v1_lay_out.csv.
+% ?- os_postfix( v1, graph_lay_out.csv, T, [ignore_post([out]),replace(true)] ).
+% T = graph_v1_out.csv
+% ?- maplist( os_postfix(v1,[sep(-)]),[a.csv,b.csv], AB ).
+% AB = ['a-v1.csv', 'b-v1.csv'].
+% ?- os_postfix( _, t(x.txt), T, postfix(abc) ).
+% T = t(x_abc.txt).
+% ?- os_postfix( _, "x.txt", T, postfix(abc) ).
+% T = "x_abc.txt".
+% ?- os_postfix( Psf, abc_def.txt ).
+% Psf = def.
+%==
+%
+% @author nicos angelopoulos
+% @version  0.2 2014/7/8   changed order of 1&2 make it more suitable to meta calls
+% @version  0.3 2014/7/28  added aliased paths and example
+% @version  0.4 2014/12/2  added options (separator/1,ignore_post/1,replace/1)
+%
+os_postfix( Psfx, Posted ) :-
+	os_postfix( Psfx, _Fname, Posted, [] ).
+os_postfix( Psfx, Fname, Posted ) :-
+	os_postfix( Psfx, Fname, Posted, [] ).
+
+os_postfix( Psfx, Args, Fname, Posted ) :-
+	ground( Args ),
+	is_list(Args),
+	!,
+	os_postfix_reorder( Psfx, Fname, Posted, Args ).
+os_postfix( Psfx, Fname, Posted, Args ) :-
+	options_append( os_postfix, Args, Opts ),
+	os_postfix_1( Psfx, Fname, Posted, Opts ).
+
+os_postfix_1( Psfx, Fname, Posted, Opts ) :-
+	ground( Fname ),
+	!,
+	os_name( Fname, Ftype ),
+	os_postfix( Ftype, Psfx, Fname, Posted, Opts ).
+os_postfix_1( Psfx, Fname, Posted, Opts ) :-
+	ground( Posted ),
+	!,
+	os_dir_stem_ext( Dir, PoStem, Ext, Posted ),
+	os_sep( Sep, Opts ),
+	at_con( Parts, Sep, PoStem ),
+	options( ignore_post(Igns), Opts, en_list(true) ),
+	append( _Short, Long, Igns ),
+	append( Clean, Long, Parts ),      %  two appends always succeed at least once
+	at_con( PsfxParts, Sep, Psfx ),    %  postfix might itself contain Sep
+	append( Withouts, PsfxParts, Clean ),
+	!,
+	at_con( Withouts, Sep, Fstem ),
+	os_dir_stem_ext( Dir, Fstem, Ext, Fname ).
+
+os_postfix( atom, Psfx, File, Posted, Opts ) :-
+	os_atom_postfix( File, Psfx, Pile, Opts ),
+	os_cast( Pile, atom, Posted ).
+os_postfix( string, Psfx, File, Posted, Opts ) :-
+	os_string_postfix( File, Psfx, Pile, Opts ),
+	os_cast( Pile, string, Posted ).
+os_postfix( slash, Psfx, Fname, Posted, Opts ) :-
+	Fname = Dir/File,
+	os_atom_postfix( File, Psfx, Pile, Opts ),
+	os_cast( Dir/Pile, slash, Posted ).
+os_postfix( alias, Psfx, Fname, Posted, Opts ) :-
+	Fname =.. [Alias,AArg],
+	os_postfix_1( Psfx, AArg, PArg, Opts ),
+	Pname =.. [Alias,PArg], 
+	os_cast( Pname, alias, Posted ).
+
+os_postfix_reorder( _Psfx, Fname, _Posted, Opts ) :-
+	is_list( Fname ),
+	!,
+	throw( pack_error(os,os_postfix_lists(Fname,Opts)) ).
+os_postfix_reorder( Psfx, Fname, Posted, Args ) :-
+	options_append( os_postfix, Args, Opts ),
+	os_postfix_1( Psfx, Fname, Posted, Opts ).
+
+os_atom_postfix( File, Postfix, Pile, Opts ) :-
+	% fixme: allow all_dots(true) as an option that jumps all extensions ?
+	options( ext(Ext), Opts ),
+	os_ext( Ext, Stem, File ),
+     % file_name_extension( Stem, Ext, File ),
+	options( [sep(Sep),replace(Rep)], Opts ),
+	os_postfix_stem( Stem, Sep, Rep, Prefix, Suffix, Opts ),
+	os_postfix_ground( Postfix, Opts ),
+	at_con( [Prefix,Postfix,Suffix], Sep, PoStem ),
+     file_name_extension( PoStem, Ext, Pile ).
+
+os_string_postfix( File, Postfix, Pile, Opts ) :-
+	options( ext(Ext), Opts ),
+	os_ext( Ext, Stem, File ),
+	options( [sep(Sep),replace(Rep)], Opts ),
+	os_postfix_stem( Stem, Sep, Rep, Prefix, Suffix, Opts ),
+	os_postfix_ground( Postfix, Opts ),
+	at_con( [Prefix,Postfix,Suffix], Sep, PoStem ),
+	os_ext( Ext, PoStem, Pile ).
+
+/*
+	term_atom( PostfIn, Postfix ),
+	os_name( Fname, OsType ),
+	os_path( Dir, Bname, Fname ),
+     file_name_extension( Stem, Ext, Bname ),
+     % atom_concat( Stem, Postfix, PoStem ),
+     file_name_extension( PoStem, Ext, Bosted ),
+	os_type_entity( compound, Dir, CmpDir ),
+	os_type_entity( OsType, CmpDir/Bosted, Posted ).
+os_postfix( PostfIn, Fname, Posted, Args ) :-
+	ground( Posted ),
+	os_postfix_opts_ground( PostfIn, Args ),
+	term_atom( PostfIn, Postfix ),
+	os_name( Posted, OsType ),
+	os_path( Dir, PBname, Posted ),
+     file_name_extension( PStem, Ext, PBname ),
+     atom_concat( Stem, Postfix, PStem ),
+     file_name_extension( Stem, Ext, Bname ),
+	% os_type_entity( compound, Dir, CmpDir ),
+	os_path( Dir, Bname, FnamePrv ),
+	os_type_entity( OsType, FnamePrv, Fname ).
+os_postfix( _PostfIn, _Fname, _Posted, _Args ) :-
+	throw( os_postfix(non_ground_input_file_argument) ).
+
+os_postfix_opts_ground( PostfIn, ArgS ) :-
+	var( PostfIn ),
+	en_list( ArgS, Args ),
+	!,
+	os_postfix_opts_alternative( Args, PostfIn ).
+os_postfix_opts_ground( _PostfIn, _ArgS ).
+
+os_postfix_opts_alternative( Opts, PostfIn ) :-
+	memberchk( postfix(PostfIn), Opts ), 
+	!.
+os_postfix_opts_alternative( Opts, PostfIn ) :-
+	throw( cannot_locate_postfix_in_arg_or_options(PostfIn,Opts) ).
+*/
+
+os_postfix_stem( Stem, Sep, Rep, Prefix, Suffix, Opts ) :-
+	atomic_list_concat( StemParts, Sep, Stem ),
+	options( ignore_post(IgnS), Opts ),
+	en_list( IgnS, Igns ),
+	os_postfix_stem_ignore( StemParts, Sep, Rep, Igns, Prefix, Suffix ).
+
+os_postfix_stem_ignore( Parts, Sep, Rep, Igns, Prefix, Suffix ) :-
+	Igns \== [],
+	append( PrefixParts, Igns, Parts ),
+	!,
+	os_postfix_stem_replace( Rep, PrefixParts, RemainingParts ),
+	at_con( RemainingParts, Sep, Prefix ),
+	at_con( Igns, Sep, Suffix ).
+os_postfix_stem_ignore( PrefixParts, Sep, Rep, _Igns, Prefix, '' ) :-
+	os_postfix_stem_replace( Rep, PrefixParts, RemainingParts ),
+	at_con( RemainingParts, Sep, Prefix ).
+
+os_postfix_stem_replace( true, PrefixParts, RemainingParts ) :-
+	append( PrefixParts, [_Last], RemainingParts ),
+	!.
+os_postfix_stem_replace( false, Parts, Parts ).
+
+os_postfix_ground( Postfix, _Opts ) :-
+	\+ var( Postfix ),
+	!.
+os_postfix_ground( Postfix, Opts ) :-
+	options( postfix(Postfix), Opts ). % fixme: message will be a bit imprecise if missing

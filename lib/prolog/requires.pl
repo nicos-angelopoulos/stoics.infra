@@ -1,0 +1,2 @@
+:- module( requires, [] ).
+:- reexport( lib ).

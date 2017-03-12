@@ -1,0 +1,37 @@
+---   Releases   ---
+--------------------
+
+0.6 
+    @ 2017/03/12  TYPO:    access_file/2 highlighting
+
+0.6 @ 2017/03/10  version:  for pack(lib) v1.1
+    @ 2017/03/10  changed:  doc for os_exists/2
+    @ 2017/03/03  changed:  os_exists/2 option reports(Rep) to error(false). Fixed its implementation for some of the cases
+                            as it was always erroring
+
+    @ 2016/12/19  added:   call_options(Copts) can now carry the value false, which excludes options argument from the os_mill/4 call.
+						changed: in file + dir are now casted to file's type (previsously always \ () )
+						fixed:   os_postfix( rho_and_psi, 'PD21872a2_refit_rho_and_psi.txt' ).  % now it succeeds
+						updated: os_unique_by_name/2,3 -> os_unique/2,3 now it additionally supports versioning 
+						added:   os_cp/2
+						added:   os_mv/2
+                  added:   os_sel/3,4
+						added:   os_un_zip/3
+						fixed:   os_path stripped unessecary /() in os_path_ground
+						fixed:   os_mill call to os_path with /() to \()
+                  fixed:   os_ext( srt, file, file.srt ).
+                  fixed:   os_cast( file, atom, file ).
+						added:   os_plate_cast/3 error
+
+0.5  2016/03/01   added os_lib.pl in the distro !
+
+0.4  2016/03/01   @see corrected to project page
+                  Use Jan Wielemakers two liner for os_lib.pl
+						:- module(os_lib, []).
+						:- reexport(os).
+
+0.3  2016/03/01   Added requires dependency to pack.pl
+
+0.2  2016/03/01   Mono-module + all pack dependencies fixed
+
+0.1  2016/01/31   First public release

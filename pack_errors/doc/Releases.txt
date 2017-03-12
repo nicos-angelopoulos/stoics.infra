@@ -1,0 +1,20 @@
+---   Releases   ----
+---------------------
+
+0.3 @ 17.03.06   tidy up (removed refs to pack(lib/requires))
+    @ 17.03.06   changed interface to arg_ground related preds
+	 @ 16.12.10   moved throw/2 into the pack from pack(options)
+	 @ 16.11.23   added type/2,3
+	              added handling of pack_error/1
+    @ 16.11.10   added err: unknown_token/2
+                 added ground/2
+
+    @ 16.09.09   split throw/2 from caught/3 and moved it to pack(options)
+					  added global flag for controlling printing of Arg in arg_ errorrs 
+					     prolog_flag(pack_errors_arg,false)
+					  added arg_enumerate/3
+		           arg related errors should now start with arg_
+
+0.2   16.02.24   update for os_lib (0.5) 
+
+0.1   16.01.30   first public release
