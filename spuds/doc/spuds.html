@@ -1,0 +1,186 @@
+<html>
+  <head>
+    <title>spuds.pl</title>
+    <link href="pldoc.css" rel="stylesheet" type="text/css">
+    <meta
+	http-equiv="content-type"
+	content="text/html; charset=UTF-8">
+  </head>
+  <body>
+    <div class="navhdr">
+      <div class="jump">
+	<div>
+	  <a class="prolog_version" href="http://www.swi-prolog.org"> SWI-Prolog 7.1.4</a>
+	</div>
+      </div>
+      <div class="search">
+      </div>
+      <br clear="right">
+    </div>
+    <h1 class="file">spuds: persistent, user code inclusive, doc server for linux</h1>
+    <p>This library creates, uses and manages a persistent documentation server on a single port.
+In addition to serving all Prolog library code as per <a href="/doc_for?object=pldoc_http:doc_server/1">doc_server/1</a>, <a href="#spuds/1">spuds/1</a> also serves
+installed packs and all user code declared as such, on the same server.</p>
+    <p>spuds is available as a SWI-Prolog pack, and can be installed the usual way.</p>
+    <pre class="code" ext="">        pack_install( spuds ).</pre>
+    <p>Since 0:1:0 spuds supports <a class="packages" href="/man?predicate=http_daemon/0">http_daemon/0</a>. It also provides a swipl-spuds bash shell file
+(<a
+	class="file"
+	href="../../../../../../usr/local/users/nicos/local/git/lib/swipl-7.1.4/pack/spuds/server/swipl-spuds">pack(spuds/server/'swipl-spuds')</a>),
+to be placed in the /etc/init.d/ directory. This is a direct copy from the SWI file.
+It follows well after standard scripts for servers starting/stopping.
+And can be used when you want all documents to be available as an independent server.</p>
+    <p>Pack files from <code>swi(pack/.../prolog/...)</code> are loaded via
+<code>use_module(File,[]])</code>.User documentation files are also
+loaded via use_module if their first term is a module declaration, otherwise
+their comments are loaded by
+<code>xref_source(Abs,[comments(store),silent(Silent)])</code>
+<a class="builtin" href="/man?predicate=use_module/2">use_module/2</a> has the side-effect of loading the code on to the server.
+If we were to load module files by <span class="undef">xref/2</span>, the downside would be that
+as far as we understand SWI will not serve the module page correctly
+(particularly missing the top comments that describe module files).</p>
+    <p>Currently to ask for help users need to call <code>spuds(Topic)</code> although ideally one
+can use <a
+	href="../../../../../../usr/local/users/nicos/local/git/lib/swipl-7.1.4/xpce/prolog/lib/swi_hooks.pl#help_hook/1">help_hook/1</a> in which case normal route via <a class="builtin" href="/man?predicate=help/1">help/1</a> should be possible.</p>
+    <p>When looking for help pages, the library tries to locate a running spuds server.
+If one is not found, it starts one. The behaviour of this server
+can be controlled via a set of predefined terms/clauses in a user profile file.
+<a href="#spuds/1">spuds/1</a> also starts a new web browser window pointing to the spuds server
+on the requested topic.</p>
+    <p>The default profile location is <code>$HOME/.pl/spuds_profile_&lt;Hostname&gt;.pl</code> or
+<code>$HOME/.pl/spuds_profile.pl</code> .
+An alternative location can be provided via (user:)<span class="undef">spuds_profile/1</span>.</p>
+    <p>In you profile you can add:</p>
+    <ul>
+      <li><code>blocked_sys_library( 'jpl.pl' )</code> if any of those are defined matcing system libraries, (whole dirs or
+
+<center>source files) the corresponding parts will be ignored.
+In this case <span class="undef">so_sub/3</span> is used instead of <span class="undef">doc_load_library/1</span>.</center>
+</li>
+      <li><code>doc_server_default( port, 4001 )</code> port for the spuds server</li>
+      <li><code>doc_server_default( start_opens_browser, false )</code> should spuds_start, start a browser ?</li>
+      <li><code>file_is_blocked_prolog_source( +AbsFile )</code> .pl file that shouldn't be served</li>
+      <li><code>file_is_prolog_source( +AbsFile )</code> non .pl file that should be served</li>
+      <li><code>prolog_source_directory( -Dir )</code> all Prolog files in Dir will be served</li>
+      <li><code>prolog_source_directory( -Dir, -Opts )</code> all Prolog files in Dir will be served
+if returned by <code>os_sub(Dir,Opts)</code>.</li>
+      <li><code>prolog_source_file( -File )</code> serve this file</li>
+      <li><code>spuds_debug( Debug )</code> be verbose and <code>silent(false)</code> for all loads of spuds server</li>
+    </ul>
+    <p>Docs for each <code>prolog_source_file</code> are loaded to the spuds server by means of:
+<code>use_module( File, [] )</code> if the File in question is a module file or
+<code>xref_source(File,[comments(store),silent(true)])</code> otherwise.</p>
+    <p>Documentation for each prolog file within each <code>prolog_source_directory</code> is also
+loaded similarly. Note you need <a
+	class="file"
+	href="../../../../../../usr/local/users/nicos/local/git/lib/swipl-7.1.4/pack/os_sub/prolog/os_sub.pl">library(os_sub)</a> for this to work.
+This is available as a pack install as per usual via</p>
+    <pre class="code" ext="">        pack_install( os_sub ).</pre>
+    <p>Within each source directory (Dir above) files are considered to be Prolog source
+if there is no barring success of the call <span class="undef">file_is_blocked_prolog_source/1</span>
+and either file has extension 'pl' or the call <span class="undef">file_is_prolog_source/1</span> succeeds.
+These calls are performed with the absolute location of the file as argument.</p>
+    <p>The server only works under linux. Compatibility patches to other platforms are very welcome.
+For MacOs there should be a trivial change on the ps flags, if that, that should
+be sufficient. For other systems we need</p>
+    <ul>
+      <li>ability to start background prolog script from within Prolog</li>
+      <li>ability to get pid from script name (can work around this one with pid files)</li>
+      <li>ability to kill a process by script name or pid.</li>
+    </ul>
+    <p>To pick changes to the user code base up and even those on Swi (say after you installed
+a new version) the server needs to be restarted. This can be done via <a href="#spuds_restart/0">spuds_restart/0</a>.</p>
+    <p>One scenario for starting the server as a debian server, including at start time,
+copy spuds/server/swipl-spuds into /etc/init.d/ then follow the instrunctions in the file.
+Usually you want to make a clean place where from the server runs.
+So for instance create /srv/www/html/spuds/ and copy into it <a class="file" href="../server/spuds_daemon.pl">spuds/server/spuds_daemon.pl</a> (along with <a class="file" href="spuds_docs.pl">spuds_docs.pl</a> from same place).</p>
+    <p>spuds stands for, Spuds Persistent User-code-inclusive Documentation Server</p>
+    <dl class="tags">
+      <dt class="keyword-author">author</dt>
+      <dd class="keyword-author">- Nicos Angelopoulos</dd>
+      <dt class="keyword-version">version</dt>
+      <dd class="keyword-version">- 0:1:4</dd>
+      <dt class="keyword-see">See also</dt>
+      <dd class="keyword-see">- <a href="http://stoics.org.uk/~nicos/sware/spuds">http://stoics.org.uk/~nicos/sware/spuds</a></dd>
+      <dd class="keyword-see">- <code>pack(spuds)</code></dd>
+      <dd class="keyword-see">- <code>pack(spuds/profiles)</code></dd>
+      <dt class="keyword-license">license</dt>
+      <dd class="keyword-license">- Perl Artistic</dd>
+      <dt class="keyword-tbd">To be done</dt>
+      <dd class="keyword-tbd">- support for other oses (MacOs should be a matter of using the correct ps flags).</dd>
+      <dd class="keyword-tbd">- add seconds delay option</dd>
+    </dl>
+    <dl>
+      <dt class="pubdef">
+	<span style="float:right"></span>
+	<a name="spuds_version/2">
+	  <b class="pred">spuds_version</b>
+	  <var class="arglist">(-Version, -Date)</var>
+	</a>
+      </dt>
+      <dd class="defbody"><var>Version</var> and release <var>Date</var> (<code>date(Y,M,D)</code> term).</dd>
+      <dt class="pubdef">
+	<span style="float:right"></span>
+	<a name="spuds_pid/1">
+	  <b class="pred">spuds_pid</b>
+	  <var class="arglist">(-Pid)</var>
+	</a>
+      </dt>
+      <dd class="defbody">Process id of any running spud <code>server(s)</code>. Non-deterministic.
+There should ever only be one process maximum, if all is working properly.</dd>
+      <dt class="pubdef">
+	<span style="float:right"></span>
+	<a name="spuds_stop/0">
+	  <b class="pred">spuds_stop</b>
+	</a>
+      </dt>
+      <dd class="defbody">Kill the spuds server. True iff a single server can be found.
+If there are mulitple servers funning use <a href="#spuds_stop_pid/1">spuds_stop_pid/1</a> to force a quit.</dd>
+      <dt class="pubdef">
+	<span style="float:right"></span>
+	<a name="spuds_stop_pid/1">
+	  <b class="pred">spuds_stop_pid</b>
+	  <var class="arglist">(Pid)</var>
+	</a>
+      </dt>
+      <dd class="defbody">Kill the spuds server with process id, <var>Pid</var>. The predicate checks
+in the output of <code>ps</code> linux command to verify that the process
+id matches to a spuds server.</dd>
+      <dt class="pubdef">
+	<span style="float:right"></span>
+	<a name="spuds_restart/0">
+	  <b class="pred">spuds_restart</b>
+	</a>
+      </dt>
+      <dd class="defbody">Restart the spuds server. It does not complain if one cannot be found.
+No browser tabs/windows are open.</dd>
+      <dt class="pubdef">
+	<span style="float:right"></span>
+	<a name="spuds_start/0">
+	  <b class="pred">spuds_start</b>
+	</a>
+      </dt>
+      <dd class="defbody">Start the spuds server. It prints an error and aborts if one is already running.</dd>
+      <dt class="pubdef">
+	<span style="float:right"></span>
+	<a name="spuds/1">
+	  <b class="pred">spuds</b>
+	  <var class="arglist">(Topic)</var>
+	</a>
+      </dt>
+      <dd class="defbody">Open a new web browser tab (<a class="builtin" href="/man?predicate=www_open_url/1">www_open_url/1</a>) on spuds server for query <var>Topic</var>.
+If there is no spuds server running, start one.
+This is run in the background and will persist beyond the limits
+of the current session. The spuds server can be managed with <a href="#spuds_stop/0">spuds_stop/0</a>,
+<a href="#spuds_pid/1">spuds_pid/1</a> and <a href="#spuds_restart/0">spuds_restart/0</a> from any Prolog session.</dd>
+      <dt class="pubdef">
+	<span style="float:right"></span>
+	<a name="spuds_profile_file/1">
+	  <b class="pred">spuds_profile_file</b>
+	  <var class="arglist">(-ProFile)</var>
+	</a>
+      </dt>
+      <dd class="defbody">Locates user's Profile file.</dd>
+    </dl>
+  </body>
+</html>

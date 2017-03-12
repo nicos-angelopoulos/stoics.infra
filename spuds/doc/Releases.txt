@@ -1,0 +1,35 @@
+0:1:5                        added --debug=true option to swipl-spuds and some reporting via repo/1 to /tmp/repo.txt
+                             changed swipl-spuds, to include some environment variables that enable the script 
+									  to run properly at start-up (in my set-up).
+									  added icons/ with svg and png at 96x96 of Swi's owl
+
+0:1:4     2014 Jan  1        moved spuds_docs to prolog/ so it can be loaded as library(spuds_docs).
+                             made displaying of all source files the default.
+									  Added all_sources_visible/1 in spuds_docs.pl 
+
+0:1:2     2013 Nov. 22       various fixes ?
+
+0:1:0     2013 Nov. 2       spuds_profile/1 is made public.
+                            Added scripts for daemon use via http_daemon/0.
+                            Added spuds/1 info message in spuds_start.
+	                         Profile source is first looked in spuds_profile_hostname.pl.
+
+0:0:6     2013 March 19     One more fix for new os_sub/3.
+
+0:0:5     2013 March 19     Use new os_sub/3 (version 0:0:4).
+
+0:0:4     2013 March 16     Updated spuds_version/2.
+
+0:0:3     2013 March 16     Deleted forgotten env .. in spudsd.pl 
+                            Changed use_module to load_files/2 with silent(true) for user's module files.
+									 Allow user to block system libraries.
+									 New spuds_debug(true) in spuds_profiles can be used to show what 's loaded.
+									 Some more documentation.
+
+0:0:2     2013 March 12     Note on what to add to /etc/rc.local for boot starts.
+                            Added 2nd argument of server script (logfile).
+									 Changed spudsd to cope with rc.local start-ups.
+									 Changed spudsd to start as /bin/sh
+									     Thanks to Michael Hendricks.
+
+0:0:1     2013 March 11     Released as a pack at SWI website.

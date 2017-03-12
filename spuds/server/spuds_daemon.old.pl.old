@@ -1,0 +1,38 @@
+
+:- use_module( library(http/http_unix_daemon) ).
+:- use_module( library(doc_http) ).
+:- use_module( library(spuds) ).
+:- use_module( library(spuds_docs) ).
+
+:- listen( http(post_server_start), spuds_daemon_listener ).
+
+/*
+   if your server fails to start  with /etc/init.d/swipl-spuds
+   it might be due to one of your source code files that fails to load properly.
+   As far as i know, while spuds tries to catch exceptions and failures in the 
+   context of the server, SWI doesnot behave as expected (reported, not fixed).
+
+   To debug situations as the above do:
+   sudo /etc/init.d/swipl-spuds stop
+   sudo /etc/init.d/swipl-spuds debug
+
+   Then look into file /tmp/spuds_debug.txt
+
+*/
+
+spuds_debug :-
+	debug( spuds, 'Spuds', [] ).
+
+load_verbosity( true ).
+
+spuds_daemon_listener :-
+	current_prolog_flag(argv, Argv),
+	http_unix_daemon:argv_options(Argv, _RestArgv, Options),
+	( memberchk(spuds_debug(Dbg),Options) -> debug(spuds); true ),
+	spuds_profile_file( Profile ),
+	load_user_file( Profile ),
+	spuds_docs.
+
+% :- http_handler( /, pldoc, [prefix] ). % works for non daemonised stufff
+
+:- initialization( (all_sources_visible(true),http_daemon) ).

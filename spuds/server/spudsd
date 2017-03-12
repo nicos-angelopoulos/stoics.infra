@@ -1,0 +1,7 @@
+#!/bin/sh
+
+PL=swipl
+
+exec $PL -q -f none  -t "consult(pack('spuds/server/spudsd.pl'))" -- $@
+# to start at boot time at to /etc/rc.local something like :
+#  su nicos -c '/usr/local/users/nicos/local/git/lib/swipl/pack/spuds/server/spudsd /home/nicos/.pl/spuds_profile.pl /tmp/spuds_log.txt' 2> /tmp/spuds_err.txt
