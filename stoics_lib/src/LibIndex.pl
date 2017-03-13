@@ -30,10 +30,12 @@ lib_index(goal_spec, 2, any, user, 'meta/goal_spec').
 lib_index(holds, 2, any, user, 'meta/holds').
 lib_index(int_trailer, 2, any, user, 'number/int_trailer').
 lib_index(imported_from, 2, any, user, 'meta/imported_from').
-lib_index(io_lines, 2, any, user, 'io/io_lines').
-lib_index(io_line, 2, any, user, 'io/io_put_line').
 lib_index(io_close, 2, any, user, 'io/io_close').
+lib_index(io_get_line, 2, any, user, 'io/io_get_line').
+lib_index(io_line, 2, any, user, 'io/io_line').
+lib_index(io_lines, 2, any, user, 'io/io_lines').
 lib_index(io_open, 3, any, user, 'io/io_open').
+lib_index(io_put_line, 2, any, user, 'io/io_put_line').
 lib_index(known, 1, any, user, 'meta/known').
 lib_index(known, 2, any, user, 'meta/known').
 lib_index(known, 3, any, user, 'meta/known').

@@ -111,6 +111,8 @@
 :- lib(message_report/3).
 :- lib(expand_spec/2).
 :- lib(io_line/2).
+:- lib(io_get_line/2).
+:- lib(io_put_line/2).
 :- lib(io_lines/2).
 :- lib(io_close/2).
 :- lib(io_open/3).
