@@ -50,6 +50,9 @@ lib_index(list_frequency, 3, any, user, 'list/list_frequency').
 lib_index(list_transpose, 2, any, user, 'list/list_transpose').
 lib_index(locate, 3, any, user, 'file/locate').
 lib_index(max_min_list, 3, any, user, 'list/max_min_list').
+lib_index(maparg, 2, any, user, 'meta/maparg').
+lib_index(maparg, 3, any, user, 'meta/maparg').
+lib_index(maparg, 4, any, user, 'meta/maparg').
 lib_index(map_succ_list, 3, any, user, 'meta/map_succ_list').
 lib_index(map_succ_list, 4, any, user, 'meta/map_succ_list').
 lib_index(message_report, 3, any, user, 'error/message_report').

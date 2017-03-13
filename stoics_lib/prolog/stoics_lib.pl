@@ -59,7 +59,9 @@
               holds/2,                 %  +Goal, -Holds
               imported_from/2,         %  +Clauser, ?Mod
               known/1,known/2,         %
-              known/3,                 %  +Goal[, +Tkn[, +Cat]
+              known/3,                 % +Goal[, +Tkn], +Cat]
+              maparg/2,maparg/3,       % +Pname, ?Term1[, ?Term2]
+              maparg/4,                % +PName, +Npos ?Term1, ?Term2
               map_succ_list/3,         %  
               map_succ_list/4,         %  +Goal, ?InList, ?OutList[, -Rejects]
               mod_goal/3, mod_goal/4,  % +Mod, +Goal[, +Override], -Moal
@@ -174,5 +176,8 @@
 :- lib(nth1/5).
 :- lib(arg/4).
 :- lib(arg/5).
+:- lib(maparg/2).
+:- lib(maparg/3).
+:- lib(maparg/4).
 
 :- lib( end(stoics_lib) ).
