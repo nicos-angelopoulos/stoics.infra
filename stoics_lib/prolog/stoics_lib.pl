@@ -26,6 +26,8 @@
               locate/3,                % +File, +Exts, -Locations
             % io/
               io_line/2,               % +Stream, ?Line
+              io_get_line/2,           % +Stream, -Line
+              io_put_line/2,           % +Stream, +Line
               io_lines/2,              % +FileOrStream, -Lines
               io_close/2,              % +FileR, -Stream
               io_open/3,               % +FileR, +Mode, -Stream
