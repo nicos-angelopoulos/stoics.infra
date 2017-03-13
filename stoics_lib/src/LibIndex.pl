@@ -1,3 +1,5 @@
+lib_index(arg, 4, any, user, 'term/arg').
+lib_index(arg, 5, any, user, 'term/arg').
 lib_index(arity, 3, any, user, 'term/arity').
 lib_index(arity, 2, any, user, 'term/arity').
 lib_index(at_con, 2, any, user, 'atom/at_con').
@@ -28,9 +30,8 @@ lib_index(goal_spec, 2, any, user, 'meta/goal_spec').
 lib_index(holds, 2, any, user, 'meta/holds').
 lib_index(int_trailer, 2, any, user, 'number/int_trailer').
 lib_index(imported_from, 2, any, user, 'meta/imported_from').
-lib_index(io_get_line, 2, any, user, 'io/io_get_line').
 lib_index(io_lines, 2, any, user, 'io/io_lines').
-lib_index(io_put_line, 2, any, user, 'io/io_put_line').
+lib_index(io_line, 2, any, user, 'io/io_put_line').
 lib_index(io_close, 2, any, user, 'io/io_close').
 lib_index(io_open, 3, any, user, 'io/io_open').
 lib_index(known, 1, any, user, 'meta/known').
@@ -55,6 +56,7 @@ lib_index(mod_goal, 4, any, user, 'meta/mod_goal').
 lib_index(n_breaks, 4, any, user, 'list/n_breaks').
 lib_index(n_digits_integer_codes, 3, any, user, 'codes/n_digits_integer_codes').
 lib_index(n_digits_min, 3, any, uer, 'number/n_digits_min' ).
+lib_index(nth1, 5, any, user, 'list/nth1' ).
 lib_index(portray_clauses, 2, any, user, 'term/portray_clauses').
 lib_index(position, 3, any, user, 'term/position').
 lib_index(position, 4, any, user, 'term/position').

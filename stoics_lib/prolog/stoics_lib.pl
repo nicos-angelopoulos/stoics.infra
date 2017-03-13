@@ -25,7 +25,7 @@
               expand_spec/2,           % +FileSpec, -Expanded
               locate/3,                % +File, +Exts, -Locations
             % io/
-              io_get_line/2,           % +Stream, -Line
+              io_line/2,               % +Stream, ?Line
               io_lines/2,              % +FileOrStream, -Lines
               io_close/2,              % +FileR, -Stream
               io_open/3,               % +FileR, +Mode, -Stream
@@ -39,6 +39,7 @@
               break_on_list/4,         % +List, +Partial, -Left, -Right
               break_nth/4,             % +Nth, +List, -Left, -Right
               n_breaks/4,              % +Vector, +N, -Breaks, -Opts
+              nth1/5,                  % ?N, +List, ?With, ?Nth, +NewList
               has_at_least/3,          % +N, +X, +List
               has_at_most/3,           % +N, +X, +List
               list_frequency/2,        % +List, -Freqs
@@ -68,6 +69,7 @@
             % strings
               letter_strings/3,        % +Start, -N, -Letts 
             % term
+              arg/4, arg/5,            % ?N, +TermIn, [+NewNth,] ?Nth, -TermOut
               arity/2,arity/3,         % ?Term[, ?Name], ?Arity
               compare/4,               % +Type, ?Op, +Term1, +Term
               compound/3,              % +Term, -Name, -Args 
@@ -108,7 +110,7 @@
 :- lib(three_letter_months/1).
 :- lib(message_report/3).
 :- lib(expand_spec/2).
-:- lib(io_get_line/2).
+:- lib(io_line/2).
 :- lib(io_lines/2).
 :- lib(io_close/2).
 :- lib(io_open/3).
@@ -165,5 +167,8 @@
 :- lib(n_digits_min/3).
 :- lib(n_breaks/4).
 :- lib(max_min_list/3).
+:- lib(nth1/5).
+:- lib(arg/4).
+:- lib(arg/5).
 
 :- lib( end(stoics_lib) ).

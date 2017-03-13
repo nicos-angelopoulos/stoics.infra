@@ -1,20 +1,22 @@
 ---   Releases   ---
 --------------------
 0.5
-    @ 17.03.12   ADDED: kv_ks/2, kv_vs/2
-                 ADDED: goal/4
-0.4 @ 17.03.10   ADDED: n_digit_min/3
-                 ADDED: max_list/3
-                 RMV:   nth_add/4   
-                 RMV:   a couple of options dependencies
-                 ADDED: n_breaks/4
-0.3 @ 17.03.09   ADDED: compare/4 + compare_arithmetic)
-0.2 @ 17.03.07   ADDED: predicates, and fixed pack.pl ("empty" dir) (+pack(lib))
-      17.02.24   ADDED: kv_compose/4
+    @ 17.03.13   CHANGED:io_{get,put}_line/2 -> io_line/2 
+                 ADDED:  nth1/5, (was nth_replace/5), arg/4+5
+    @ 17.03.12   ADDED:  kv_ks/2, kv_vs/2
+                 ADDED:  goal/4
+0.4 @ 17.03.10   ADDED:  n_digit_min/3
+                 ADDED:  max_list/3
+                 RMV:    nth_add/4   
+                 RMV:    a couple of options dependencies
+                 ADDED:  n_breaks/4
+0.3 @ 17.03.09   ADDED:  compare/4 + compare_arithmetic)
+0.2 @ 17.03.07   ADDED:  predicates, and fixed pack.pl ("empty" dir) (+pack(lib))
+      17.02.24   ADDED:  kv_compose/4
 
 0.1 @ 17.02.21   VERSION:first public release
-		16.12.10   ADDED: en_list.pl portray_clauses
-		16.12.10   ADDED: meta/: current_call.pl goal_sepc.pl holds.pl
-		16.12.10   ADDED: list/select_all.pl
-		16.12.10   ADDED: io/io_lines.pl and dependencies
-      16.12.10   ADDED: the infrastructure
+		16.12.10   ADDED:  en_list.pl portray_clauses
+		16.12.10   ADDED:  meta/: current_call.pl goal_sepc.pl holds.pl
+		16.12.10   ADDED:  list/select_all.pl
+		16.12.10   ADDED:  io/io_lines.pl and dependencies
+      16.12.10   ADDED:  the infrastructure
