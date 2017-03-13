@@ -3,6 +3,7 @@
               stoics_lib_version/2,    % -Vers, -Date
             % atom/
               at_con/2, at_con/3,      % ?List[, +Sep], ?Atom
+              atom_replace/4,          % +Atom, +What, +With, -New
               atom_sub/2,              %  ?Sub, ?Ful.
               prefix_atom/2,prefix_atom/3,  % +Prefix, +Atom[, -Postfix]
               sub_atom/2,sub_atom/4,   % +Full[, ?Pre, ?Post], Sub
@@ -179,5 +180,6 @@
 :- lib(maparg/2).
 :- lib(maparg/3).
 :- lib(maparg/4).
+:- lib(atom_replace/4).
 
 :- lib( end(stoics_lib) ).

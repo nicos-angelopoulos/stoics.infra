@@ -4,6 +4,7 @@ lib_index(arity, 3, any, user, 'term/arity').
 lib_index(arity, 2, any, user, 'term/arity').
 lib_index(at_con, 2, any, user, 'atom/at_con').
 lib_index(at_con, 3, any, user, 'atom/at_con').
+lib_index(atom_replace, 4, any, user, 'atom/atom_replace').
 lib_index(atom_sub, 2, any, user, 'atom/atom_sub').
 lib_index(break_on_list, 4, any, user, 'list/break_on_list').
 lib_index(break_nth, 4, any, user, 'list/break_nth').

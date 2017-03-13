@@ -4,6 +4,7 @@
     @ 17.03.13   CHANGED:io_{get,put}_line/2 -> io_line/2 
                  ADDED:  nth1/5, (was nth_replace/5), arg/4+5
                  ADDED:  maparg/2+3+4
+                 ADDED:  atom_replace/4
     @ 17.03.12   ADDED:  kv_ks/2, kv_vs/2
                  ADDED:  goal/4
 0.4 @ 17.03.10   ADDED:  n_digit_min/3
