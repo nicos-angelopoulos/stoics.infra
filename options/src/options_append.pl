@@ -175,8 +175,9 @@ options_append_types( _Defaulty, _Pid, _Pack, _Opts ).
 
 options_append_types_remove( false, Opts, Opts ) :- !.
 options_append_types_remove( _Defaulty, OptsWT, Opts ) :-
-    findall( Other, (member(Other,OptsWT),\+ functor(Other,options_types,1)), Opts ).
-    
+    % findall( Other, (member(Other,OptsWT),\+ functor(Other,options_types,1)), Opts ).
+    options_remainder( OptsWT, remove_types, 1, Opts ).
+
 % options_append_profile_options( Pname, Args, ProfArgs ),
 % 
 % If file $HOME/.pl/Pname.pl exists, append its terms to Args.

@@ -1,6 +1,9 @@
 ---   Releases   ---
 --------------------
 
+0.6   17.03.14   FIXED:  return values (findall in options_append_types_remove)
+                 ADDED:  options_remainder/4 (interal at options_auxil.pl)
+
 0.5   17.03.10   Works with pack(lib) v1.1
 		16.12.10   Args = true is dealt as a synonym for Args = []
 		16.12.10   added atoms(Atoms) option to options_append

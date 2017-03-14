@@ -24,3 +24,12 @@ options_en_list( In, Opts ) :-
 	Opts = [In].
 options_en_list( Else, _Opts ) :-
 	throw( options_en_list(2,encountered_variable_in_1st_arg(Else)) ).
+
+options_remainder( [], _OptNm, _OptAr, [] ).
+options_remainder( [O|Os], OptNm, OptAr, Remain ) :-
+    ( functor(O,OptNm,OptAr) ->
+        Remain = Temain
+        ;
+        Remain = [O|Temain]
+    ),
+    options_remainder( Os, OptNm, OptAr, Temain ).
