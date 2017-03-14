@@ -142,7 +142,7 @@ Opts
         throws the error (any unrecognised value defaults to error)
 
   * ball(Ball)
-      instantiates the original exeption Ball caught from calling Goal.
+      instantiates the original exception Ball caught from calling Goal.
       (So that parts of it can be included in Error.)
 
 ==
