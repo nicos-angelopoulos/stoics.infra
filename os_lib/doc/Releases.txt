@@ -2,12 +2,13 @@
 --------------------
 
 0.6 
+    @ 2017/03/12  ADDED:   @(Goal) as an allowed first argument to os_mill/4
     @ 2017/03/12  TYPO:    access_file/2 highlighting
 
-0.6 @ 2017/03/10  version:  for pack(lib) v1.1
-    @ 2017/03/10  changed:  doc for os_exists/2
-    @ 2017/03/03  changed:  os_exists/2 option reports(Rep) to error(false). Fixed its implementation for some of the cases
-                            as it was always erroring
+0.6 @ 2017/03/10  version: for pack(lib) v1.1
+    @ 2017/03/10  changed: doc for os_exists/2
+    @ 2017/03/03  changed: os_exists/2 option reports(Rep) to error(false). Fixed its implementation for some of the cases
+                           as it was always erroring
 
     @ 2016/12/19  added:   call_options(Copts) can now carry the value false, which excludes options argument from the os_mill/4 call.
 						changed: in file + dir are now casted to file's type (previsously always \ () )

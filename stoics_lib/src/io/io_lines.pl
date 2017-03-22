@@ -44,5 +44,5 @@ io_get_lines( Line, Stream, [Line|Ls] ) :-
 
 io_put_lines( [], _Out ).
 io_put_lines( [L|Ls], Out ) :-
-    io_put_line_put( L, Out ),
+    io_put_line( L, Out ),
     io_put_lines( Ls, Out ).
