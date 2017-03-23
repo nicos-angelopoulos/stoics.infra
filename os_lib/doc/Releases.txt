@@ -2,6 +2,7 @@
 --------------------
 
 0.6 
+    @ 2017/03/23  FIXED:   use read_link's 2nd rather than 3rd argument (posted bug to SWI) in os_exists/1+2
     @ 2017/03/12  ADDED:   @(Goal) as an allowed first argument to os_mill/4
     @ 2017/03/12  TYPO:    access_file/2 highlighting
 
