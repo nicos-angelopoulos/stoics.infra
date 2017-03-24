@@ -488,33 +488,38 @@ lib_not_found( suggests, Repo, _Cxt ) :-
     lib_message_report( Mess, [Repo], informational ).
 
 lib_explicit( Repo, Pn, Pa, Cxt, _Opts ) :-
-    % fixme: if full pack is already loaded we better abort with relevant message hree
-    % as is we get a clash of the full versus the lazy 
-    current_predicate( Repo:Pn/Pa ),
-    !,
-    lib_import_existing( Repo, Pn/Pa, Cxt ).
-lib_explicit( Repo, Pn, Pa, Cxt, _Opts ) :-
     % fixme: check
     lib_tables:lib_full(Repo,_),
     !,   % this should be able to cope with cyclic dependencies? 
          % check with options
     Cxt:import( Repo:Pn/Pa ).
-
+lib_explicit( Repo, Pn, Pa, Cxt, _Opts ) :-
+    current_predicate( Repo:Pn/Pa ),
+    !,
+    lib_import_existing( Repo, Pn/Pa, Cxt ).
 lib_explicit( Repo, Pn, Pa, Cxt, Opts ) :-
     lib_type( Repo, Type, Rmod, Root, Load ),
     lib_repo_lazy_assert( Rmod ),
     lib_explicit_repo( Type, Repo, Rmod, Root, Load, Pn, Pa, Cxt, Opts ),
     !.
-    % lib_repo_lazy_assert( Rmod ).
-lib_explicit( Repo, Pn, Pa, Cxt, Args ) :-
-    lib( Repo, Cxt, Args ),
-    lib( Pn/Pa, Cxt, [repo(Repo)|Args] ).
+lib_explicit( Repo, Pn, Pa, Cxt, _Args ) :-
+    % 17.03.24; the following 2 lines create a cycle
+    % lib( Repo, Cxt, Args ),
+    % lib( Pn/Pa, Cxt, [repo(Repo)|Args] ).
+    Mess = 'Failed to locate: ~w within explicit repository:~w, within context: ~w',
+    lib_message_report( Mess, [Pn/Pa,Repo,Cxt], error ).
 
 lib_explicit_repo( pack, Repo, Rmod, Root, Load, Pn, Pa, Cxt, Opts ) :-
     file_name_extension( LoadStem, pl, Load ),
     atomic_concat( LoadStem, '_lazy', LazyStem ),
     file_name_extension( LazyStem, pl, LazyF ),
-    exists_file( LazyF ),
+    ( exists_file(LazyF) ->
+        true
+        ; 
+        Mess = 'Lazy loading file: ~w does not exist (context: ~w)',
+        lib_message_report( Mess, [LazyF,Cxt], informational),
+        fail
+    ),
     lib_defaults( pack, Defs ),
     append( Opts, Defs, All ),
     lib( Rmod, Root, LazyF, Cxt, All ),
