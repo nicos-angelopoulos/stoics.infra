@@ -32,6 +32,7 @@
               io_lines/2,              % +FileOrStream, -Lines
               io_close/2,              % +FileR, -Stream
               io_open/3,               % +FileR, +Mode, -Stream
+              io_sections/3,           % +File, -Sections, +Opts
             % kv/
               kv_compose/3,            % +Ks, +Vs, -KVs
               kv_compose/4,            % +List1, +List2, -KVsCont, -Tkvs
@@ -93,7 +94,6 @@
 % :- ensure_loaded( '../src/auxil/stoics_lib_module.pl' ).
 
 :- use_module( library(lib) ).
-% :- lib( source(stoics_lib), [homonyms(true),lib_index(true)] ).
 :- lib( source(stoics_lib), [index(true),homonyms(false)] ).
 
 :- lib(stoics_lib/0).
