@@ -18,13 +18,14 @@ lib_ensure_loaded_index( Root, Repo, Cxt ) :-
     fail.
 lib_ensure_loaded_index( _Root, _Repo, _Cxt ).
     
-lib_ensure_loaded_index_file( Repo, _Cxt, File ) :-
+lib_ensure_loaded_index_file( Repo, Cxt, File ) :-
     lib_tables:lib_loaded_index( Repo, XFile ),
     !,
-    lib_ensure_loaded_index_file_exists( Repo, File, XFile ).
+    lib_ensure_loaded_index_file_exists( Repo, File, XFile ),
+    lib_ensure_loaded_index_file_attach( Repo, Cxt ).
 lib_ensure_loaded_index_file( Repo, Cxt, LibIdxF ) :-
-    Mess = 'Loading index for repo: ~w, from file:~w',
-    debug( lib, Mess, [Repo,LibIdxF] ),
+    Mess = 'Loading index for repo: ~w, from file:~w, into: ~w',
+    debug( lib, Mess, [Repo,LibIdxF,Cxt] ),
     lib_load_index_file( LibIdxF, Repo ),
     lib_ensure_loaded_index_file_attach( Repo, Cxt ).
 

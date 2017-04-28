@@ -367,7 +367,7 @@ lib( Repo, ArgS ) :-
     lib( Repo, Cxt, Args ).
 
 lib( Lib, Cxt, Args ) :-
-    debug( lib, 'Searching for: ~w, in context: ~w, with opts: ~w', [Lib,Cxt,Args] ),
+    debug( lib, 'lib directive: ~w, in context: ~w, with opts: ~w', [Lib,Cxt,Args] ),
     fail.
 lib( Pn/Pa, Cxt, Args ) :-
     !,
@@ -423,7 +423,7 @@ lib( Repo, Cxt, Args ) :-
     lib_type( Repo, RepoType, RepoMod, RepoRoot, RepoLoad ),
     !,
     lib_reg_repo( RepoMod, RepoType, RepoRoot, RepoLoad ),
-    MsId = 'Identified repo:~w as: ~w, loading in: ~w, with root: ~w',
+    MsId = 'Identified repo: ~w as: ~w, loading in: ~w, with root: ~w',
     debug( lib, MsId, [Repo,RepoType,RepoMod,RepoRoot] ),
     lib_defaults( RepoType, Defs ),
     append( Args, Defs, Opts ),

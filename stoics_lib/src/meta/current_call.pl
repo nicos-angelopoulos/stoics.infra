@@ -4,8 +4,8 @@
 /** current_call( +Goal ).
     current_call( +Goal, +Else ).
 
-If Goal's predicate indicator is defined, call Goal, 
-Else, call Else if in current_call/2 or fail if in current_call/1.
+If Goal's predicate indicator is defined, call Goal.
+Otherwise, call Else, if in current_call/2, or fail if we are in current_call/1.
 
 ==
 ?- current_call( irrelevant(x) ).
