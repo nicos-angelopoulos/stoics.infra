@@ -1,20 +1,22 @@
 ---   Releases   ---
 --------------------
 TBD
-    @ 17.03.12   TO ADD: debug() -> listing of all tables in lib_tables:
+    17.03.12   TO ADD: debug() -> listing of all tables in lib_tables:
 
 
 1.3 
-    @ 17.03.24   FIXED:   cyclic execution when looking for non loadable explicit (b_real:mtx_heatmap/2 where b_real_lazy.pl does not exist).
-                 ADDED:   warning if explicitly loaded pred is attempted from repo that has no lazy loader
-    @ 17.03.12   FIXED:   when Repo & Cxt are both user, could get duplicate sourcing
-                 CHANGED: import debugs are now before call
-                 FIXED:   do not export->import if context = repo
+    17.04.27   ADDED:   more debug messages
+               FIXED:   attaching repo that is already loaded
+    17.03.24   FIXED:   cyclic execution when looking for non loadable explicit (b_real:mtx_heatmap/2 where b_real_lazy.pl does not exist).
+               ADDED:   warning if explicitly loaded pred is attempted from repo that has no lazy loader
+    17.03.12   FIXED:   when Repo & Cxt are both user, could get duplicate sourcing
+               CHANGED: import debugs are now before call
+               FIXED:   do not export->import if context = repo
 
-1.2 @ 17.03.11   FIXED: missing cut in lib/3.
-    @ 17.03.10   FIXED: lib_mkindex remove .pl which causes dict read problems
+1.2 17.03.11   FIXED: missing cut in lib/3.
+    17.03.10   FIXED: lib_mkindex remove .pl which causes dict read problems
 
-1.1 @ 17.03.10   ADDED: full lazy mode that can intermingle with full loading
-                 FIXED: innumerable bugs
+1.1 17.03.10   ADDED: full lazy mode that can intermingle with full loading
+               FIXED: innumerable bugs
 
-1.0 @ 17.03.08   VERSION: first public release
+1.0 17.03.08   VERSION: first public release

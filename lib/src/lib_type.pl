@@ -56,6 +56,7 @@ lib_type( Pack, Type, Repo, Root, Load ) :-
     file_name_extension( AbsStem, pl, Load ),
     exists_file( Load ),
     !,
+    debug( lib, 'Repo typed as pack: ~w, with type: ~w and mod: ~w', [Pack,Type,Repo] ),
     lib_type_required( Root ),  % this can fail, but its fine to do so after cut as the caller deals with non-requires packs
     Type = pack, Repo = Pack.
 lib_type( FileSpc, Type, Repo, Root, Load ) :-
@@ -63,13 +64,15 @@ lib_type( FileSpc, Type, Repo, Root, Load ) :-
     AbsOpts = [access(read),file_errors(fail)],
     absolute_file_name( File, Abs, AbsOpts ),
     lib_type_file( Abs, Type, Repo, Root, Load ),
-    !.
+    !,
+    debug( lib, 'Repo typed as file: ~w, with type: ~w and mod: ~w', [FileSpc,Type,Repo] ).
 lib_type( DirSpc, Type, Repo, Root, Load ) :-
     expand_file_name( DirSpc, [Dir] ),
     AbsOpts = [file_type(directory),file_errors(fail)],
     absolute_file_name( Dir, Abs, AbsOpts ),
     lib_type_dir( Abs, Type, Repo, Root, Load ),
-    !.
+    !,
+    debug( lib, 'Repo typed as dir: ~w, with type: ~w and mod: ~w', [DirSpc,Type,Repo] ).
 /*
 lib_type( Other, _Type, _Rmod, _Root, _Load ) :-
     throw( cannot_establish_lib_type_for(Other) ).

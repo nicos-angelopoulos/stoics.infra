@@ -25,14 +25,15 @@ lib_load_repo( Repo, Cxt, Pn, Pa, _Opts ) :-
     lib_load_repo_defined( Repo, Cxt, Pn, Pa ).
 lib_load_repo( Repo, Cxt, Pn, Pa, _Opts ) :-
     debug( lib, 'lib_load_repo Repo var: ~w, Cxt: ~w', [Repo,Cxt] ),
-    findall( Repo-AbsF, ( 
-                         (  lib_tables:lib_attached_indices(Cxt,Repo),
-                            debug( lib, 'trying repo: ~w', Repo ),
-                            lib_tables:lib_index(Pn,Pa,Repo,AbsF)
+    findall( Repo1-AbsF, ( 
+                         (  lib_tables:lib_attached_indices(Cxt,Repo1),
+                            debug( lib, 'trying attached repo: ~w', Repo1 ),
+                            lib_tables:lib_index(Pn,Pa,Repo1,AbsF)
                           ; 
                             ( once(Repo == user;Repo == Cxt) ),
                             lib_tables:lib_loaded_index(Cxt,_File),
-                            lib_tables:lib_index(Pn,Pa,Repo,AbsF)
+                            lib_tables:lib_index(Pn,Pa,Repo,AbsF),
+                            Repo1 = Repo
                          )
                          % above ensures Repo indices are loaded too
                    ),

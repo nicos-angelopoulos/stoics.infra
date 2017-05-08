@@ -1,6 +1,7 @@
 ---   Releases   ---
 --------------------
 0.5   
+      17.04.27   DOC:    typo in current_call/1+2
       17.04.25   PRED:   io_sections/3
       17.03.13   CHANGED:io_{get,put}_line/2 -> io_line/2 
                  ADDED:  nth1/5, (was nth_replace/5), arg/4+5
