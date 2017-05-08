@@ -535,6 +535,8 @@ debug_call_location_exception_message( Error, _Loc, _MessI, _Mess, _Args ) :-
     % fixme:
     throw( debug_call_caught(Error) ).
 
+debug_mtx_dims( [], 0, 0 ) :-
+    !.
 debug_mtx_dims( Rows, NRows, NCols ) :-
     length( Rows, NRows ),
     Rows = [Hdr|_],

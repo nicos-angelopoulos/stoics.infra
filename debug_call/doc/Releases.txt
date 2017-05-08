@@ -2,8 +2,11 @@
 --------------------
 TBD @ 17.03.10   debug_call with Success/failure by colour too (see SWI installation)
 
-0.3 @ 17.03.06   More remaing libs to stoics_lib (no local libs) and requires->lib
-    @ 16.12.11   Moved more of libs to pack(stoics_lib) and re-added lib(requires) !
+0.4 
+    17.05.08   FIXED: dims on empty matrices was erroring.
+
+0.3 17.03.06   More remaing libs to stoics_lib (no local libs) and requires->lib
+    16.12.11   Moved more of libs to pack(stoics_lib) and re-added lib(requires) !
 
 0.2  2016/11/01  Published
 	  2016/11/01  Removed dependency to lib(requires).
