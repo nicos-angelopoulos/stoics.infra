@@ -15,14 +15,14 @@ Frequencies is a list of Term-Freq -pairs with Freq being the number of times ea
 appear in the List.
 
 Opts
- * order(Ord=false)
- order of results: elem sorts by element, freq sorts by frequency, and false for no sorting 
- * transpose(T=false)
- when true returns the elements of Frequencies as Freq-Term
- *variant(Var=true)
- when false compare elements with ==
- * zero(Zero=false)
- whether to include zero counter elements (Zero should be list of expected elements)
+  * order(Ord=false)
+     order of results: elem sorts by element, freq sorts by frequency, and false for no sorting 
+  * transpose(T=false)
+     when true returns the elements of Frequencies as Freq-Term
+  * variant(Var=true)
+     when false compare elements with ==
+  * zero(Zero=false)
+     whether to include zero counter elements (Zero should be list of expected elements)
 
 ==
 ?- list_frequency( [c,a,b,a,b,c], Freqs ).
