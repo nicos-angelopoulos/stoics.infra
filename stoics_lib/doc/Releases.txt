@@ -1,6 +1,7 @@
 ---   Releases   ---
 --------------------
 0.5   
+      17.05.17   PRED:   op_compare/3
       17.05.08   DOC:    fixed options list layout in list_frequency/2
       17.04.27   DOC:    typo in current_call/1+2
       17.04.25   PRED:   io_sections/3
