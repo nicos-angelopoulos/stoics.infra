@@ -1,6 +1,7 @@
 ---   Releases   ---
 --------------------
 0.5   
+      17.05.17   ADDED:  Pass 1st arg of map_succ_list/3+4 via mod_goal/4
       17.05.17   PRED:   op_compare/3
       17.05.08   DOC:    fixed options list layout in list_frequency/2
       17.04.27   DOC:    typo in current_call/1+2

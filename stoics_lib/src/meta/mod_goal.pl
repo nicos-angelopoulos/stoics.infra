@@ -6,13 +6,13 @@
     mod_goal( -Mod, -Goal, +Moal ).
 
 Construct and deconstruct a goal and its module prepended form.
-Argumen Override, controls what happends when constructing over a Goal
+Argument Override, controls what happends when constructing over a Goal
 that already has a module prepention: false ignores the new Mod,
 true (default) replaces Goal's prepention with Mod and error
 reports the conflict.
 
-When de-constructing Goal will be a goal with no module prepent. 
-When constructing Moal will be a module prepented goal
+When de-constructing, Goal will be a goal with no module prepent. 
+When constructing, Moal will be a module prepented goal
 
 ==
 ?- mod_goal( mod1, g1, MG ).
