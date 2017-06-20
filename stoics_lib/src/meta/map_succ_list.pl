@@ -1,3 +1,6 @@
+
+:- lib( stoics_lib:mod_goal/4 ).
+
 /** map_succ_list( +Goal, ?InList, ?OutList ).
     map_succ_list( +Goal, ?InList, ?OutList, -Rejects ).
 
