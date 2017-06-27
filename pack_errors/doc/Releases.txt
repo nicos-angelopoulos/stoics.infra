@@ -1,6 +1,8 @@
 ---   Releases   ----
 ---------------------
 
+      17.06.27   added @() as an alias to call() in type/3's 1st argument
+
 0.3 @ 17.03.06   tidy up (removed refs to pack(lib/requires))
     @ 17.03.06   changed interface to arg_ground related preds
 	 @ 16.12.10   moved throw/2 into the pack from pack(options)

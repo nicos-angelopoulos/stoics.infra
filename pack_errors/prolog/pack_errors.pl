@@ -287,7 +287,7 @@ throw_opt( _, Error ) :-
 /** type( +Type, @Term ).
     type( +Type, @Term, +Opts ).
 
-type/2 is a superset of must_be, in that it adds Type = call(Callable), which will succeed iff
+type/2 is a superset of must_be, in that it adds Type = @(Callable), (equiv: Type = call(Callable)), which will succeed iff
 call( Callable, Term ) succeeds. It also enhances must_be/2 by adding options .
 In the case of a call-wrapped type, the call to type/3 will succeed iff 
 call(Callable,Term) succeeds.
@@ -343,6 +343,10 @@ type( Type, Term, Args ) :-
     pack_errors_options_append( type, Args, Opts ),
     type_optioned( Type, Term, Opts ).
 
+type_optioned( @(GoalPrv), Term, _Opts ) :-
+    ( GoalPrv = _:_ -> Goal = GoalPrv; Goal = user:GoalPrv ),
+    call( Goal, Term ),
+    !.
 type_optioned( call(GoalPrv), Term, _Opts ) :-
     ( GoalPrv = _:_ -> Goal = GoalPrv; Goal = user:GoalPrv ),
     call( Goal, Term ),
