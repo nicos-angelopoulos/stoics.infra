@@ -1,6 +1,6 @@
 :- module( lib_mkindex, [lib_mkindex/2,lib/1,lib/2] ).
 
-:- use_module( library(lib) ).
+:- use_module( library(lib) ).   % ??? fixme: 
 
 :- dynamic( lib_mkindex_defines:defines/2 ).
 
@@ -61,7 +61,6 @@ lib_mkindex_file( Repo, Root, Hmns, AbsF, [Sourced,Asserted] ) :-
     file_name_extension( Stem, pl, File ),
     Stem \== 'LibIndex',
     !,
-    trace,
     % ensure_loaded( Repo:AbsF ),
     % findall( Pn/Pa-AbsF, () ).
     % findall( lib_index(Pn,Pa,any,user,AbsF),  )
