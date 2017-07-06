@@ -3,30 +3,38 @@
 
 % should these be library wide defautls
 %
-os_dir_stem_ext_defaults( [dir('.'),ext('')] ).
+os_dir_stem_ext_defaults( Defs ) :-
+    Defs = [dir('.'),ext(''),type(file),dir_surpress_ext(true)].
 
 /** os_dir_stem_ext( -Os, +Opts ).
 
-Create a os-name (Os) from bits in Opts.
+Create an os object (Os) from bits in Opts.
 
 Opts
   * ext(Ext='')
-    extension for File
+     extension for File
   * dir(Dir='.')
-    directory for File (if ODIr is not given
+     directory for File (if ODIr is not given)
+  * dir_surpress_ext(Dre=true) 
+     when true, do not use extension for Os 
   * odir(ODir)
-    preferred option when constructing output File
+     preferred option when constructing Os
   * stem(Stem)
-    stem for File
+     stem for Os
+  * type(Type=file)
+     or dir for directory (type only matters for handling extension)
 
 ==
 ?- os_dir_stem_ext( Os, [stem(file),ext(csv)] ).
-?- 
+Os = file.csv.
+
+?- os_dir_stem_ext( Os, [stem(some_dir),ext(csv),type(dir)] ).
+Os = some_dir.
 ==
 
 @author nicos angelopoulos
 @version  0.1 2016/6/24
-@tbd i thought i have implemented this previously....
+@version  0.2 2017/7/6, added type() and dir_surpress_ext()
 @see module docs (how to cross-ref?)
 
 */
@@ -34,8 +42,16 @@ os_dir_stem_ext( Os, Args ) :-
 	options_append( os_dir_stem_ext, Args, Opts ),
 	options( stem(Stem), Opts ),
 	options( ext(Ext), Opts ),
+    options( type(Type), Opts ),
+    options( dir_surpress_ext(Surp), Opts ),
+    os_dir_stem_ext_type_ext( Type, Surp, Ext, OsExt ),
 	os_odir( Odir, Opts ),
-	os_dir_stem_ext( Odir, Stem, Ext, Os ).
+	os_dir_stem_ext( Odir, Stem, OsExt, Os ).
+
+os_dir_stem_ext_type_ext( dir, true, _Ext, OsExt ) :-
+    !,
+    OsExt = ''.
+os_dir_stem_ext_type_ext( _, _, Ext, Ext ).
 
 %% os_dir_stem_ext( +Dir, +Stem, +Ext, -File ).
 %% os_dir_stem_ext( -Dir, -Stem, -Ext, +File ).

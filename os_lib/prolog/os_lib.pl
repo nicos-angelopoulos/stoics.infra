@@ -4,6 +4,7 @@
               os_ext/2,                  % ?Ext, +Os
               os_ext/3,                  % ?Ext, ?Stem, ?Os
               os_ext/4,                  % ?Ext, ?NewExt, +Os, -NewOs
+              os_dir_stem_ext/2,         % -Os, +Opts
               os_dir_stem_ext/4,         % ?Dir, ?Stem, ?Ext, ?Os
               os_stem/3,                 % ?Stem, -Os, +Opts
               os_postfix/2,              % -Psfx, +Posted
@@ -81,6 +82,8 @@ all the arguments. For instance
     constructs unique filenames either based ondate (and possible time stamp) or on versioning
   * os_dir_stem_ext( Dir, Stem, Ext, Os )
     os_dir_stem_ext/4 construct and de-construct OS names from/to its main parts
+  * os_dir_stem_ext( Os, Opts )
+    construct 
   * os_mill(File,Goal,Milled,Opts)
     os_mill/4 allows construction of evolving pipelines
   * os_file(File)
@@ -172,6 +175,7 @@ The library predicates can be split to 4 groups.
   * os_base/2
   * os_ext/3
   * os_dir_stem_ext/4
+  * os_dir_stem_ext/2
   * os_postfix/3
   * os_path/3
   * os_parts/3
@@ -231,6 +235,7 @@ The library predicates can be split to 4 groups.
 :- lib(pack_errors).
 
 :- lib(os_dir_stem_ext/4).
+:- lib(os_dir_stem_ext/2).
 :- lib(os_stem/3).
 :- lib(os_ext/3).
 :- lib(os_remove/2).

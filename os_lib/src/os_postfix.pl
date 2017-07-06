@@ -1,12 +1,9 @@
 
 % :- use_module( library(options) ).   % assume
-
-% :- requires( stoics_lib:compound/3 ).  % in module file
 :- lib( os_path/3 ).
 :- lib( os_sep/2 ).
 :- lib( os_name/2 ).
 :- lib( os_type_entity/3 ).
-% :- requires( stoics_lib:at_con/3 ).  % in module file
 
 os_postfix_defaults( Args, Defs ) :-
 	Defs = [ sep(Sep),

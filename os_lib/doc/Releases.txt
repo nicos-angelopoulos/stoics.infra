@@ -2,16 +2,23 @@
 --------------------
 
 0.6 
-    @ 2017/03/23  FIXED:   use read_link's 2nd rather than 3rd argument (posted bug to SWI) in os_exists/1+2
-    @ 2017/03/12  ADDED:   @(Goal) as an allowed first argument to os_mill/4
-    @ 2017/03/12  TYPO:    access_file/2 highlighting
+    17.07.06  DOC:     os_dir_stem_ext/2 enhancements
+              IFACE:   os_dir_stem_ext/2
+              DEL:     loading library requires in os_mill.pl
+              OPTS:    new option type(Type) and associated options
+              IFACE:   delegate some of os_mill/4's options to os_dir_stem_ext/2  
+              DEL:     os_mill_milled/5 (internal, its function should now be in os_dir_stem_ext/2)
+              DEL:     os_mill_dir/5 (now in os_dir_stem_ext/2, was already commented out)
+    17.03.23  FIXED:   use read_link's 2nd rather than 3rd argument (posted bug to SWI) in os_exists/1+2
+    17.03.12  ADDED:   @(Goal) as an allowed first argument to os_mill/4
+    17.03.12  TYPO:    access_file/2 highlighting
 
-0.6 @ 2017/03/10  version: for pack(lib) v1.1
-    @ 2017/03/10  changed: doc for os_exists/2
-    @ 2017/03/03  changed: os_exists/2 option reports(Rep) to error(false). Fixed its implementation for some of the cases
+0.6 17.03.10  version: for pack(lib) v1.1
+    17.03.10  changed: doc for os_exists/2
+    17.03.03  changed: os_exists/2 option reports(Rep) to error(false). Fixed its implementation for some of the cases
                            as it was always erroring
 
-    @ 2016/12/19  added:   call_options(Copts) can now carry the value false, which excludes options argument from the os_mill/4 call.
+    16.12.19  added:   call_options(Copts) can now carry the value false, which excludes options argument from the os_mill/4 call.
 						changed: in file + dir are now casted to file's type (previsously always \ () )
 						fixed:   os_postfix( rho_and_psi, 'PD21872a2_refit_rho_and_psi.txt' ).  % now it succeeds
 						updated: os_unique_by_name/2,3 -> os_unique/2,3 now it additionally supports versioning 

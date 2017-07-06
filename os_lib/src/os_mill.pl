@@ -1,24 +1,18 @@
 
-:- use_module( library(requires) ). % assume
-% :- lib( options ).                % assume
-
-% :- requires( stoics_lib:compound/3 ).  % in module file
 :- lib( stoics_lib:mod_goal/3 ).
-% :- requires( os:os_postfix/3 ).
 
-
-os_mill_defaults( Args, [ recreate(false), separator('_'),
-                    type(file), call_options([]), dir_remove_ext(true),
-				milled(_),dir(''),homonymous(false),call_module(user),
-				not_created(error), postfix(Psfx)
-				] ) :-
-	( memberchk(goal(MGoal),Args) -> 
-		mod_goal( _Mod, Goal, MGoal ),
-		functor( Goal, Psfx, _ )
-		;
-		throw( internal_error(12.35) )
-	).
-
+os_mill_defaults( Args, Defs ) :- 
+    ( memberchk(goal(MGoal),Args) -> 
+        mod_goal( _Mod, Goal, MGoal ),
+        functor( Goal, Psfx, _ )
+        ;
+        throw( internal_error(os_mill_no_goal) )
+    ),
+    Defs = [ recreate(false), separator('_'),
+             type(file), call_options([]),
+             milled(_), dir(''), homonymous(false),
+             call_module(user), not_created(error), postfix(Psfx)
+                ].
 
 /** os_mill( +Os, +Goal, ?Milled, +Opts ).
 
@@ -41,8 +35,6 @@ Opts
     whether to print debugs (see options_append/4) (default does nothing)
   * dir(Dir)
     directory for both File and Milled (no default)
-  * dir_remove_ext(Dre=true) 
-    remove extension from Milled, when Milled is of Type dir
   * ext(Ext)
     if given, change the extension in Milled (ignored for dirs),
     when Milled is ground the extension is added
@@ -62,6 +54,9 @@ Opts
     separator for Psf
   * type(Type=file)
     or dir for directory
+
+The predicate uses os_dir_stem_ext/2 to consturct OS, so its options can be used 
+in addition to the above.
 
 The default postfix (P) is taken to be the predicate name of Goal, 
 minus a possible 'file_' prefix.
@@ -87,22 +82,20 @@ false.
 */
 os_mill( InFile, Goal, Milled, Args ) :-
     ( InFile = @(FileGoal) -> call(FileGoal,File); File = InFile ),
-	en_list( Args, Argos ),
-	options_append( os_mill, [goal(Goal)|Argos], Opts, process(debug) ),
-	options( recreate(Rcr), Opts ),
-	options( type(Type), Opts ),
-	options( homonymous(Omon), Opts ),
-	( var(Milled) -> true; Nilled = Milled ),
-	os_mill_destination( Omon, Nilled, Goal, File, DMilled, Opts ),
-	options( dir(Dir), Opts ),
-	os_path( Dir, File, DirFile ),
-	os_name( File, Ftype ),
-	os_cast( DirFile, Ftype, DFile ),
-	% os_mill_dir( Opts, File, Milled, DFile, DMilled ),
-	os_mill_milled( Opts, Goal, DFile, Type, DMilled ),
-	memberchk( milled(DMilled), Opts ),
-	os_mill( Rcr, DFile, Type, Goal, DMilled, Opts ),
-	( var(Milled) -> Milled = DMilled; true ).
+    en_list( Args, Argos ),
+    options_append( os_mill, [goal(Goal)|Argos], Opts, process(debug) ),
+    options( recreate(Rcr), Opts ),
+    options( type(Type), Opts ),
+    options( homonymous(Omon), Opts ),
+    ( var(Milled) -> true; Nilled = Milled ),
+    os_mill_destination( Omon, Nilled, Goal, File, DMilled, Opts ),
+    options( dir(Dir), Opts ),
+    os_path( Dir, File, DirFile ),
+    os_name( File, Ftype ),
+    os_cast( DirFile, Ftype, DFile ),
+    memberchk( milled(DMilled), Opts ),
+    os_mill( Rcr, DFile, Type, Goal, DMilled, Opts ),
+    ( var(Milled) -> Milled = DMilled; true ).
 
 /** os_mill_destination( +Homon, +Goal, +SrcFile, -Milled, -DMilled ).
 
@@ -126,156 +119,97 @@ DMill = 'sub/true'.
 
 */
 os_mill_destination( false, Milled, _Goal, File, DMilled, Opts ) :-
-	os_ext(Ext,File),
-	append( [from(File)|Opts], [ext(Ext)], StemOpts ),
-	% os_stem( Stem, Milled, [from(File)|Opts] ),
-	( var(Milled) -> 
-		options( postfix(Psfx), Opts ),
-		os_postfix( Psfx, File, Posted ),
-		os_stem( Stem, Posted, Opts )
-		;
-		os_stem( Stem, Milled, StemOpts )
-	),
-	append( [stem(Stem)|Opts], [ext(Ext)], DSEopts ),
-	os_dir_stem_ext( DMilled, DSEopts ).
+    os_ext(Ext,File),
+    append( [from(File)|Opts], [ext(Ext)], StemOpts ),
+    % os_stem( Stem, Milled, [from(File)|Opts] ),
+    ( var(Milled) -> 
+        options( postfix(Psfx), Opts ),
+        os_postfix( Psfx, File, Posted ),
+        os_stem( Stem, Posted, Opts )
+        ;
+        os_stem( Stem, Milled, StemOpts )
+    ),
+    append( [stem(Stem)|Opts], [ext(Ext)], DSEopts ),
+    os_dir_stem_ext( DMilled, DSEopts ).
 
 os_mill_destination( true, Milled, Goal, File, DMilled, Opts ) :-
-	( var(Milled) -> 
-		mod_goal( _Mod, Call, Goal ),
-		functor(Call,Gname,_),
-		( memberchk(ext(Ext),Opts) -> os_ext(Ext,Gname,Milled) ; Milled = Gname )
-		;
-		os_stem( Stem, Milled, [from(File)|Opts] )
-	),
-	os_ext( Ext, Stem, Milled ),
-	os_dir_stem_ext( DMilled, [stem(Stem),ext(Ext)|Opts] ).
-
-/*
-os_mill_dir( Opts, File, Milled, DFile, DMilled ) :-
-
-	( memberchk(dir(Dir),Opts) ->
-		( memberchk(odir(Odir),Opts) -> true; Odir = Dir )
-		;
-		memberchk(odir(Odir),Opts),
-		Dir = ''
-	),
-	!,
-	os_path( Dir, File, -DFile ),
-	( ground(Milled) -> 
-	   ( memberchk(ext(Ext),Opts) -> true ; Ext = '' ),
-	   os_dir_stem_ext(Odir,Milled,Ext,DMilled)
-	   ; 
-	   Milled=DMilled
-	).
-os_mill_dir( _Opts, File, Milled, File, Milled ).
-*/
+    ( var(Milled) -> 
+        mod_goal( _Mod, Call, Goal ),
+        functor(Call,Gname,_),
+        ( memberchk(ext(Ext),Opts) -> os_ext(Ext,Gname,Milled) ; Milled = Gname )
+        ;
+        os_stem( Stem, Milled, [from(File)|Opts] )
+    ),
+    os_ext( Ext, Stem, Milled ),
+    os_dir_stem_ext( DMilled, [stem(Stem),ext(Ext)|Opts] ).
 
 os_mill( false, File, Type, _Goal, Milled, _Opts ) :-
-	exists_milled( Type, Milled ),
-	!,
-	Using = 'Using existing milled ~w: ~w, apparently from: ~w ',
-	debug( os_mill, Using, [Type,Milled,File] ).
+    exists_milled( Type, Milled ),
+    !,
+    Using = 'Using existing milled ~w: ~w, apparently from: ~w ',
+    debug( os_mill, Using, [Type,Milled,File] ).
 os_mill( false, File, Type, Goal, Milled, Opts ) :-
-	\+ exists_milled( Type, Milled ),
-	Create = 'Creating non-existing mill entity: ~w, from: ~w',
-	debug( os_mill, Create,  [Milled,File] ),
-	os_mill_call( File, Goal, Milled, Opts ).
+    \+ exists_milled( Type, Milled ),
+    Create = 'Creating non-existing mill entity: ~w, from: ~w',
+    debug( os_mill, Create,  [Milled,File] ),
+    os_mill_call( File, Goal, Milled, Opts ).
 os_mill( true, File, Type, Goal, Milled, Opts ) :-
-	exists_milled( Type, Milled ),
-	!,
-	Create = 'Recreating mill ~w: ~w, from: ~w',
-	debug( os_mill, Create,  [Type,Milled,File] ),
-	os_mill_delete_type( Type, Milled ),
-	os_mill_call( File, Goal, Milled, Opts ).
+    exists_milled( Type, Milled ),
+    !,
+    Create = 'Recreating mill ~w: ~w, from: ~w',
+    debug( os_mill, Create,  [Type,Milled,File] ),
+    os_mill_delete_type( Type, Milled ),
+    os_mill_call( File, Goal, Milled, Opts ).
 os_mill( true, File, Type, Goal, Milled, Opts ) :-
-	\+ exists_milled( Type, Milled ),
-	Create = 'Creating non-existing mill entity: ~w, from: ~w',
-	debug( os_mill, Create,  [Milled,File] ),
-	os_mill_call( File, Goal, Milled, Opts ).
+    \+ exists_milled( Type, Milled ),
+    Create = 'Creating non-existing mill entity: ~w, from: ~w',
+    debug( os_mill, Create,  [Milled,File] ),
+    os_mill_call( File, Goal, Milled, Opts ).
 
 os_mill_delete_type( file, Milled ) :-
-	os_rm( Milled ).
+    os_rm( Milled ).
 os_mill_delete_type( dir, Milled ) :-
-	delete_directory_and_ontents( Milled ).
+    delete_directory_and_ontents( Milled ).
 
 % this was old style can remove now that we use os_exists/2
 exists_milled( file, Milled ) :-
-	os_exists( Milled, type(flink) ),
-	!.
+    os_exists( Milled, type(flink) ),
+    !.
 exists_milled( dir, Milled ) :-
-	% exists_directory( Milled ).
-	os_exists( Milled, dlink ).
+    os_exists( Milled, dlink ).
 
 os_mill_call( File, Goal, Milled, Opts ) :-
-	options( call_options(CoPrv), Opts ),
-	( CoPrv == false -> CoInc = false; CoInc = true ),
-	en_list( CoPrv, Copts ),
-	options( call_module(Mod), Opts ),
-	( Goal = _:_ -> Callable = Goal; Callable = Mod:Goal ),
-	Callable = CallMod:Pid,
-	functor( Pid, Patom, Parity ),
-	debug( os_mill, 'Calling os_mill: ~w', [CallMod:Patom/Parity] ),
-	os_mill_call_opts( CoInc, Callable, File, Milled, Copts ),
-	% write( holds( os_lib:os_exists(Milled), Exists ) ), nl,
-	holds( os_lib:os_exists(Milled), Exists ),
-	% write( holded( os_lib:os_exists(Milled), Exists ) ), nl,
-	options( not_created(Created), Opts ),
-	os_mill_created( Exists, Created, Milled, File, Opts ).
+    options( call_options(CoPrv), Opts ),
+    ( CoPrv == false -> CoInc = false; CoInc = true ),
+    en_list( CoPrv, Copts ),
+    options( call_module(Mod), Opts ),
+    ( Goal = _:_ -> Callable = Goal; Callable = Mod:Goal ),
+    Callable = CallMod:Pid,
+    functor( Pid, Patom, Parity ),
+    debug( os_mill, 'Calling os_mill: ~w', [CallMod:Patom/Parity] ),
+    os_mill_call_opts( CoInc, Callable, File, Milled, Copts ),
+    holds( os_lib:os_exists(Milled), Exists ),
+    options( not_created(Created), Opts ),
+    os_mill_created( Exists, Created, Milled, File, Opts ).
 
 os_mill_call_opts( true, Callable, File, Milled, Copts ) :-
-	call( Callable, File, Milled, Copts ).
+    call( Callable, File, Milled, Copts ).
 os_mill_call_opts( false, Callable, File, Milled, _Copts ) :-
-	call( Callable, File, Milled ).
+    call( Callable, File, Milled ).
 
 os_mill_created( true, _Created, _Milled, _File, _Opts ).
 os_mill_created( false, Created, Milled, File, _Opts ) :-
-	os_mill_created_not( Created, Milled, File ),
-	!.
+    os_mill_created_not( Created, Milled, File ),
+    !.
 os_mill_created( false, Created, _Milled, _File, _Opts ) :-
-	Created \== fail,
-	Mismatch = opt_mismatch(created,[false,error,fail,debug]),
-	throw( pack_error(os,os_mill/4,Mismatch) ).
+    Created \== fail,
+    Mismatch = opt_mismatch(created,[false,error,fail,debug]),
+    throw( pack_error(os,os_mill/4,Mismatch) ).
 
 os_mill_created_not( true, _Milled, _File ).  % take no action (true = succeed)
 os_mill_created_not( error, Milled, File ) :-
-	throw( pack_error(os,os_mill/4,os_created_not(Milled,File)) ).
+    throw( pack_error(os,os_mill/4,os_created_not(Milled,File)) ).
 os_mill_created_not( fail, _Milled, _File ) :-
-	fail.
+    fail.
 os_mill_created_not( debug, Milled, File ) :-
-	debug( os_mill, 'Os milled was not created: ~p, (from: ~p)', [Milled,File] ).
-
-os_mill_milled( _Opts, _Goal, _File, _Type, Milled ) :-
-	ground( Milled ),
-	!.
-os_mill_milled( Opts, Goal, File, Type, Milled ) :-
-	os_mill_milled_postfix( Opts, Goal, Psfx ),
-	% options( separator(Sep), Opts ),
-	% atomic_list_concat( [Sep,Psfx], Sfx ),
-	% os_postfix( Sfx, Opts, File, PsfxFile ),
-	os_postfix( Psfx, Opts, File, PsfxFile ),
-	os_mill_milled_ext( Type, Opts, PsfxFile, Milled ).
-
-os_mill_milled_postfix( Opts, _Goal, Psfx ) :-
-	memberchk( postfix(Psfx), Opts ),
-	!.
-os_mill_milled_postfix( _Opts, ModGoal, Psfx ) :-
-	( ModGoal = _Mod:Goal -> true; Goal = ModGoal ),
-	( compound(Goal,Name,_); (atomic(Goal),Goal=Name) ),
-	os_mill_milled_name_postfix( Name, Psfx ),
-	!.
-
-os_mill_milled_name_postfix( Name, Psfx ) :-
-	atom_concat( 'file_', Psfx, Name ),
-	!.
-os_mill_milled_name_postfix( Psfx, Psfx ).
-
-os_mill_milled_ext( dir, Opts, PsfxFile, Milled ) :-
-	\+ memberchk( dir_remove_ext(false), Opts ), % fixme: bit lazy
-	!,
-	file_name_ext( Milled, _Old, PsfxFile ).
-os_mill_milled_ext( file, Opts, PsfxFile, Milled ) :-
-	memberchk( ext(Ext), Opts ),
-	!,
-	file_name_extension( Stem, _Old, PsfxFile ),
-	file_name_extension( Stem, Ext, Milled ).
-os_mill_milled_extension( _Type, _Opts, Milled, Milled ).
+    debug( os_mill, 'Os milled was not created: ~p, (from: ~p)', [Milled,File] ).
