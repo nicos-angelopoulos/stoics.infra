@@ -1,7 +1,11 @@
 ---   Releases   ---
 --------------------
 
-0.6 
+0.7 
+    17.08.04  DOC:     os_postfix/3 one more example
+              FIXED:   os_postfix/4 instantiation error when ignore_post(IpostB) was used
+              FIXED:   os_postfix/2 instantiation error when Postfix (arg 1) was variable
+              RETAB:   replaced tabs by spaces in src/os_postfix.pl
     17.07.06  DOC:     os_dir_stem_ext/2 enhancements
               IFACE:   os_dir_stem_ext/2
               DEL:     loading library requires in os_mill.pl
