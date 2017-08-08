@@ -49,7 +49,7 @@ Ns = [1, 2, 3].
 @version   0.1 2017/2/20
 @version   0.2 2017/3/7
 @version   0.3 2017/3/9
-@version   0.4 2017/3/10
+@version   0.4 2017/8/8
 @see http://www.stoics.org.uk/~nicos/sware/stoics_lib
 
 */
@@ -123,6 +123,11 @@ stoics_lib.
 
 Version, term of the from Mj:Mn:Fx and Date is date(Year,Month,Day)
 
+==
+?- stoics_lib_version( V, D ).
+D = 0:4:0,
+V = date(2017,8,8).
+==
 */
-% stoics_lib_version( 0:4:0, date(2017,3,10) ).
-stoics_lib_version( 0:4:0, date(2017,3,10) ).
+% stoics_lib_version( 0:4:0, date(2017,8,8) ).
+stoics_lib_version( 0:4:0, date(2017,8,8) ).
