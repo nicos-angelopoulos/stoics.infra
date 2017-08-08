@@ -5,6 +5,8 @@ TBD
 
 
 1.3 
+    17.08.08   ADDED:   question whether to contact the server when lib not local
+               FIXED:   broken downloading from pack server
     17.04.27   ADDED:   more debug messages
                FIXED:   attaching repo that is already loaded
     17.03.24   FIXED:   cyclic execution when looking for non loadable explicit (b_real:mtx_heatmap/2 where b_real_lazy.pl does not exist).

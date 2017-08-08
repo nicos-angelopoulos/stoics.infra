@@ -12,6 +12,8 @@ message(confirm(Question,Default)) -->
 	prolog_pack:confirm_default(Default),
 	[ flush ].
 
+message(contact_server(Pack)) -->
+    ['Library: ~w, not locally installed. Do you want me to search on the SWI server for matching packs ?'-[Pack] ].
 message(pack_on_server(suggests,Pack)) -->
 	[ 'Suggested lib not found locally, Above are possible replacements on the server.\nDo you want to run ?- pack_install(~w).'-[Pack] ].
 message(pack_on_server(self,Pack)) -->

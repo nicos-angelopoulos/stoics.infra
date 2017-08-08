@@ -227,7 +227,7 @@ Listens to =|debug(lib)|=.
 @version  1.0 2017/3/6
 @version  1.1 2017/3/9,  lazy loading
 @version  1.2 2017/3/11, fixed missing cut, added lib(version(V,D))
-@version  1.2.1 2017/3/12, fixed multi-source for user
+@version  1.3 2017/8/??, fixed multi-source for user, fixed and improved contact to server
 @see http://stoics.org.uk/~nicos/sware/lib
 
 */
@@ -393,7 +393,7 @@ lib( alias(Alias), Cxt, Opts ) :-
 lib( version(V,D), _, _Args ) :-
     !,
     % V = 1:2, D = date(2017,3,11).
-    V = 1:2:1, D = date(2017,3,12).
+    V = 1:2:2, D = date(2017,8,8).
 lib( suggests(Lib), _, _Args ) :-  % fixme: add note() option
     !,
     lib_suggests( Lib ).
@@ -408,9 +408,9 @@ lib( init(Lib), Cxt, _Opts ) :-
     lib_init( Lib, Cxt ).
 lib( sys(SysLib), Cxt, _Opts ) :-
     !,
-    % absolute_file_name(library(SysLib), AbsLib, [access(read),file_errors(fail)] ), 
+    % AbsOpts = [access(read),file_errors(fail),file_type(prolog)],
+    % absolute_file_name(library(SysLib), AbsLib, AbsOpts ),
     absolute_file_name(library(SysLib), AbsLib ),
-            %fixme: file_type(prolog)
     % fixme: need map from SysLib -> Repo
     lib_retract_lazy( SysLib, WasLazy ),
     lib_sys_lazy( WasLazy, SysLib, AbsLib, ', expected,', Cxt ).
@@ -429,9 +429,8 @@ lib( Repo, Cxt, Args ) :-
     append( Args, Defs, Opts ),
     lib( RepoMod, RepoRoot, RepoLoad, Cxt, Opts ).
 lib( SysLib, Cxt, _Args ) :-
-    % absolute_file_name(library(SysLib), AbsLib, [access(read),file_errors(fail)] ), 
-    absolute_file_name(library(SysLib), AbsLib ),
-            %fixme: file_type(prolog)
+    AbsOpts = [access(read),file_errors(fail),file_type(prolog)],
+    absolute_file_name(library(SysLib), AbsLib, AbsOpts ),
     lib_retract_lazy( SysLib, WasLazy ),
     lib_sys_lazy( WasLazy, SysLib, AbsLib, '', Cxt ),
     !.  % fixme: is this too late in the body?
@@ -533,13 +532,17 @@ lib_repo_lazy_assert( Repo ) :-
 lib_repo_lazy_assert( Repo ) :-
     asserta( lib_tables:lib_lazy(Repo) ).
 
-lib_missing( Pack, Cxt, Opts ) :-
+lib_missing( Pack, Cxt, Args ) :-
+	prolog_pack:confirm( contact_server(Pack), yes, [] ),
     G = query_pack_server(search(Pack), Result, [] ),
     catch( prolog_pack:G, _Ball, fail ),
     Result \== false,
-	!,
+    lib_defaults( lib, LibDefs ),
+    append( Args, LibDefs, Opts ),
     memberchk( mode(Mode), Opts ),
+    catch( prolog_pack:pack_list(Pack), _, fail ),
 	prolog_pack:confirm( pack_on_server(Mode,Pack), yes, [] ),
+	!,
 	pack_install( Pack ),
 	Cxt:use_module( library(Pack) ).
 
