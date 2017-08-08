@@ -226,7 +226,7 @@ Listens to =|debug(lib)|=.
 @version  1.0 2017/3/6
 @version  1.1 2017/3/9,  lazy loading
 @version  1.2 2017/3/11, fixed missing cut, added lib(version(V,D))
-@version  1.3 2017/8/8, fixed multi-source for user, fixed and improved contact to server
+@version  1.3+4 2017/8/8, fixed multi-source for user, improved contact to server, install while lazy loading
 @see http://stoics.org.uk/~nicos/sware/lib
 
 */
@@ -392,7 +392,7 @@ lib( alias(Alias), Cxt, Opts ) :-
 lib( version(V,D), _, _Args ) :-
     !,
     % V = 1:2, D = date(2017,3,11).
-    V = 1:3:0, D = date(2017,8,8).
+    V = 1:4:0, D = date(2017,8,8).
 lib( suggests(Lib), _, _Args ) :-  % fixme: add note() option
     !,
     lib_suggests( Lib ).
@@ -452,7 +452,7 @@ lib( Root, Cxt, Args ) :-
     !,
     lib_repo( Repo, Type, Root, Load, Cxt, Args ).
 lib( Pack, Cxt, Opts ) :-
-    lib_missing( Pack, Cxt, Opts ),
+    lib_missing( Pack, Cxt, Opts, true ),
     !.
 lib( Repo, Cxt, Opts ) :-
     memberchk( mode(Mode), Opts ),
@@ -486,7 +486,6 @@ lib_not_found( suggests, Repo, _Cxt ) :-
     lib_message_report( Mess, [Repo], informational ).
 
 lib_explicit( Repo, Pn, Pa, Cxt, _Opts ) :-
-    % fixme: check
     lib_tables:lib_full(Repo,_),
     !,   % this should be able to cope with cyclic dependencies? 
          % check with options
@@ -500,6 +499,10 @@ lib_explicit( Repo, Pn, Pa, Cxt, Opts ) :-
     lib_repo_lazy_assert( Rmod ),
     lib_explicit_repo( Type, Repo, Rmod, Root, Load, Pn, Pa, Cxt, Opts ),
     !.
+lib_explicit( Repo, Pn, Pa, Cxt, Opts ) :-
+    lib_missing( Repo, Cxt, Opts, false ),
+    !,
+    lib_explicit( Repo, Pn, Pa, Cxt, Opts ).
 lib_explicit( Repo, Pn, Pa, Cxt, _Args ) :-
     % 17.03.24; the following 2 lines create a cycle
     % lib( Repo, Cxt, Args ),
@@ -531,7 +534,7 @@ lib_repo_lazy_assert( Repo ) :-
 lib_repo_lazy_assert( Repo ) :-
     asserta( lib_tables:lib_lazy(Repo) ).
 
-lib_missing( Pack, Cxt, Args ) :-
+lib_missing( Pack, Cxt, Args, Load ) :-
 	prolog_pack:confirm( contact_server(Pack), yes, [] ),
     G = query_pack_server(search(Pack), Result, [] ),
     catch( prolog_pack:G, _Ball, fail ),
@@ -543,7 +546,11 @@ lib_missing( Pack, Cxt, Args ) :-
 	prolog_pack:confirm( pack_on_server(Mode,Pack), yes, [] ),
 	!,
 	pack_install( Pack ),
+    lib_missing_load( Load, Cxt, Pack ).
+
+lib_missing_load( true, Cxt, Pack ) :-
 	Cxt:use_module( library(Pack) ).
+lib_missing_load( false, _Cxt, _Pack ).
 
 lib_import_existing( Repo, Pn/Pa, Cxt ) :-
     functor( Phead, Pn, Pa ),
