@@ -45,9 +45,8 @@ lib_src_sub_dir( 'src/auxil' ).
 /** <module> Predicate based code development.
 
  This pack implements methods for loading code into SWI Prolog programs.
- One of the major innovations the library introduces is that of progressive, lazy
- loading of packs.
- That is, if only a specific predicate is required
+ One of the major innovations the library introduces, is that of progressive, lazy loading of packs.
+ That is, if only a specific predicate is (lazily) required
  from a =|pack(lib)-aware|= pack, only that and its dependent code will be loaded.
 
 That is, your code can load things like
@@ -227,7 +226,7 @@ Listens to =|debug(lib)|=.
 @version  1.0 2017/3/6
 @version  1.1 2017/3/9,  lazy loading
 @version  1.2 2017/3/11, fixed missing cut, added lib(version(V,D))
-@version  1.3 2017/8/??, fixed multi-source for user, fixed and improved contact to server
+@version  1.3 2017/8/8, fixed multi-source for user, fixed and improved contact to server
 @see http://stoics.org.uk/~nicos/sware/lib
 
 */
@@ -393,7 +392,7 @@ lib( alias(Alias), Cxt, Opts ) :-
 lib( version(V,D), _, _Args ) :-
     !,
     % V = 1:2, D = date(2017,3,11).
-    V = 1:2:2, D = date(2017,8,8).
+    V = 1:3:0, D = date(2017,8,8).
 lib( suggests(Lib), _, _Args ) :-  % fixme: add note() option
     !,
     lib_suggests( Lib ).
