@@ -67,6 +67,7 @@
               map_succ_list/3,         %  
               map_succ_list/4,         %  +Goal, ?InList, ?OutList[, -Rejects]
               mod_goal/3, mod_goal/4,  % +Mod, +Goal[, +Override], -Moal
+              on_fail/2, on_fail/3,    % +Goal, +Call, +Opts
               which/3,                 % Goal, +Term, -Indices
             % number
               int_trailer/2,           % +Int, -Trailer
@@ -181,5 +182,8 @@
 :- lib(maparg/3).
 :- lib(maparg/4).
 :- lib(atom_replace/4).
+:- lib(io_sections/3).
+:- lib(on_fail/2).
+:- lib(on_fail/3).
 
 :- lib( end(stoics_lib) ).

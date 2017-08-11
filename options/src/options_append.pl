@@ -40,16 +40,17 @@ OAopts term or list of
       term structure
 
   * debug(Dbg=none)   
-       if _true_ debug this call, and call prolog_debug:debug_topic(Pname). 
-       if _false_ trun debugging off for this call.
-       Else Dbg can be a debug term (other than none,false,true) or list of debug terms.
+      if _true_ debug this call, and call prolog_debug:debug_topic(Pname). 
+      if _false_ trun debugging off for this call.
+      Else Dbg can be a debug term (other than none,false,true) or list of debug terms.
  
   * funnel(Proccess)    
-       as process() below, but leaves processed 
-       options in All.
+      as process() below, 
+      but leaves processed options in All.
 
   * pack(Pack)
-      caller pack, only used to report type errors for now
+      caller pack. For now it is 
+      only used to report type errors
 
   * process(Proccess)
       with Proccess in 
@@ -58,7 +59,8 @@ OAopts term or list of
         to debug/0,1,2 options, see below
 
   * remove_types(Rtypes=true)
-        to pass options_types(OTypes) to the result Options use Rtypes == false
+      to pass options_types(OTypes) 
+      to the result Options use Rtypes == false
 
  When processing debugging options in All, the first matching term of the following is used: 
     * debug

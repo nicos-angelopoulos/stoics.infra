@@ -64,6 +64,8 @@ lib_index(n_breaks, 4, any, user, 'list/n_breaks').
 lib_index(n_digits_integer_codes, 3, any, user, 'codes/n_digits_integer_codes').
 lib_index(n_digits_min, 3, any, uer, 'number/n_digits_min' ).
 lib_index(nth1, 5, any, user, 'list/nth1' ).
+lib_index(on_fail, 2, any, user, 'meta/on_fail').
+lib_index(on_fail, 3, any, user, 'meta/on_fail').
 lib_index(op_compare, 3, any, user, 'term/op_compare').
 lib_index(portray_clauses, 2, any, user, 'term/portray_clauses').
 lib_index(position, 3, any, user, 'term/position').
