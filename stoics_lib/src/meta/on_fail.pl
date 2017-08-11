@@ -61,7 +61,7 @@ true.
 
 ==
 @author nicos angelopoulos
-@version  0.1 2017/08/11
+@version  0.1 2017/08/11, lil'B
 
 */
 on_fail( Goal, Call ) :-
@@ -70,6 +70,7 @@ on_fail( Goal, Call ) :-
 on_fail( Goal, Call, Args ) :-
     options_append( on_fail, Args, Opts ),
     options( [catch(Catcher),mtype(Mtype),rep(Rep),rethrow(Reth)], Opts ),
+    mod_goal( user, 
     on_fail_catch( Goal, Catcher, Rep, Mtype, Reth, Call ).
 
 on_fail_catch( Goal, Catcher, Rep, Mtype, Reth, Call ) :-
