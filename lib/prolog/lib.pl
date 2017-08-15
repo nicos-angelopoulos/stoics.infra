@@ -227,6 +227,7 @@ Listens to =|debug(lib)|=.
 @version  1.1 2017/3/9,  lazy loading
 @version  1.2 2017/3/11, fixed missing cut, added lib(version(V,D))
 @version  1.3+4 2017/8/8, fixed multi-source for user, improved contact to server, install while lazy loading
+@version  1.5 2017/8/15
 @see http://stoics.org.uk/~nicos/sware/lib
 
 */
@@ -249,15 +250,22 @@ Operands
     A pack known to SWI. If pack is not installed then the server is contacted to look
     for name-matching packs that can be installed. If there is at least
     one matching pack, it can be installed interactively.
-  * lib 
-    Declares a library directory. The default options for libs are
+  * LibDir
+    Declares a library directory should be 
+      * atomic,       
+           an absolute path
+      * rel(Rel)     
+           Rel will be absolute_file_name/3 to be made into an absolute location
+      * alias(Dir)    
+           as above, but ensures that nothing in Dir is interpreted as a command
+      * compound 
+           compound terms are tried to be expanded to an existing directory
+
+    The default options for libs are
       * load(Load=false)
       * index(Idx=true)
       * homonyms(Hmns=true)
       * type(Type=lib)
-
-  * alias(Dir)
-    As above, but ensures that nothing in Dir is interpreted as a command.
 
   * Command
     One of 
@@ -386,13 +394,14 @@ lib( source(Src), _Cxt, Opts ) :-
 lib( end(Src), _Cxt, Opts ) :-
     lib_source_end( Src, Opts ).
 
-lib( alias(Alias), Cxt, Opts ) :-
-    !,
-    lib_alias( Alias, Cxt, Opts ).
+% lib( alias(Alias), Cxt, Opts ) :-
+    % !,
+    % lib_alias( Alias, Cxt, Opts ).
 lib( version(V,D), _, _Args ) :-
     !,
     % V = 1:2, D = date(2017,3,11).
-    V = 1:4:0, D = date(2017,8,8).
+    % V = 1:4:0, D = date(2017,8,8).
+    V = 1:5:0, D = date(2017,8,15).
 lib( suggests(Lib), _, _Args ) :-  % fixme: add note() option
     !,
     lib_suggests( Lib ).
@@ -586,12 +595,12 @@ lib_lazy_no_more( Repo, Cxt, Opts ) :-
 lib_explicit_exports( Repo, Cxt, Opts, Pn/Pa) :-
     lib_explicit( Repo, Pn, Pa, Cxt, Opts ).
 
-lib_alias( Alias, Cxt, Opts ) :-
-    !,
-    absolute_file_name( Alias, Dir, [access(exist)] ),
-    lib( Dir, Cxt, Opts ).
-lib_alias( Alias, _Cxt, _Opts ) :-
-    throw( alias_does_not_correspont_to_lib(Alias) ).
+% lib_alias( Alias, Cxt, Opts ) :-
+    % !,
+    % absolute_file_name( Alias, Dir, [access(exist)] ),
+    % lib( Dir, Cxt, Opts ).
+% lib_alias( Alias, _Cxt, _Opts ) :-
+    % throw( alias_does_not_correspont_to_lib(Alias) ).
 
 lib( Repo, Root, Load, Cxt, Opts ) :-
     ( catch(lib_load_repo_root_index_file(Repo,Root), _, true ) -> true; true ),

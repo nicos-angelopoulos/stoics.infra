@@ -37,16 +37,42 @@ Load = false.
 
 ?- absolute_file_name( pack(lib), AbsLib ), directory_file_path( AbsLib, 'prolog/lib.pl', AbsLibF ),
    lib_type( AbsLibF, Type, Repo, Root, Load ).
-
-AbsLib = '/usr/local/users/nicos/local/git/lib/swipl-7.3.33/pack/lib',
-AbsLibF = '/usr/local/users/nicos/local/git/lib/swipl-7.3.33/pack/lib/prolog/lib.pl',
+AbsLib = Root, Root = '/usr/local/users/na11/local/git/lib/swipl-7.5.12/pack/lib',
+AbsLibF = Load, Load = '/usr/local/users/na11/local/git/lib/swipl-7.5.12/pack/lib/prolog/lib.pl',
 Type = pack,
-Repo= lib,
-Root = '/home/nicos/pl/packs/src/lib/',
-Load = '/home/nicos/pl/packs/src/lib/prolog/lib.pl'.
+Repo = lib.
+
+?- Abs = '/usr/local/users/na11/local/git/lib/swipl-7.5.12/pack/lib/prolog',
+   lib_type( Abs, Type, Repo, Root, Load ).
+
+?- ls.
+.... optios/ ....
+
+?- lib:lib_type( rel(options), Type, Repo, Root, Load ).
+Type = lib,
+Repo = user,
+Root = '/home/na11/web/sware/packs/options',
+Load = false.
+
 ==
 
 */
+lib_type( rel(Spc), Type, Repo, Root, Load ) :-
+    % expand_file_name( DirSpc, [Dir] ),
+    AbsOpts1 = [file_type(directory),file_errors(fail)],
+    AbsOpts2 = [access(exist),file_errors(fail)],
+    once( (absolute_file_name(Spc,Abs,AbsOpts1);absolute_file_name(Spc,Abs,AbsOpts2)) ),
+    !,
+    lib_type_dir( Abs, Type, Repo, Root, Load ),
+    debug( lib, 'Repo explicitly from dir: ~w, with type: ~w and mod: ~w and abs location: ~p', [Spc,Type,Repo,Abs] ).
+lib_type( alias(Spc), Type, Repo, Root, Load ) :-
+    % we probably need to commit here, but we delay for the message
+    AbsOpts1 = [file_type(directory),file_errors(fail)],
+    AbsOpts2 = [access(exist),file_errors(fail)],
+    once( (absolute_file_name(Spc,Abs,AbsOpts1);absolute_file_name(Spc,Abs,AbsOpts2)) ),
+    !,
+    lib_type_dir( Abs, Type, Repo, Root, Load ),
+    debug( lib, 'Alias: ~w explicitly typed as: ~w, with mod: ~w and abs location: ~p', [Spc,Type,Repo,Load] ).
 lib_type( Pack, Type, Repo, Root, Load ) :-
     AbsOpts = [file_type(directory),file_errors(fail)],
     absolute_file_name( pack(Pack), Root, AbsOpts ),
@@ -66,13 +92,11 @@ lib_type( FileSpc, Type, Repo, Root, Load ) :-
     lib_type_file( Abs, Type, Repo, Root, Load ),
     !,
     debug( lib, 'Repo typed as file: ~w, with type: ~w and mod: ~w', [FileSpc,Type,Repo] ).
-lib_type( DirSpc, Type, Repo, Root, Load ) :-
-    expand_file_name( DirSpc, [Dir] ),
-    AbsOpts = [file_type(directory),file_errors(fail)],
-    absolute_file_name( Dir, Abs, AbsOpts ),
-    lib_type_dir( Abs, Type, Repo, Root, Load ),
+lib_type( AbsDir, Type, Repo, Root, Load ) :-
+    absolute_file_name( AbsDir, AbsDir ),
+    lib_type_dir( AbsDir, Type, Repo, Root, Load ),
     !,
-    debug( lib, 'Repo typed as dir: ~w, with type: ~w and mod: ~w', [DirSpc,Type,Repo] ).
+    debug( lib, 'Absolute location defined repo typed as dir: ~w, with type: ~w and mod: ~w', [AbsDir,Type,Repo] ).
 /*
 lib_type( Other, _Type, _Rmod, _Root, _Load ) :-
     throw( cannot_establish_lib_type_for(Other) ).
