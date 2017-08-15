@@ -1,10 +1,9 @@
 ---   Releases   ---
 --------------------
-0.5   
+0.5   17.08.15   VER:    0.5
       17.08.11   FIXED:  remove stoics_lib: from lib(stoics_lib:mod_goal/4), in map_succ_list.pl
                  DOC:    fixed intendantion in options_append/4 options
-                 PRED:   on_fail/2,3
-                 VER:    lilB
+                 PRED:   on_fail/2,3, lil'B
 0.4   17.08.08   VER:    version 0.4
       17.05.17   FIX:    Added mod_goal/4 loading to map_succ_list/4
       17.05.17   DOC:    Typos in mod_goal/3+4
