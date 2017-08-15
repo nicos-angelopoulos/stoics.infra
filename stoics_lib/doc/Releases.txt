@@ -1,6 +1,7 @@
 ---   Releases   ---
 --------------------
 0.5   17.08.15   VER:    0.5
+                 FIXED:  spurious incomplete call to mod_goal/n
       17.08.11   FIXED:  remove stoics_lib: from lib(stoics_lib:mod_goal/4), in map_succ_list.pl
                  DOC:    fixed intendantion in options_append/4 options
                  PRED:   on_fail/2,3, lil'B
