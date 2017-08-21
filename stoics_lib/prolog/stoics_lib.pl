@@ -81,9 +81,9 @@
               compare/4,               % +Type, ?Op, +Term1, +Term
               compound/3,              % +Term, -Name, -Args 
               en_list/2,               % +Term, -Listed
+              op_compare/3,            % ?Op, +Term1, +Term2
               portray_clauses/2,       % +Terms, +Opts
               positions/2,positions/3, % +Data, [-Dtype,] -NofPositions ).
-
               position/3,position/4,   % [+Type,] ?N, +Data, ?Nths
               position/6,              % +Type, ?N, +Data, ?Nths, -NxN, -Cont
               position_nth/3, position_nth/4, % +N, +Data[, -Nth]
@@ -156,6 +156,7 @@
 :- lib(arity/3).
 :- lib(compound/3).
 :- lib(en_list/2).
+:- lib(op_compare/3).
 :- lib(portray_clauses/2).
 :- lib(positions/2).
 :- lib(positions/3).
