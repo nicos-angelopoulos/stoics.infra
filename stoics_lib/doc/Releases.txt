@@ -1,6 +1,7 @@
 ---   Releases   ---
 --------------------
 0.6   
+      17.08.22   IFACE:  has_length/2,3,4
       17.08.21   IFACE:  added op_compare/3 to full interface (already was in sources)
 
 0.5   17.08.15   VER:    0.5

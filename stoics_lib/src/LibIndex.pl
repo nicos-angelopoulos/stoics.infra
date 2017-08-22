@@ -23,6 +23,8 @@ lib_index(get_date, 1, any, user, 'date_time/get_date').
 lib_index(get_date_time, 1, any, user, 'date_time/get_date_time').
 lib_index(has_at_least, 3, any, user, 'list/has_at_least').
 lib_index(has_at_most, 3, any, user, 'list/has_at_most').
+lib_index(has_length, 2, any, user, 'list/has_length').
+lib_index(has_length, 3, any, user, 'list/has_length').
 lib_index(en_list, 2, any, user, 'term/en_list').
 lib_index(expand_spec, 2, any, user, 'file/expand_spec').
 lib_index(get_datetime, 1, any, user, 'date_time/get_datetime' ).

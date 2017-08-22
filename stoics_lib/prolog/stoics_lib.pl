@@ -46,6 +46,9 @@
               nth1/5,                  % ?N, +List, ?With, ?Nth, +NewList
               has_at_least/3,          % +N, +X, +List
               has_at_most/3,           % +N, +X, +List
+              has_length/2,            % +List, +Lengthy
+              has_length/3,            % +List, +Lengthy, +Op
+              has_length/4,            % +List, +Lengthy, +Op, +Err
               list_frequency/2,        % +List, -Freqs
               list_frequency/3,        % +List, -Freqs, +Opts
               list_transpose/2,        % +List, -Transpose
@@ -131,6 +134,9 @@
 :- lib(break_nth/4).
 :- lib(has_at_least/3).
 :- lib(has_at_most/3).
+:- lib(has_length/2).
+:- lib(has_length/3).
+:- lib(has_length/4).
 :- lib(list_frequency/2).
 :- lib(list_frequency/3).
 :- lib(list_transpose/2).

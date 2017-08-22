@@ -52,6 +52,7 @@ Other errors
 
   * cast(Term,From,To) )
   * lengths_mismatch(Tkn1,Tkn2,Len1,Len2)
+  * lengths_mismatch(Tkn1,Tkn2,Op,Len1,Len2)
   * type_error(Type,Term)
   * type_error(Pos,Type,Term)
   * unknown_token(Tkn,Cat)
@@ -494,6 +495,8 @@ message( arg_ground_pattern(Poss,Args) ) -->
 
 message( lengths_mismatch(Tkn1,Tkn2,Len1,Len2) ) -->
     ['Lists for ~w and ~w have mismatching lengths: ~d and ~d respectively'-[Tkn1,Tkn2,Len1,Len2]].
+message( lengths_mismatch(Tkn1,Tkn2,Op,Len1,Len2) ) -->
+    ['Terms idied by: ~w and ~w, have mismatching lengths: ~d and ~d respectively (~w expected)'-[Tkn1,Tkn2,Len1,Len2,Op]].
 message( cast(Term,From,To) ) -->
     ['Cannot cast: ~w, from type: ~w to type: ~w'-[Term,From,To]].
 message( cast(Term,To) ) -->
