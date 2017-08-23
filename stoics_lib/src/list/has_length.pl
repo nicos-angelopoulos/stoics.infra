@@ -10,7 +10,7 @@ Succeeds iff Term has length that is op_compare/3 succesful with Lengthy.
 If the predicate does not succeed, it either fails (Err=fail) or throws an error.
 Lengthy is either an integer or a term, of which the length is found
 via term_length/2. When CompOp is missing is set to =:=.
-If Err is anything else than fail it will be transormed to a pack_error/N ball.
+If Err is anything else than fail it will be transformed to a pack_error/N ball.
 If Err is error, then it is ignored and ball is a vanila lengths_mismatch/4, pack_error/1 ball.
 Else name and first argument of Err are taken to be the pack and preciate callers and if 3rd and
 fourth exist are taken to be token1 and token2 of the length_mismatch/5. 
