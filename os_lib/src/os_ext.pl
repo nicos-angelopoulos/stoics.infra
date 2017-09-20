@@ -1,6 +1,7 @@
 %% os_ext( ?Ext, +File ).
-%% os_ext( +Ext, ?Stem, ?File ).
-%% os_ext( +Ext, +New, ?File, -NewFile ).
+%% os_ext( +Ext, +Stem, -File ).
+%% os_ext( -Ext, -Stem, +File ).
+%% os_ext( ?Ext, +New, +File, -NewFile ).
 % 
 %  Switch the position of the first two arguments of file_name_extension/3.
 %  Ext is the file extension of File.  Provides an arity 2 version of 
@@ -68,6 +69,15 @@
 % ?- os_ext( srt, 'a.file', 'a.file.srt' ).
 % true.
 %==
+% ?- os_ext( Old, srt, 'a.file', Afile ).
+% Old = file,
+% Afile = a.srt.
+% 
+% ?- os_ext( txt, Csv, old.txt, New ).
+% ERROR: os:os_ext/4: Ground argument expected at position: 2,  (found: _7644)
+% ?- os_ext( txt, Csv, New ).
+% ERROR: os:os_ext/3: Ground arguments expected in some of the positions: [[1,2],3], but found:[txt,_8390,_8396]
+%==
 %
 % @author nicos angelopoulos
 % @version  0.2 2015/5/18   changed behaviour to not adding Ext if it is already in Stem.
@@ -94,8 +104,8 @@ os_ext( Ext, Stem, Os ) :-
 	!,
 	os_name( Stem, Type ),
 	os_ext_stem( Type, Stem, Ext, Os ).
-os_ext( _Ext, _Stem, _Os ) :-
-	throw( pack_error(os,os_ext/3,ground_dual_mode([1,2],3)) ).
+os_ext( Ext, Stem, Os ) :-
+	throw( pack_error(os,os_ext/3,arg_ground_pattern([[1,2],3],[Ext,Stem,Os])) ).
 	% throw( instantiation_error ).
 
 os_ext_file( atom, Stem, Ext, Os ) :-
@@ -173,6 +183,14 @@ os_ext_file_alias( alias, Os, _Stem, _Ext ) :-
 os_ext_file_alias( Other, Os, Stem, Ext ) :-
 	os_ext_file( Other, Stem, Ext, Os ).
 
+os_ext( _Ext, NewExt, _File, _NewFile ) :-
+    \+ ground(NewExt),
+    !,
+	throw( pack_error(os,os_ext/4,arg_ground(2,NewExt)) ).
+os_ext( _Ext, _NewExt, File, _NewFile ) :-
+    \+ ground(File),
+    !,
+	throw( pack_error(os,os_ext/4,arg_ground(3,File)) ).
 os_ext( Ext, NewExt, File, NewFile ) :-
 	os_ext( Ext, Stem, File ),
 	os_ext( NewExt, Stem, NewFile ).

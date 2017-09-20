@@ -9,7 +9,8 @@ os_postfix_defaults( Args, Defs ) :-
     Defs = [ sep(Sep),
              replace(false),
              ignore_post([]),
-             ext(_)
+             ext(_),
+             with_ext(_)
             ],
     os_sep( Sep, Args ).
 
@@ -31,10 +32,13 @@ os_postfix_defaults( Args, Defs ) :-
 % Opts 
 %  * ext(Ext)
 %    if Ext is ground is assumed to be the strippable part of Fname. When Ext is a variable
-%    the found extension is bound to it.
+%    the found extension is bound to it. This option is for testing and returning, see with_ext() for setting alternative extensions.
 % 
 %  * ignore_post(Posts=[])
 %    (separated) parts to ignore at end (see ex. below)
+% 
+%  * with_ext(WithExt)
+%    replace extension of Fname with WithExt, if ground (you can pick up the old one using an unbound varible in ext(Ext) above)
 % 
 %  * postfix(Psfx)
 %    alternative way of defining Postfix, only used when Postfix is a variable
@@ -73,6 +77,8 @@ os_postfix_defaults( Args, Defs ) :-
 % T = "x_abc.txt".
 % ?- os_postfix( Psf, abc_def.txt ).
 % Psf = def.
+% ?- os_postfix( bit, by.csv, ByBit, with_ext(txt) ).
+% ByBit = by_bit.txt.
 %==
 %
 % @author nicos angelopoulos
@@ -153,7 +159,8 @@ os_atom_postfix( File, Postfix, Pile, Opts ) :-
     os_postfix_stem( Stem, Sep, Rep, Prefix, Suffix, Opts ),
     os_postfix_ground( Postfix, Opts ),
     at_con( [Prefix,Postfix,Suffix], Sep, PoStem ),
-    file_name_extension( PoStem, Ext, Pile ).
+    file_name_extension( PoStem, Ext, Xile ),
+    os_postfix_with_ext( Xile, Pile, Opts ).
 
 os_string_postfix( File, Postfix, Pile, Opts ) :-
     options( ext(Ext), Opts ),
@@ -163,6 +170,16 @@ os_string_postfix( File, Postfix, Pile, Opts ) :-
     os_postfix_ground( Postfix, Opts ),
     at_con( [Prefix,Postfix,Suffix], Sep, PoStem ),
     os_ext( Ext, PoStem, Pile ).
+
+
+os_postfix_with_ext( Xile, Pile, Opts ) :-
+    options( with_ext(WithExt), Opts ),
+    holds( ground(WithExt), WithExtB ),
+    os_atom_postfix_ext( WithExtB, WithExt, Xile, Pile ).
+
+os_atom_postfix_ext( true, WithExt, Xile, Pile ) :-
+    os_ext( _, WithExt, Xile, Pile ).
+os_atom_postfix_ext( false, _WithExt, Pile, Pile ).
 
 /*
     term_atom( PostfIn, Postfix ),

@@ -2,6 +2,10 @@
 --------------------
 
 0.7 
+    17.09.20  OPTS:    with_ext(WithExt) @ os_postfix/4, with example
+              DOC:     made call modes of os_ext/4,3 more precise
+              FIXED:   groundess error in os_ext/3, now uses new pack_errors version (and distinct error for os_ext/4)
+              DOC:     more examples @ os_ext/4,3
     17.08.04  DOC:     os_postfix/3 one more example
               FIXED:   os_postfix/4 instantiation error when ignore_post(IpostB) was used
               FIXED:   os_postfix/2 instantiation error when Postfix (arg 1) was variable
