@@ -68,7 +68,8 @@
               maparg/2,maparg/3,       % +Pname, ?Term1[, ?Term2]
               maparg/4,                % +PName, +Npos ?Term1, ?Term2
               map_succ_list/3,         %  
-              map_succ_list/4,         %  +Goal, ?InList, ?OutList[, -Rejects]
+              map_succ_list/4,         % +Goal, ?InList, ?OutList[, -Rejects]
+              mod_goal/2,              % +Goal, -Moal
               mod_goal/3, mod_goal/4,  % +Mod, +Goal[, +Override], -Moal
               on_fail/2, on_fail/3,    % +Goal, +Call, +Opts
               which/3,                 % Goal, +Term, -Indices
@@ -153,6 +154,7 @@
 :- lib(known/2).
 :- lib(known/3).
 :- lib(map_succ_list/4).
+:- lib(mod_goal/2).
 :- lib(mod_goal/3).
 :- lib(mod_goal/4).
 :- lib(which/3).

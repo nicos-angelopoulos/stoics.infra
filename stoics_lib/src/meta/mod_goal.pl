@@ -4,12 +4,13 @@
 /** mod_goal( +Mod, +Goal, +Override, -Moal ).
     mod_goal( +Mod, +Goal, -Moal ).
     mod_goal( -Mod, -Goal, +Moal ).
+    mod_goal( +Goal, Moal ).
 
 Construct and deconstruct a goal and its module prepended form.
 Argument Override, controls what happends when constructing over a Goal
-that already has a module prepention: false ignores the new Mod,
-true (default) replaces Goal's prepention with Mod and error
-reports the conflict.
+that already has a module prepention: false (default) ignores the new Mod,
+true replaces Goal's prepention with Mod and error
+reports the conflict. When Mod is missing is taken to be user.
 
 When de-constructing, Goal will be a goal with no module prepent. 
 When constructing, Moal will be a module prepented goal
@@ -26,21 +27,27 @@ G = g2(a, b, c).
 ERROR: auxil:mod_goal/3: Ground argument expected either at: [1,2], or at: 3 
 
 ?- mod_goal( m, k:g(a), MG ).
+MG = k:g(a).
+
+?- mod_goal( m, k:g(a), true, MG ).
 MG = m:g(a).
 
-?- mod_goal( m, k:g(a), false, MG ).
-MG = k:g(a).
+?- mod_goal( g(a), MG ).
+MG = user:g(a).
 ==
 
 @author  nicos angelopoulos
 @version 0.1   2014
+@version 0.2   2017/9/25,  default value for Override changed to false, added mod_goal/2
 
 */
+mod_goal( Goal, Moal ) :-
+    mod_goal( user, Goal, Moal ).
 mod_goal( Mod, Goal, Moal ) :-
 	ground( Mod ),
 	ground( Goal ),
 	!,
-	mod_goal_gen( Mod, Goal, true, Moal ).
+	mod_goal_gen( Mod, Goal, false, Moal ).
 mod_goal( Mod, Goal, Moal ) :-
 	ground( Moal ),
 	!,

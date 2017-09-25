@@ -1,6 +1,8 @@
 ---   Releases   ---
 --------------------
 0.6   
+      17.09.25   IFACE:  mod_goal/2
+                 CHANGE: default Override in mod_goal/3 is now false (previously true)
       17.09.20   IFACE:  map_list_options/3,4
       17.08.23   TYPO:   doc of has_length/2,3,4
       17.08.22   IFACE:  has_length/2,3,4
