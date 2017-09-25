@@ -32,10 +32,12 @@ false.
 
 @author nicos angelopoulos
 @version  0.1 2015/12/9
+@version  0.2 2017/9/25, added mod_goal/2
 
 */
 holds( Goal, Holds ) :-
-	call( Goal ),
+    mod_goal( Goal, Moal ),
+	call( Moal ),
 	!,
 	Holds = true.
 holds( _Goal, false ).
