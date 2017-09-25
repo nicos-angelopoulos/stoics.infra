@@ -29,7 +29,7 @@
     will only be allowed to succeed once.
 
 ==
-?- [user]
+?- [user].
 theme_background( colour, blue ).
 theme_background( monochromoe, grey ).
 ^D
@@ -48,6 +48,8 @@ ERROR: user:theme_background/2: Token: wrong, is not a recognisable: colour_them
 
 @author nicos angelopoulos
 @version  0.1 2017/2/22
+@version  0.1 2017/7/25,  Goal is now passed through mod_goal/2
+
 */
 
 known( G ) :-
@@ -58,7 +60,8 @@ known( G, Cat ) :-
     known( G, Tkn, Cat ).
 
 known( G, _Tkn, _Cat ) :-
-    call( G ),
+    mod_goal( G, MG ),
+    call( MG ),
     !.
 known( G, Tkn, Cat ) :-
     functor( G, Gn, Ga ),
@@ -80,6 +83,7 @@ known_not( ErrCat, Pack, _G, Gspc, Tkn ) :-
     throw( pack_error(Pack,Gspc,unknown_token(Tkn,ErrCat)) ).
 
 known_goal_values( G, Vals ) :-
+    imported_from( G, Gmod ),
     functor( G, Pname, Parity ),
     functor( Head, Pname, Parity ),
-    findall( Fst, (clause(Head,_),arg(1,Head,Fst)), Vals ).
+    findall( Fst, (Gmod:clause(Head,_),arg(1,Head,Fst)), Vals ).

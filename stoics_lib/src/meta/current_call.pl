@@ -1,6 +1,5 @@
 
 :- lib(goal_spec/2).
-:- lib(mod_goal/2).
 
 /** current_call( +Goal ).
     current_call( +Goal, +Else ).

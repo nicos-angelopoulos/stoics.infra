@@ -6,6 +6,11 @@
                  CHANGE: pass meta-goals in current_call/1,2 via mod_goal/2
                  DOC:    improvement for goal/4
                  CHANGE: pass meta-goal in holds/2 through mod_goal/2
+                 CHANGE: pass meta-goal in known/3 through mod_goal/2
+                 FIXED:  collecting of unknown values in known/3
+                 FIXED:  mod_call/3 change ground(Goal) to \+ var(Goal)
+                 FIXED:  maparg/4 Npos was not allowed -1
+                 CHANGE: pass meta-goals in maparg/2,3,4 through mod_goal/2
       17.09.20   IFACE:  map_list_options/3,4
       17.08.23   TYPO:   doc of has_length/2,3,4
       17.08.22   IFACE:  has_length/2,3,4

@@ -39,13 +39,14 @@ MG = user:g(a).
 @author  nicos angelopoulos
 @version 0.1   2014
 @version 0.2   2017/9/25,  default value for Override changed to false, added mod_goal/2
+@tbd  investigate imported_from for locating default Mod
 
 */
 mod_goal( Goal, Moal ) :-
     mod_goal( user, Goal, Moal ).
 mod_goal( Mod, Goal, Moal ) :-
 	ground( Mod ),
-	ground( Goal ),
+	\+ var( Goal ),
 	!,
 	mod_goal_gen( Mod, Goal, false, Moal ).
 mod_goal( Mod, Goal, Moal ) :-
