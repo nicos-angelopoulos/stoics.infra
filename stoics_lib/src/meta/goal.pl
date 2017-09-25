@@ -3,8 +3,8 @@
 
 /** goal( +Partial, +ArgS, +Mod, -Goal ).
 
-Construct Goal from a partial or predicate name either of which might be moded
-and some arguments. If none of these is moded, Mod is used. 
+Construct Goal from a partial or predicate name, either of which can be (column) :-prepended, and some arguments. <br>
+If Partial is not moduled, then Mod is :-prepended.
 
 ==
 ?- goal( p, x, u, G ).
