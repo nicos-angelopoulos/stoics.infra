@@ -1,5 +1,6 @@
 
 :- lib(goal_spec/2).
+:- lib(mod_goal/2).
 
 /** current_call( +Goal ).
     current_call( +Goal, +Else ).
@@ -31,6 +32,7 @@ X = c.
 
  @author nicos angelopoulos
  @version  0.1 2014/9/14
+ @version  0.2 2017/9/25
  @tbd interact with autoloading
 
 */
@@ -41,6 +43,8 @@ current_call( Goal, _Else ) :-
 	goal_spec( Goal, Spec ),
 	current_predicate( Spec ),
 	!,
-	call( Goal ).
+    mod_goal( Goal, Moal ),
+	call( Moal ).
 current_call( _Goal, Else ) :-
-	call( Else ).
+    mod_goal( Else, Mlse ),
+	call( Mlse ).
