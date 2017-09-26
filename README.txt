@@ -4,7 +4,7 @@ Typically these are utilised by other of our own packs/libraries.
 
 The software is distributed under the MIT license.
 
-Packs: 
+Packs:
 
   + debug_call    http://stoics.org.uk/~nicos/sware/debug_call
   + lib           http://stoics.org.uk/~nicos/sware/lib
