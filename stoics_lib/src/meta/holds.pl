@@ -1,3 +1,5 @@
+:- lib(mod_goal/2).
+
 /** holds( +Goal, -Holds ).
     
     Goal is called deterministically with =|Holds = true|= iff Goal
@@ -37,7 +39,7 @@ false.
 */
 holds( Goal, Holds ) :-
     mod_goal( Goal, Moal ),
-	call( Moal ),
-	!,
-	Holds = true.
+    call( Moal ),
+    !,
+    Holds = true.
 holds( _Goal, false ).

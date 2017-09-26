@@ -45,41 +45,41 @@ MG = user:g(a).
 mod_goal( Goal, Moal ) :-
     mod_goal( user, Goal, Moal ).
 mod_goal( Mod, Goal, Moal ) :-
-	ground( Mod ),
-	\+ var( Goal ),
-	!,
-	mod_goal_gen( Mod, Goal, false, Moal ).
+    ground( Mod ),
+    \+ var( Goal ),
+    !,
+    mod_goal_gen( Mod, Goal, false, Moal ).
 mod_goal( Mod, Goal, Moal ) :-
-	ground( Moal ),
-	!,
-	( Moal = Mod:Goal -> true; Mod=user, Goal=Moal ).
+    ground( Moal ),
+    !,
+    ( Moal = Mod:Goal -> true; Mod=user, Goal=Moal ).
 mod_goal( _Mod, _Goal, _Moal ) :-
-	throw( pack_error(auxil,mod_goal/3,ground_dual_mode([1,2],3)) ).
+    throw( pack_error(auxil,mod_goal/3,ground_dual_mode([1,2],3)) ).
 mod_goal( Mod, Goal, Over, Moal ) :-
-	ground( Mod ),
-	ground( Goal ),
-	ground( Over ),
-	!,
-	mod_goal_gen( Mod, Goal, Over, Moal ).
+    ground( Mod ),
+    ground( Goal ),
+    ground( Over ),
+    !,
+    mod_goal_gen( Mod, Goal, Over, Moal ).
 mod_goal( Mod, Goal, Over, _Moal ) :-
-	throw( pack_error(auxil,mod_goal/4,ground([1,2,3],[Mod,Goal,Over])) ).
+    throw( pack_error(auxil,mod_goal/4,ground([1,2,3],[Mod,Goal,Over])) ).
 
 mod_goal_gen( Mod, Goal, Over, Moal ) :-
-	Goal = Mod1:Goal1,
-	!,
-	mod_goal_over( Over, Mod, Mod1, Goal1, Moal ).
+    Goal = Mod1:Goal1,
+    !,
+    mod_goal_over( Over, Mod, Mod1, Goal1, Moal ).
 mod_goal_gen( Mod, Goal, _Over, Moal ) :-
-	Moal = Mod:Goal.
+    Moal = Mod:Goal.
 
 mod_goal_over( false, _Mod, Mod1, Goal1, Moal ) :-
-	Moal = Mod1:Goal1.
+    Moal = Mod1:Goal1.
 mod_goal_over( true, Mod, _Mod1, Goal1, Moal ) :-
-	Moal = Mod:Goal1.
+    Moal = Mod:Goal1.
 mod_goal_over( error, ModIn, ModAttached, Naked, _Moal ) :-
-	% throw( pack_error(stoics_lib,mod_goal/4,modules_clash(ModIn,ModAttached,Naked)) ).
-	throw( pack_error(stoics_lib,modules_clash(ModIn,ModAttached,Naked)) ).
+    % throw( pack_error(stoics_lib,mod_goal/4,modules_clash(ModIn,ModAttached,Naked)) ).
+    throw( pack_error(stoics_lib,modules_clash(ModIn,ModAttached,Naked)) ).
 
 :- multifile( pack_errors:message/3 ).
 
 pack_errors:message( modules_clash(In,Attached,Goal) ) -->
-	['Module to fix-on: ~w differs from module attached in: ~w'- [In,Attached:Goal] ].
+    ['Module to fix-on: ~w differs from module attached in: ~w'- [In,Attached:Goal] ].

@@ -1,3 +1,4 @@
+
 :- lib(mod_goal/4).
 
 /** map_list_options( +Goal, ?InList, ?OutList, +Opts ).
@@ -22,29 +23,29 @@ Outs = [2, 3, 4]
 */
 map_list_options( GoalIn, InL, Opts ) :-
     mod_goal( user, GoalIn, false, Goal ),
-	map_list_options_3( InL, Goal, Opts ).
+    map_list_options_3( InL, Goal, Opts ).
 
 map_list_options( GoalIn, InL, OutL, Opts ) :-
-	var( InL ),
-	ground( OutL ),
-	!,
+    var( InL ),
+    ground( OutL ),
+    !,
     mod_goal( user, GoalIn, false, Goal ),
-	maplist_options_2( OutL, Goal, InL, Opts ).
+    maplist_options_2( OutL, Goal, InL, Opts ).
 map_list_options( GoalIn, InL, OutL, Opts ) :-
     mod_goal( user, GoalIn, false, Goal ),
-	maplist_options_1( InL, Goal, OutL, Opts ).
+    maplist_options_1( InL, Goal, OutL, Opts ).
 
 maplist_options_1( [], _Goal, [], _Opts ).
 maplist_options_1( [InH|InT], Goal, [OutH|OutT], Opts ) :-
-	call( Goal, InH, OutH, Opts ),
-	maplist_options_1( InT, Goal, OutT, Opts ).
+    call( Goal, InH, OutH, Opts ),
+    maplist_options_1( InT, Goal, OutT, Opts ).
 
 maplist_options_2( [], _Goal, [], _Opts ).
 maplist_options_2( [OutH|OutT], Goal, [InH|InT], Opts ) :-
-	call( Goal, InH, OutH, Opts ),
-	maplist_options_2( OutT, Goal, InT, Opts ).
+    call( Goal, InH, OutH, Opts ),
+    maplist_options_2( OutT, Goal, InT, Opts ).
 
 map_list_options_3( [], _Goal, _Opts ).
 map_list_options_3( [H|T], Goal, Opts ) :-
-	call( Goal, H, Opts ),
-	map_list_options_3( T, Goal, Opts ).
+    call( Goal, H, Opts ),
+    map_list_options_3( T, Goal, Opts ).

@@ -1,6 +1,11 @@
 ---   Releases   ---
 --------------------
 0.6   
+      17.09.26   CHANGE: pass meta-goals in on_fail/3 through mod_goal/2
+                 CHANGE: pass meta-goals in which/3 through mod_goal/2
+                 FIXED:  add lib(mod_goal/n) to all meta/ files that use the predicates
+                 FIXED:  added mod_goal/2 into stoics_lib/LibIndex.pl
+                 RETAB:  all files in src/meta/
       17.09.25   IFACE:  mod_goal/2
                  CHANGE: default Override in mod_goal/3 is now false (previously true)
                  CHANGE: pass meta-goals in current_call/1,2 via mod_goal/2

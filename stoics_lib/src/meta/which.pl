@@ -1,4 +1,5 @@
 
+:- lib(mod_goal/2).
 :- lib(position/3).
 
 %% which( +Goal, +Term, -Indices ).
@@ -28,5 +29,6 @@
 % @tbd implement ala library(apply)
 % 
 which( Goal, List, Indices ) :-
-	findall( I, (position(I,List,Ith),once(call(Goal,Ith))), Indices ).
-	% findall( I, (nth1(I,List,Ith),once(call(Goal,Ith))), Indices ).
+    mod_goal( Goal, Moal ),
+    findall( I, (position(I,List,Ith),once(call(Moal,Ith))), Indices ).
+    % findall( I, (nth1(I,List,Ith),once(call(Goal,Ith))), Indices ).

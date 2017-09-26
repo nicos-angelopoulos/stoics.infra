@@ -23,18 +23,18 @@ false.
 
 */
 goal( Mod:Partial, Args, _Def, Goal ) :-
-	!,
-	Partial \= (_:_),
-	goal( Partial, Args, Mod, Goal ).
+    !,
+    Partial \= (_:_),
+    goal( Partial, Args, Mod, Goal ).
 goal( Partial, ExtraArgS, Mod, Goal ) :-
-	compound( Partial ),
-	!,
-	Partial =.. [PredName|PartArgs],
-	en_list( ExtraArgS, ExtraArgs ),
-	append( PartArgs, ExtraArgs, Args ),
-	Full =.. [PredName|Args],
-	Goal = (Mod:Full).
+    compound( Partial ),
+    !,
+    Partial =.. [PredName|PartArgs],
+    en_list( ExtraArgS, ExtraArgs ),
+    append( PartArgs, ExtraArgs, Args ),
+    Full =.. [PredName|Args],
+    Goal = (Mod:Full).
 goal( PredName, ArgS, Mod, Goal ) :-
-	en_list( ArgS, Args ),
-	Full =.. [PredName|Args],
-	Goal = (Mod:Full).
+    en_list( ArgS, Args ),
+    Full =.. [PredName|Args],
+    Goal = (Mod:Full).

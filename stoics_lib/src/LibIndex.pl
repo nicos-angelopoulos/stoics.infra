@@ -62,6 +62,7 @@ lib_index(map_succ_list, 4, any, user, 'meta/map_succ_list').
 lib_index(map_list_options, 3, any, user, 'meta/map_list_options').
 lib_index(map_list_options, 4, any, user, 'meta/map_list_options').
 lib_index(message_report, 3, any, user, 'error/message_report').
+lib_index(mod_goal, 2, any, user, 'meta/mod_goal').
 lib_index(mod_goal, 3, any, user, 'meta/mod_goal').
 lib_index(mod_goal, 4, any, user, 'meta/mod_goal').
 lib_index(n_breaks, 4, any, user, 'list/n_breaks').

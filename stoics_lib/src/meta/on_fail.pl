@@ -1,5 +1,8 @@
 
 :- lib(options).
+
+:- lib(mod_goal/2).
+:- lib(mod_goal/3).
 :- lib(message_report/3).
 
 on_fail_defaults( Defs  ) :-
@@ -74,13 +77,16 @@ on_fail( Goal, Call, Args ) :-
 
 on_fail_catch( Goal, Catcher, Rep, Mtype, Reth, Call ) :-
     on_fail_reports_caught( Rep, RepB ),
-    functor( Goal, Gnm, Gar ),
-    catch( Goal, Catcher, on_fail_caught(RepB,Mtype,Gnm/Gar,Catcher,Reth,Call) ),
+    mod_goal( Goal, Moal ),             % Moal Mod:Goal form
+    mod_goal( _Mod, Noal, Moal ),       % Noal Goal guaranteed with no Mod prepending form
+    functor( Noal, Gnm, Gar ),
+    catch( Moal, Catcher, on_fail_caught(RepB,Mtype,Gnm/Gar,Catcher,Reth,Call) ),
     !.
 on_fail_catch( Goal, _Catcher, Rep, Mtype, _Reth, Call ) :-
     on_fail_reports_failure( Rep, RepB ),
-    functor( Goal, Gnm, Gar ),
-    on_fail_failed( RepB, Mtype, Gnm/Gar, Call ).
+    mod_goal( Mod, Noal, Goal ),
+    functor( Noal, Gnm, Gar ),
+    on_fail_failed( RepB, Mtype, Mod:Gnm/Gar, Call ).
 
 on_fail_caught( true, Mtype, Gid, Catcher, Reth, Call ) :-
     functor( Call, Cnm, Car ),
@@ -97,12 +103,15 @@ on_fail_rethrow( true, Catcher ) :-
 on_fail_rethrow( false, _Catcher ).
 
 on_fail_failed( true, Mtype, Gid, Call ) :-
-    functor( Call, Cnm, Car ),
+    mod_goal( Call, Mall ),
+    mod_goal( Mod, Nall, Mall ),
+    functor( Nall, Cnm, Car ),
     Mess = 'Call to ~w, failed, calling: ~w',
-    message_report( Mess, [Gid,Cnm/Car], Mtype ),
-    call( Call ).
+    message_report( Mess, [Gid,Mod:Cnm/Car], Mtype ),
+    call( Mall ).
 on_fail_failed( false, _Mtype, _Gid, Call ) :-
-    call( Call ).
+    mod_goal( Call, Mall ),
+    call( Mall ).
 
 on_fail_reports_failure(false, false).
 on_fail_reports_failure(failure, true).

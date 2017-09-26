@@ -1,4 +1,5 @@
 
+:- lib(mod_goal/2).
 :- lib(goal_spec/2).
 
 /** current_call( +Goal ).
@@ -36,14 +37,14 @@ X = c.
 
 */
 current_call( Goal ) :-
-	current_call( Goal, fail ).
+    current_call( Goal, fail ).
 
 current_call( Goal, _Else ) :-
-	goal_spec( Goal, Spec ),
-	current_predicate( Spec ),
-	!,
+    goal_spec( Goal, Spec ),
+    current_predicate( Spec ),
+    !,
     mod_goal( Goal, Moal ),
-	call( Moal ).
+    call( Moal ).
 current_call( _Goal, Else ) :-
     mod_goal( Else, Mlse ),
-	call( Mlse ).
+    call( Mlse ).

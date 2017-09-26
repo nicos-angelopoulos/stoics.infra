@@ -15,18 +15,18 @@
 % @version  0.1 2014/9/14
 %
 goal_spec( Goal, Spec ) :-
-	var( Spec ),
-	!,
-	\+ var( Goal ),
-	goal_spec_1( Goal, Spec ).
+    var( Spec ),
+    !,
+    \+ var( Goal ),
+    goal_spec_1( Goal, Spec ).
 goal_spec( Mod:Goal, Mod:Pname/Arity ) :-
-	!,
-	functor( Goal, Pname, Arity ).
+    !,
+    functor( Goal, Pname, Arity ).
 goal_spec( Goal, Pname/Arity ) :-
-	functor( Goal, Pname, Arity ).
+    functor( Goal, Pname, Arity ).
 
 goal_spec_1( Mod:Goal, Mod:Pname/Arity ) :-
-	!,
-	functor( Goal, Pname, Arity ).
+    !,
+    functor( Goal, Pname, Arity ).
 goal_spec_1( Goal, Pname/Arity ) :-
-	functor( Goal, Pname, Arity ).
+    functor( Goal, Pname, Arity ).

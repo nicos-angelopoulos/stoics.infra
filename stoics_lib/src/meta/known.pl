@@ -1,5 +1,6 @@
 
 :- lib(pack_errors).
+:- lib(mod_goal/2).
 :- lib(imported_from/2).
 
 /** known( +Goal ).
