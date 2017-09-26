@@ -1,3 +1,4 @@
+stoics.infra
 
 This is a collection of SWI-Prolog packs that implement basic system functionality.
 Typically these are utilised by other of our own packs/libraries.
