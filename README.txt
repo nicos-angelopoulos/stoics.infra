@@ -14,7 +14,6 @@ Packs:
   + spuds         http://stoics.org.uk/~nicos/sware/spuds
   + stoics_lib    http://stoics.org.uk/~nicos/sware/stoics_lib
 
-
 Nicos Angelopoulos
 ---
 London, 2017
