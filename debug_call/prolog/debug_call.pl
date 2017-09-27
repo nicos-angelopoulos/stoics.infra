@@ -313,6 +313,8 @@ debug_portray( _Topic, _Term ).
 %    If Hdr or Ftr are '' then that part of the message is skipped
 %  * dims
 %    prints the dimensions of matrix, see mtx_dims/3
+%  * odir
+%     output directory (Arg should exist and be a directory)
 %  * wrote 
 %    reports the writting of output on a file. Arg should be file specification suitable for locate/3.
 %    Either loc(File,Exts) or simply File in which case Exts = ''.
@@ -322,9 +324,9 @@ debug_portray( _Topic, _Term ).
 %  * task(Wch)  
 %    time of start/stop of a task. Other values are allowed put printed as is. 
 %  * start 
-%    translates to starting ~Arg
+%    translates to starting ~Arg or starting ~Topic if Arg == true
 %  * end
-%    translates to finishing ~Arg
+%    translates to finishing ~Arg or starting ~Topic if Arg == true
 %  * call(Goal)
 %    call Goal before printing debugging message debug( Topic, Mess, Args).  (Goal is called in non-deterministic context).
 %  * pwd 
@@ -472,6 +474,14 @@ debug_call_topic( dims, Pfx, NamesPrv/MtxsPrv, Topic ) :-
     flatten( NNest, Vars ),
     atom_concat( Prefixed, Right, Message ),
     debug_message( Topic, Message, Vars ). % do the messaging !
+debug_call_topic( odir, Pfx, Odir, Topic ) :-
+    ( exists_directory(Odir) ->
+        Mess = 'Ouput in directory: ~w'
+        ;
+        Mess = 'Output (claimed) in (non-existing) directory: ~w'
+    ),
+    debug_message_prefixed( Pfx, Mess, Prefixed ),
+    debug_message( Topic, Prefixed, [Odir] ).
 debug_call_topic( wrote, Pfx, ForLoc, Topic ) :-
     ( ForLoc = loc(Spec,Ext) -> true; Spec=ForLoc, Ext = '' ),
     catch( locate(Spec,Ext,Loc), Excp, true ),
@@ -492,14 +502,16 @@ debug_call_topic( task(Whc), Pfx, Task, Topic ) :-
     atomic_list_concat( [Readable,' ',Whcable,' task: ', Task,'.'], Mess ),
     debug_message_prefixed( Pfx, Mess, Prefixed ),
     debug_message( Topic, Prefixed, [] ).
-debug_call_topic( start, Pfx, _, Topic ) :-
+debug_call_topic( start, Pfx, Arg, Topic ) :-
     Mess = 'Starting: ~w',
     debug_message_prefixed( Pfx, Mess, Prefixed ),
-    debug_message( Topic, Prefixed, [Topic] ).
-debug_call_topic( end, Pfx, _, Topic ) :-
+    ( Arg == true -> Rep = Topic; Rep = Arg ),
+    debug_message( Topic, Prefixed, [Rep] ).
+debug_call_topic( end, Pfx, Arg, Topic ) :-
     Mess = 'Finished: ~w',
     debug_message_prefixed( Pfx, Mess, Prefixed ),
-    debug_message( Topic, Prefixed, [Topic] ).
+    ( Arg == true -> Rep = Topic; Rep = Arg ),
+    debug_message( Topic, Prefixed, [Rep] ).
 debug_call_topic( pwd, Pfx, Stage, Topic ) :-
     working_directory( Pwd, Pwd ),
     ( Stage == false -> 
