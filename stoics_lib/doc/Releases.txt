@@ -1,6 +1,9 @@
 ---   Releases   ---
 --------------------
 0.6   
+      17.10.04   IFACE:  allow list and atoms in 1st arg of termplate/2,3
+                 ERR:    handling of var input for 1st arg of termplate/2,3
+                 DOC:    document list and atom inputs to termplate/2,3
       17.09.26   CHANGE: pass meta-goals in on_fail/3 through mod_goal/2
                  CHANGE: pass meta-goals in which/3 through mod_goal/2
                  FIXED:  add lib(mod_goal/n) to all meta/ files that use the predicates
