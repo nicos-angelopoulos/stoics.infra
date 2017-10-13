@@ -131,4 +131,4 @@ V = date(2017,8,15).
 ==
 */
 % stoics_lib_version( 0:4:0, date(2017,8,8) ).
-stoics_lib_version( 0:5:0, date(2017,8,15) ).
+stoics_lib_version( 0:6:0, date(2017,10,13) ).
