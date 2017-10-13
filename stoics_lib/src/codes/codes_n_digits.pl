@@ -1,5 +1,5 @@
 
-% :- lib(break_nth/4).
+:- lib(break_nth/4).
 
 /** codes_n_digits( +InCodes, +N, Codes ).
 

@@ -1,6 +1,7 @@
 ---   Releases   ---
 --------------------
 0.6   
+      17.10.13   FIXED:  de-comment dependency to break_nth/4 in codes_n_digits.pl
       17.10.04   IFACE:  allow list and atoms in 1st arg of termplate/2,3
                  ERR:    handling of var input for 1st arg of termplate/2,3
                  DOC:    document list and atom inputs to termplate/2,3
