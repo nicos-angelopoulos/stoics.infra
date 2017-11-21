@@ -51,6 +51,7 @@ Ns = [1, 2, 3].
 @version   0.3 2017/3/9
 @version   0.4 2017/8/8
 @version   0.5 2017/8/15
+@version   0.6 2017/10/13
 @see http://www.stoics.org.uk/~nicos/sware/stoics_lib
 
 */
@@ -131,4 +132,4 @@ V = date(2017,8,15).
 ==
 */
 % stoics_lib_version( 0:4:0, date(2017,8,8) ).
-stoics_lib_version( 0:6:0, date(2017,10,13) ).
+stoics_lib_version( 0:6:1, date(2017,11,21) ).

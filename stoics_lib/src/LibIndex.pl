@@ -14,6 +14,7 @@ lib_index(compare, 4, any, user, 'term/compare').
 lib_index(compare_arithmetic, 3, any, user, 'number/compare_arithmetic').
 lib_index(current_call, 1, any, user, 'meta/current_call').
 lib_index(current_call, 2, any, user, 'meta/current_call').
+lib_index(curtail, 3, any, user, 'term/curtail').
 lib_index(datime_readable, 1, any, user, 'date_time/datime_readable').
 lib_index(datime_readable, 2, any, user, 'date_time/datime_readable').
 lib_index(date_two_digit_dotted, 1, any, user, 'date_time/date_two_digit_dotted').
@@ -23,8 +24,9 @@ lib_index(get_date, 1, any, user, 'date_time/get_date').
 lib_index(get_date_time, 1, any, user, 'date_time/get_date_time').
 lib_index(has_at_least, 3, any, user, 'list/has_at_least').
 lib_index(has_at_most, 3, any, user, 'list/has_at_most').
-lib_index(has_length, 2, any, user, 'list/has_length').
-lib_index(has_length, 3, any, user, 'list/has_length').
+lib_index(has_length, 2, any, user, 'term/has_length').
+lib_index(has_length, 3, any, user, 'term/has_length').
+lib_index(has_length, 4, any, user, 'term/has_length').
 lib_index(en_list, 2, any, user, 'term/en_list').
 lib_index(expand_spec, 2, any, user, 'file/expand_spec').
 lib_index(get_datetime, 1, any, user, 'date_time/get_datetime' ).
@@ -93,6 +95,8 @@ lib_index(sub_atom, 2, any, user, 'atom/sub_atom').
 lib_index(sub_atom, 4, any, user, 'atom/sub_atom').
 lib_index(three_letter_months, 1, any, user, 'date_time/three_letter_months').
 lib_index(three_letter_month, 2, any, user, 'date_time/three_letter_month').
+lib_index(term_length, 2, any, user, 'term/term_length').
+lib_index(term_type, 2, any, user, 'term/term_type').
 lib_index(termplate, 2, any, user, 'term/termplate').
 lib_index(termplate, 3, any, user, 'term/termplate').
 lib_index(which, 3, any, user, 'meta/which').

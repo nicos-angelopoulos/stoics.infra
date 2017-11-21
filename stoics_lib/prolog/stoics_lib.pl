@@ -46,9 +46,6 @@
               nth1/5,                  % ?N, +List, ?With, ?Nth, +NewList
               has_at_least/3,          % +N, +X, +List
               has_at_most/3,           % +N, +X, +List
-              has_length/2,            % +List, +Lengthy
-              has_length/3,            % +List, +Lengthy, +Op
-              has_length/4,            % +List, +Lengthy, +Op, +Err
               list_frequency/2,        % +List, -Freqs
               list_frequency/3,        % +List, -Freqs, +Opts
               list_transpose/2,        % +List, -Transpose
@@ -84,7 +81,11 @@
               arity/2,arity/3,         % ?Term[, ?Name], ?Arity
               compare/4,               % +Type, ?Op, +Term1, +Term
               compound/3,              % +Term, -Name, -Args 
+              curtail/3,               % +Term, -Max, -Curtailed
               en_list/2,               % +Term, -Listed
+              has_length/2,            % +List, +Lengthy
+              has_length/3,            % +List, +Lengthy, +Op
+              has_length/4,            % +List, +Lengthy, +Op, +Err
               op_compare/3,            % ?Op, +Term1, +Term2
               portray_clauses/2,       % +Terms, +Opts
               positions/2,positions/3, % +Data, [-Dtype,] -NofPositions ).
@@ -93,6 +94,8 @@
               position_nth/3, position_nth/4, % +N, +Data[, -Nth]
               position_nth/5, position_nth/6, % [+Dtype,] +N, +Data, -Nth, -Rem, -Nxt
               position_type/2,         % +Term, -PosType
+              term_length/2,           % +Term, -Length
+              term_type/2,             % +Term, -Type
               termplate/2,termplate/3  % +Term[, Arity3], -Termplate
     ] ).
 
@@ -194,5 +197,8 @@
 :- lib(io_sections/3).
 :- lib(on_fail/2).
 :- lib(on_fail/3).
+:- lib(term_length/2).
+:- lib(curtail/3).
+:- lib(term_type/2).
 
 :- lib( end(stoics_lib) ).

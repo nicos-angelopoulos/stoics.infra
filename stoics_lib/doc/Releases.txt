@@ -1,5 +1,13 @@
 ---   Releases   ---
 --------------------
+0.7
+      17.11.21   IFACE:  added term_length/2 to term/
+                 MOVED:  has_length/2,3,4 to term/ (from list/)
+                 FIXED:  has_length/4 was not in LibIndex.pl
+                 ADDED:  length for vars and strings in has_length/2,3,4
+                 IFACE:  curtail/3 in term/
+                 IFACE:  term_type/2 in term/
+
 0.6   17.10.13   VER:    0.6
       17.10.13   FIXED:  de-comment dependency to break_nth/4 in codes_n_digits.pl
       17.10.04   IFACE:  allow list and atoms in 1st arg of termplate/2,3
