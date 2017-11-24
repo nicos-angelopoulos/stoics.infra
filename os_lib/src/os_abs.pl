@@ -18,12 +18,16 @@ os_abs( /(Sub), Abs, OptsPrvT ) :-
     ( select(access(new),OptsPrv,Opts) ->
         ( absolute_file_name(AbsSub,Abs,[access(exist),file_errors(fail)|Opts]) ->
             exists_file(Abs),
-            throw(error(permission_error(overwrite,'existing file',Abs),_))   % use 'context' instead of _ to surpress trace
+            throw(error(permission_error(overwrite,'existing file',Abs),_))   % use 'context' instead of _ to surpress trace ?
             ;
             true
         )
         ;
-	    absolute_file_name( AbsSub, Abs, OptsPrv )
+        ( OptsPrv = [] ->
+	        absolute_file_name( Atom, Abs )
+            ;
+	        absolute_file_name( Atom, Abs, OptsPrv )
+        )
     ).
 
 os_abs( Rel, Abs, OptsPrvT ) :-
@@ -36,5 +40,9 @@ os_abs( Rel, Abs, OptsPrvT ) :-
             true
         )
         ;
-	    absolute_file_name( Rel, Abs, OptsPrv )
+        ( OptsPrv = [] ->
+	        absolute_file_name( Rel, Abs )
+            ;
+	        absolute_file_name( Rel, Abs, OptsPrv )
+        )
     ).
