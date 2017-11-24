@@ -303,6 +303,14 @@ debug_portray( _Topic, _Term ).
 %  When Goal is of the form call(Goal), Arg will be passed to debug(Topic,Mess,Arg). 
 % 
 %Goal in:
+%  * call(Goal)
+%    call Goal before printing debugging message debug( Topic, Mess, Args).  (Goal is called in non-deterministic context).
+%  * dims
+%    prints the dimensions of matrix, see mtx_dims/3
+%  * end
+%    translates to finishing ~Arg or starting ~Topic if Arg == true
+%  * goal
+%    anything that does n't match any of the above is retried as call(Goal)
 %  * length
 %    prints the lenghts of a bunch of lists. Args should be ListNames/Lists. 
 %    uses non list ListNames if debuging the length of a single list, in which case
@@ -311,28 +319,26 @@ debug_portray( _Topic, _Term ).
 %    writes contents of list with header and footer. Arg should be of the form Hdr/Ftr/List, 
 %    else it is translated as Hdr/''/List or ''/''/List. 
 %    If Hdr or Ftr are '' then that part of the message is skipped
-%  * dims
-%    prints the dimensions of matrix, see mtx_dims/3
+%  * ns_sel
+%    first argument is the item selected from second arg list (only reported if 2nd arg is not a singleton (ns))
+%    accepts 2 optional args, 3rd is the token of what is selected (false for printing nothing on the subject, default)
+%    and 4th is whether to report if the 2nd argument is indeed a singleton (default: false)
+%  * ns_sel(true)
+%    first argument is the item selected from second arg list. reports differently if 2nd arg is a singleton, but always does report
 %  * odir
-%     output directory (Arg should exist and be a directory)
-%  * wrote 
-%    reports the writting of output on a file. Arg should be file specification suitable for locate/3.
-%    Either loc(File,Exts) or simply File in which case Exts = ''.
+%    output directory (Arg should exist and be a directory)
+%  * pwd 
+%    message about the current directory location (if Arg == false, it is ignored)
 %  * read
 %    reports reading from a file. Arg should be file specification suitable for locate/3.
 %    Either loc(File,Exts) or simply File in which case Exts = ''.
 %  * task(Wch)  
 %    time of start/stop of a task. Other values are allowed put printed as is. 
+%  * wrote 
+%    reports the writting of output on a file. Arg should be file specification suitable for locate/3.
+%    Either loc(File,Exts) or simply File in which case Exts = ''.
 %  * start 
 %    translates to starting ~Arg or starting ~Topic if Arg == true
-%  * end
-%    translates to finishing ~Arg or starting ~Topic if Arg == true
-%  * call(Goal)
-%    call Goal before printing debugging message debug( Topic, Mess, Args).  (Goal is called in non-deterministic context).
-%  * pwd 
-%    message about the current directory location (if Arg == false, it is ignored)
-%  * goal
-%    anything that does n't match any of the above is retried as call(Goal)
 %
 %==
 % ?- debug( ex ).
@@ -355,6 +361,10 @@ debug_portray( _Topic, _Term ).
 %?- debug_call( ex, (length([a,b,c],L),write(len(L)),nl) ).
 %len(3)
 %L = 3.
+%
+%?-  Etcs = [suv-17.09.26.txg,suv-17.09.21.txg], Etc = suv-17.09.26.txg,
+%    debug_call( suv, ns_sel, c(Etc,Etcs,'suv file',true) )
+% Continuing with: suv file, as: suv-17.09.26.txg, from non singleton list: [suv-17.09.26.txg,suv-17.09.21.txg]
 %==
 %
 % @author nicos angelopoulos
@@ -362,6 +372,7 @@ debug_portray( _Topic, _Term ).
 % @version  0.2 2014/04/24  added wrote
 % @version  0.3 2014/07/2   added task
 % @version  0.4 2014/09/22  renamed from debug_call/3
+% @version  0.5 current     added ns_sel
 %
 debug_call( Topic, Goal, Args ) :-
     debug_call( Topic, Goal, '', Args ).
@@ -521,6 +532,36 @@ debug_call_topic( pwd, Pfx, Stage, Topic ) :-
     ),
     debug_message_prefixed( Pfx, Mess, Prefixed ),
     debug_message( Topic, Prefixed, Args ).
+debug_call_topic( ns_sel, Pfx, Term, Topic ) :-
+    % ( Term = [Fst,Sec] -> true; arg(1,Term,Fst),arg(2,Term,Sec) ),
+    arg( 1, Term, Fst ), 
+    arg( 2, Term, Sec ),
+    functor( Term, _Tname, Arity ),
+    ( Sec == [] -> 
+        true % fixme: it will make more sense to throw an error if Sec = []
+        ;
+        ( Sec = [_Single] ->
+            ( (Arity>3,arg(4,Term,true)) ->
+                ( (Arity>2,\+ arg(3,Term,false)) ->
+                    arg(3,Term,Trd),
+                    Mess= 'Continuing with: ~w as: ~w, (only match).', MArgs = [Trd,Fst]
+                    ;
+                    Mess= 'Continuing with only match: ~w.', MArgs = [Fst,Sec]
+                )
+                ;
+                true
+            )
+            ;
+            ( (Arity>2,\+ arg(3,Term,false)) ->
+                arg(3,Term,Trd),
+                Mess = 'Continuing with: ~w, as: ~w, from non singleton list: ~w', MArgs = [Trd,Fst,Sec]
+                ;
+                Mess = 'Continuing: ~w, from non singleton list: ~w', MArgs = [Fst,Sec]
+            )
+        ),
+        debug_message_prefixed( Pfx, Mess, Prefixed ),
+        debug_message( Topic, Prefixed, MArgs )
+    ).
 
 debug_call_topic_list_delim( '', _Topic, _Pfx, _Mess ).
 debug_call_topic_list_delim( ListName, Topic, Pfx, Mess ) :-

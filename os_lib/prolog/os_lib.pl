@@ -9,8 +9,8 @@
               os_stem/3,                 % ?Stem, -Os, +Opts
               os_postfix/2,              % -Psfx, +Posted
               os_postfix/3,              % +Psfx, ?Fname, ?Posted
-              os_postfix/4,              % +Psfx, ?Fname, ?Posted, ?Opts
-              os_abs/2,                  % +Os, -Abs
+              os_postfix/4,              % +Psfx, ?Fname, ?Posted, +Opts
+              os_abs/2, os_abs/3,        % +Os, -Abs[, +Opts]
               os_path/3,                 % +-Dir, +-File, -+Path
               os_slashify/2,             % +-Path, -+Slashed
               os_parts/2,                % +-Parts, -+Stem
@@ -171,7 +171,7 @@ Variable name conventions
 The library predicates can be split to 4 groups.
 
 1. Predicates for manipulating and constructing OS entity names
-  * os_abs/2
+  * os_abs/2,3
   * os_base/2
   * os_ext/3
   * os_dir_stem_ext/4
@@ -256,6 +256,7 @@ The library predicates can be split to 4 groups.
 :- lib(os_cast/3).
 :- lib(os_errors/0).
 :- lib(os_abs/2).
+:- lib(os_abs/3).
 :- lib(os_file/1).
 :- lib(os_dir/1).
 :- lib(os_exists/1).

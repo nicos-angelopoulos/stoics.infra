@@ -2,6 +2,7 @@
 --------------------
 
 0.7 
+    17.09.24  IFACE:   os_abs/3, with option access(new) (non absolute_file_name/3)
     17.09.20  OPTS:    with_ext(WithExt) @ os_postfix/4, with example
               DOC:     made call modes of os_ext/4,3 more precise
               FIXED:   groundess error in os_ext/3, now uses new pack_errors version (and distinct error for os_ext/4)

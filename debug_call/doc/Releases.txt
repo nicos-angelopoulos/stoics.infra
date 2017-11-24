@@ -3,12 +3,13 @@
 TBD @ 17.03.10   debug_call with Success/failure by colour too (see SWI installation)
 
 0.4 
-    17.09.27   CHANGE: start/stop recognise true as default but now accept other args too
-               ADDED:  odir token
-    17.05.08   FIXED:  dims on empty matrices was erroring.
+    17.11.24  IFACE:  ns_sel pre-canned call in debug_call/3,4
+    17.09.27  CHANGE: start/stop recognise true as default but now accept other args too
+              ADDED:  odir token
+    17.05.08  FIXED:  dims on empty matrices was erroring.
 
-0.3 17.03.06   More remaing libs to stoics_lib (no local libs) and requires->lib
-    16.12.11   Moved more of libs to pack(stoics_lib) and re-added lib(requires) !
+0.3 17.03.06  More remaing libs to stoics_lib (no local libs) and requires->lib
+    16.12.11  Moved more of libs to pack(stoics_lib) and re-added lib(requires) !
 
 0.2 16.11.01  Published
 	 16.11.01  Removed dependency to lib(requires).
