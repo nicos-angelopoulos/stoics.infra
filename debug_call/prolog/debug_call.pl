@@ -549,7 +549,7 @@ debug_call_topic( ns_sel, Pfx, Term, Topic ) :-
                     Mess= 'Continuing with only match: ~w.', MArgs = [Fst,Sec]
                 )
                 ;
-                true
+                Mess = 'Continuing: ~w, from non singleton list: ~w', MArgs = [Fst,Sec]
             )
             ;
             ( (Arity>2,\+ arg(3,Term,false)) ->
