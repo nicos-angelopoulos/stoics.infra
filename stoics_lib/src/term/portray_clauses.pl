@@ -16,7 +16,7 @@ Opts
   through by_unix_term_to_serial/2 before passed to open/3
 
 @author nicos angelopoulos
-@verison  0.1 2016/12/10,  modified for public release
+@version  0.1 2016/12/10,  modified for public release
 
 */
 

@@ -1,6 +1,7 @@
 ---   Releases   ---
 --------------------
 0.7
+      17.12.21   TYPO:   portray_clauses/2 version tag
       17.11.21   IFACE:  added term_length/2 to term/
                  MOVED:  has_length/2,3,4 to term/ (from list/)
                  FIXED:  has_length/4 was not in LibIndex.pl
