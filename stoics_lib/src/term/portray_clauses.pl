@@ -1,22 +1,21 @@
 /** portray_clauses( +List, +OptS ).
 
-Record a bunch of clauses to either a stream or file. Supports append and write modes.
+Record a bunch of clauses to either a stream or a file. Supports append and write modes.
 OptS can be a list or single option term from the following:
 
 Opts
+  * mode(Mode=append)
+     append or write
 
-* mode(Mode=append)
-  append or write
+  * stream(Stream)
+     default is user_output
 
-* stream(Stream)
-  default is user_output
-
-* file(File)
-  if present, overwrites Stream. if pack(by_unix) is present File will be passed
-  through by_unix_term_to_serial/2 before passed to open/3
+  * file(File)
+     if present, overwrites Stream. if pack(by_unix) is present File will be
+     passed through by_unix_term_to_serial/2 before passed to open/3
 
 @author nicos angelopoulos
-@version  0.1 2016/12/10,  modified for public release
+@version  0.1 2016/12/10
 
 */
 
