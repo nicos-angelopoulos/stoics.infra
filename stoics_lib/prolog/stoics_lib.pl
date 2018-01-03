@@ -82,6 +82,7 @@
               compare/4,               % +Type, ?Op, +Term1, +Term
               compound/3,              % +Term, -Name, -Args 
               curtail/3,               % +Term, -Max, -Curtailed
+              en_append/3,             % +ListOr1, +ListOr2, List
               en_list/2,               % +Term, -Listed
               has_length/2,            % +List, +Lengthy
               has_length/3,            % +List, +Lengthy, +Op
@@ -200,5 +201,6 @@
 :- lib(term_length/2).
 :- lib(curtail/3).
 :- lib(term_type/2).
+:- lib(en_append/3).
 
 :- lib( end(stoics_lib) ).

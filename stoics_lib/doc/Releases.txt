@@ -1,6 +1,7 @@
 ---   Releases   ---
 --------------------
 0.7
+      18.01.03   IFACE:  en_append/3
       17.12.21   TYPO:   portray_clauses/2 version tag
                  DOC:    proper formatting
       17.11.21   IFACE:  added term_length/2 to term/
