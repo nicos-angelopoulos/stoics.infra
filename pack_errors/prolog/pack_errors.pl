@@ -2,6 +2,7 @@
                 pack_errors/0,              % 
                 caught/3,                   % +Goal, +Error, +Opts 
                 ground/2, ground_binary/2,  % +Term, -Groundness
+                defined/3,                  % +Pid,  +From
                 throw/2,                    % +Error,+Opts
                 type/2,                     % +Type, +Term
                 type/3,                     % +Type, +Term, +Opts
@@ -118,6 +119,7 @@ The library listens to =|debug(pack_errors)|=.
 @see     throw/2                args: +Ball, +Opts
 @see     type/2,  type/3        args: +Type, +Term [, +Opts]
 @see     pack_errors/0, pack_errors_version/2  args: +Version, +Date
+@see     defined/3              args: 
 
 */
 
@@ -235,9 +237,7 @@ ground_binary( Term, Type ) :-
     Type = true.
 ground_binary( _Term, false ).
 
-type_defaults( [error(true),pack(false),pred(false),arg(false)] ).
-
-throw_defaults( [on_throw(error)] ).
+throw_defaults( [on_throw(error),pack_format(short),as_pack_err(true)] ).
 
 /** throw( +Error, +Opts ).
 
@@ -249,7 +249,19 @@ where is to thrown Error is assumed.
 
 Opts
  * on_throw(OnThrow=error)
- one of [succeed,fail,error].
+    one of [succeed,fail,error].
+
+ * as_pack_err(Perr=true)
+    true wraps Error, as a pack_error
+
+ * pack(Pack=_)
+    originator pack
+ 
+ * pred(Pred=_)
+    originator predicate
+
+ * pack_format(Pfmt=short)
+    output format for pack announcement
 
 ==
 ?- throw( my_error(x), true ).
@@ -270,20 +282,45 @@ ERROR: Unhandled exception: my_error(x)
 ==
 
 @version  0.2 2017/3/6
+@version  0.3 2018/1/5  added tracer options: pack, pred & pack_format
 
 */
 throw( Error, Args ) :-
     pack_errors_options_append( throw, Args, Opts ),
     memberchk( on_throw(OnThrow), Opts ),
-    throw_opt( OnThrow, Error ).
+    throw_if_on( OnThrow, Error, Opts ).
 
-throw_opt( succeed, _Error ) :- 
+throw_if_on( succeed, _Error, _Opts ) :- 
     !.
-throw_opt( fail, _Error ) :-
+throw_if_on( fail, _Error, _Opts ) :-
     !,
     fail.
-throw_opt( _, Error ) :-
+throw_if_on( _, Error, Opts ) :-
+    memberchk( as_pack_err(Per), Opts ),
+    throw_as_pack_error( Per, Error, Opts ).
+
+throw_as_pack_error( false, Error, _Opts ) :-
+    !,
     throw( Error ).
+throw_as_pack_error( _, Error, Opts ) :-
+    memberchk( pack_format(Sil), Opts ),
+    ( memberchk(pack(Pack),Opts) -> 
+        ( memberchk(pred(Pred),Opts) ->
+            true
+            ;
+            Pred = '$unknown'/0
+        ),
+        throw( pack_error(Pack,Pred,Sil,Error) )
+        ;
+        ( memberchk(pred(Pred),Opts) ->
+            Pred = Pname/Arity,
+            throw( pack_error(Pname/Arity,Error) )
+            ;
+            throw( pack_error(Error) )
+        )
+    ).
+
+type_defaults( [error(true),pack(false),pred(false),arg(false)] ).
 
 /** type( +Type, @Term ).
     type( +Type, @Term, +Opts ).
@@ -381,6 +418,80 @@ pack_errors_options_append( Pname, ArgS, Opts ) :-
     append( Args, Defs, Opts ),
     !.
 
+defined_defaults( [load(false)] ).
+
+/** defined( +Pid, +From, +Opts ).
+
+Throws an error if Pid is not defined in current context.<br>
+From is the source from where Pid was supposed to be loaded.<br>
+This predicate can act independently (particularly with load(true))<br>
+or be combined with pack(lib)'s lib(suggests(Pack)) to, on-demand, <br>
+pinpoint to which library is missing and what <br>
+predicate within that pack is the deal breaker.
+
+==
+:- lib(suggests(Pack))
+==
+silently fails if Pack is not present. This is intendent for dependendencies 
+that do not impact major parts for the importing pack. Thus allow common
+use without grabbing all dependencies that may not be needed for a particular user.
+
+Opts are passed to throw/2, except for:
+ * load(Load=false)
+
+==
+?- defined( abc/0, pack(b_real), [as_pack_err(true)] ).
+ERROR: Predicate is not defined: abc/0, (source apparently available at: pack(b_real))
+
+?- defined( abc/0, false, [as_pack_err(true),pack(sourcey)] ).
+ERROR: sourcey:$unknown/0: Predicate is not defined: abc/0
+
+?- defined( abc/0, false, [as_pack_err(true)] ).
+ERROR: Predicate is not defined: abc/0
+
+?- defined( abc/0, pack(b_real), [as_pack_err(true),pack(sourcey)] ).
+ERROR: sourcey:$unknown/0: Predicate is not defined: abc/0, (source apparently available at: pack(b_real))
+
+?- defined( abc/0, pack(b_real), [as_pack_err(true),pack(sourcey),pred(foo/1;2)] ).
+ERROR: sourcey:foo/1;2: Predicate is not defined: abc/0, (source apparently available at: pack(b_real))
+
+==
+
+@author nicos angelopoulos
+@version  0.1 2018/1/5
+@see throw/2
+
+*/
+defined( Pid, _From, _Opts ) :-
+    current_predicate( Pid ),
+    !. % fixme: need version where From and Into are checked ? 
+       %        here we don't check as From and Into are assumed as tracers no enforcables
+defined( Pid, From, Args ) :-
+    \+ var(Args),                   % fixme: error
+    defined_defaults( Defs ),
+    ( is_list(ArgS) -> Args = ArgS; Args = [ArgS] ),
+    append( Args, Defs, Opts ),
+    memberchk( load(Load), Opts ),
+    defined_load( Load, Pid, From, Args ).
+
+defined_if_load( false, Pid, From, Args ) :-
+    throw( expected_from(Pid,From), Opts ).
+defined_if_load( true, Pid, From, Args ) :-
+    defined_load( From, Pid, From, Args ).
+defined_if_load( Other, Pid, From, Args ) :-
+    defined_load( Other, Pid, From, Args ).
+
+defined_load( LoadThis, Pid, From, Args ) :-
+    % fixme: check is not loaded ?
+    ensure_loaded( LoadThis ),
+    defined_loaded( Pid, From, Args ).
+
+defined_loaded( Pid, _From, _Args ) :-
+    current_predicate( Pid ),
+    !. % fixme: need version where From and Into are checked ? 
+defined_loaded( Pid, From, Args ) :-
+    throw( expected_from(Pid,From), Opts ).
+
 /** pack_errors.
 
 This is a documentation predicate, providing an anchor for documentation pointers.
@@ -395,7 +506,7 @@ Current version and release date for the library.
 
 Currently: pack_errors_version( 0:3:0, date(2017,3,6) ).
 */
-pack_errors_version( 0:3:1, date(2017,3,6) ).
+pack_errors_version( 0:3:2, date(2018,1,5) ).
 
 prolog:message(unhandled_exception(pack_error(Message))) -->
      { debug( pack_errors, 'Unhandled pack_error/1 ~w', Message ) },
@@ -448,6 +559,8 @@ message( from_pack(long,Pack,Pred) ) -->
     pack_errors:message( from_pack_long(Pred,Pack) ).
 message( from_pack(true,Pack,Pred) ) -->
     pack_errors:message( from_pack_short(Pred,Pack) ).
+message( from_pack(short,Pack,Pred) ) -->                % synonym to true
+    pack_errors:message( from_pack_short(Pred,Pack) ).
 
 message( from_pack_short(false,false) ) -->
     { ! }.
@@ -462,9 +575,9 @@ message( from_pack_short(Pred,Pack) ) -->
     % ['[~w::~w]: '-[Pack,Pred] ].
 
 message( from_pack_long(false,Pack) ) -->
-    ['Following error genererated from pack: ~w\n'-[Pack] ].
+    ['Following error generated from pack: ~w\n'-[Pack] ].
 message( from_pack_long(Pred,Pack) ) -->
-    ['Following error genererated for predicate: ~w, from pack: ~w'-[Pred,Pack] ].
+    ['Following error generated for predicate: ~w, from pack: ~w\n'-[Pred,Pack] ].
 
 message( arg_enumerate(Pos,Vals,_Arg) ) --> 
     { current_prolog_flag(pack_errors_arg,false) },
@@ -509,3 +622,7 @@ message( type_error(Type,Term) ) -->
     ['Object of type: ~w, expected but found term: ~w'-[Type,Term]].
 message( unknown_token(Tkn,Cat) ) -->
     ['Token: ~w, is not a recognisable: ~w'-[Tkn,Cat]].
+message( expected_from(Pid,false) ) -->
+    ['Predicate is not defined: ~w'-[Pid]].
+message( expected_from(Pid,From) ) -->
+    ['Predicate is not defined: ~w, (source apparently available at: ~w)'-[Pid,From]].

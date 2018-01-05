@@ -19,3 +19,26 @@ lib_suggests( Lib ) :-
     !.
 lib_suggests( Lib ) :-  % fixme:
     debug( lib, 'Suggested repository no installed: ~w', Lib ).
+
+lib_suggests( Pids, Load ) :-
+    is_list( Pids ),
+    !,
+    maplist( lib_suggests_pid(Load), Pids ).
+lib_suggests( Pid, Load ) :-
+    lib_suggests_pid( Load, Pid ).
+
+lib_suggests_pid( _Load, Promised ) :-
+    current_predicate( Promised ),
+    !.  % fixme: need to check from where ?
+lib_suggests_pid( Load, Promised ) :-
+    lib_tables:lib_promise( Load, Promised ),
+    !.
+lib_suggests_pid( Load, Promised ) :-
+    lib_tables:lib_promise( Other, Promised ),
+    Other \== Load,
+    !,
+    throw( lib(already_promised_from_elsewhere(Promised,Other,Load)) ). % fixme: ... message
+lib_suggests_pid( Load, Pname/Parity ) :-
+    functor( Head, Pname, Parity ),
+    assert( (Head :- lib:lib_promise(Load,Pname/Parity)) ),
+    assert( lib_tables:lib_promise(Load,Pname/Parity) ).

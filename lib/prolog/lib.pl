@@ -17,6 +17,7 @@
 :- ensure_loaded( '../src/lib_homonyms'  ).
 :- ensure_loaded( '../src/lib_suggests'  ).
 :- ensure_loaded( '../src/lib_expects'  ).
+:- ensure_loaded( '../src/lib_promise'  ).
 :- ensure_loaded( '../src/lib_message'  ).
 
 
@@ -25,6 +26,7 @@
 :- dynamic( lib_tables:lib_repo_homonyms/2 ).    % +Repo, +SrcDir
 :- dynamic( lib_tables:lib_context/2 ).          % +Ctx, +Root
 :- dynamic( lib_tables:lib_index/4 ).            % +Pa, +Pn, +Repo, +File
+:- dynamic( lib_tables:lib_promise/2 ).            % +Pa, +Pn, +Repo, +File
                                                  % records all loaded indices
 :- dynamic( lib_tables:lib_homonym/3 ).          % +Stem, +Repo, +File
                                                  % records all loaded homonyms
@@ -277,6 +279,8 @@ Operands
        case for lib_mkindex/1)
     * suggests(Lib)
        it is likely you need Lib for full functionalilty
+    * suggests(Pred,Load)
+       Pred is needed for functionality and it can be found by loading Load, but it will only happen at Pred's first call
     * expects(Pid,Mess)
     * expects(Pid,Mess,Call)
        complains if Pid is not defined at loading time. Mess should be a debug style message
@@ -405,6 +409,9 @@ lib( version(V,D), _, _Args ) :-
 lib( suggests(Lib), _, _Args ) :-  % fixme: add note() option
     !,
     lib_suggests( Lib ).
+lib( suggests(PidS,Load), _, _Args ) :-  % fixme: add note() option
+    !,
+    lib_suggests( PidS, Load ).
 lib( expects(Lib,Mess), _, _Opts ) :-  % fixme: add note() option 
     !,
     lib_expects( Lib, Mess ).
