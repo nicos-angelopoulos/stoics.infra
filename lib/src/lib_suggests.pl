@@ -40,5 +40,5 @@ lib_suggests_pid( Load, Promised ) :-
     throw( lib(already_promised_from_elsewhere(Promised,Other,Load)) ). % fixme: ... message
 lib_suggests_pid( Load, Pname/Parity ) :-
     functor( Head, Pname, Parity ),
-    assert( (Head :- lib:lib_promise(Load,Pname/Parity)) ),
+    assert( (user:Head :- lib:lib_promise(Load,Head)) ),
     assert( lib_tables:lib_promise(Load,Pname/Parity) ).

@@ -25,13 +25,10 @@
 :- dynamic( lib_tables:lib_repo_index/2 ).       % +Repo, +IdxFile
 :- dynamic( lib_tables:lib_repo_homonyms/2 ).    % +Repo, +SrcDir
 :- dynamic( lib_tables:lib_context/2 ).          % +Ctx, +Root
-:- dynamic( lib_tables:lib_index/4 ).            % +Pa, +Pn, +Repo, +File
-:- dynamic( lib_tables:lib_promise/2 ).            % +Pa, +Pn, +Repo, +File
-                                                 % records all loaded indices
-:- dynamic( lib_tables:lib_homonym/3 ).          % +Stem, +Repo, +File
-                                                 % records all loaded homonyms
-:- dynamic( lib_tables:lib_loaded_index/2 ).     % +Repo, +File
-                                                 % keeps track of loaded index files
+:- dynamic( lib_tables:lib_index/4 ).            % +Pa, +Pn, +Repo, +File. records loaded indices
+:- dynamic( lib_tables:lib_promise/2 ).          % +Load, +Pid.  hot swap Pid with loading Load
+:- dynamic( lib_tables:lib_homonym/3 ).          % +Stem, +Repo, +File. record loaded homonym
+:- dynamic( lib_tables:lib_loaded_index/2 ).     % +Repo, +File. tracks loaded index files
 :- dynamic( lib_tables:lib_loaded_homonyms/2 ).  % 
 :- dynamic( lib_tables:lib_attached_indices/2 ). % +Ctx, Repo
 :- dynamic( lib_tables:lib_attached_homonyms/2 ).% +Ctx, Repo
