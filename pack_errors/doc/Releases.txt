@@ -1,6 +1,9 @@
 ---   Releases   ----
 ---------------------
 
+0.4
+      18.01.06   IFACE:  defined/2;3 
+                 ADDED:  tracer options: pack, pred & pack_format options to throw/2
       17.08.22   IFACE:  lengths_mismatch/5, generalised /4 for terms and op
       17.06.27   ADDED:  @() as an alias to call() in type/3's 1st argument
 

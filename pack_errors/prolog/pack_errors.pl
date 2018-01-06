@@ -2,7 +2,7 @@
                 pack_errors/0,              % 
                 caught/3,                   % +Goal, +Error, +Opts 
                 ground/2, ground_binary/2,  % +Term, -Groundness
-                defined/3,                  % +Pid,  +From
+                defined/2, defined/3,       % +Pid,  +From[, +Opts]
                 throw/2,                    % +Error,+Opts
                 type/2,                     % +Type, +Term
                 type/3,                     % +Type, +Term, +Opts
@@ -247,6 +247,8 @@ Error is not thrown and the call itself succeeds.
 For all other values the default behaviour is that of =|OnThrow==error|=
 where is to thrown Error is assumed.
 
+As of version 0.3 this should be the adviced entry point for throwing pack tracing balls.
+
 Opts
  * on_throw(OnThrow=error)
     one of [succeed,fail,error].
@@ -281,6 +283,7 @@ ERROR: Unhandled exception: my_error(x)
 
 ==
 
+@author nicos angelopoulos
 @version  0.2 2017/3/6
 @version  0.3 2018/1/5  added tracer options: pack, pred & pack_format
 
@@ -429,6 +432,13 @@ or be combined with pack(lib)'s lib(suggests(Pack)) to, on-demand, <br>
 pinpoint to which library is missing and what <br>
 predicate within that pack is the deal breaker.
 
+Note that pack(lib) also provides
+==
+lib(suggests(Pid,Load))
+==
+which is an alternative and more automatic way to achieve demand driven 
+loading via hot-swapping.
+
 ==
 :- lib(suggests(Pack))
 ==
@@ -440,57 +450,73 @@ Opts are passed to throw/2, except for:
  * load(Load=false)
 
 ==
-?- defined( abc/0, pack(b_real), [as_pack_err(true)] ).
-ERROR: Predicate is not defined: abc/0, (source apparently available at: pack(b_real))
+?- defined( abc/0, pack(b_real) ).
+ERROR: Predicate: abc/0 is not defined (source apparently available at: pack(b_real); not asked to load)
 
-?- defined( abc/0, false, [as_pack_err(true),pack(sourcey)] ).
-ERROR: sourcey:$unknown/0: Predicate is not defined: abc/0
+?- defined( abc/0, false ).
+ERROR: Predicate: abc/0 is not defined
 
-?- defined( abc/0, false, [as_pack_err(true)] ).
-ERROR: Predicate is not defined: abc/0
+?- defined( abc/0, false, pack(sourcey) ).
+ERROR: sourcey:$unknown/0: Predicate: abc/0 is not defined
 
-?- defined( abc/0, pack(b_real), [as_pack_err(true),pack(sourcey)] ).
-ERROR: sourcey:$unknown/0: Predicate is not defined: abc/0, (source apparently available at: pack(b_real))
+?- defined( abc/0, pack(b_real), [pack(sourcey),pred(foo/1;2)] ).
+ERROR: sourcey:foo/1;2: Predicate: abc/0 is not defined (source apparently available at: pack(b_real); not asked to load)
 
-?- defined( abc/0, pack(b_real), [as_pack_err(true),pack(sourcey),pred(foo/1;2)] ).
-ERROR: sourcey:foo/1;2: Predicate is not defined: abc/0, (source apparently available at: pack(b_real))
-
+?- defined( b_real/0, pack(b_real), [as_pack_err(true),load(library(b_real))] ).
+true.
 ==
+The above only succeeds if b_real is an install library and defines b_real/0.
+
+From or Load can have the special form: lib(CodeLib). This assumes pack(lib) is installed and lib/1
+will be used to load the requested CodeLib.
+==
+?- defined( b_real/0, lib(b_real), load(true) ),
+==
+Will again, only succeed if b_real is installed and defines b_real/0. In this occasion library(lib) should be also installed.
 
 @author nicos angelopoulos
 @version  0.1 2018/1/5
 @see throw/2
+@see lib/1 (lib(suggests/1)) can work with this predicate
+@see lib/1 (lib(suggests/2)) as an alternative
 
 */
+defined( Pid, From ) :-
+    defined( Pid, From, [] ).
 defined( Pid, _From, _Opts ) :-
     current_predicate( Pid ),
     !. % fixme: need version where From and Into are checked ? 
        %        here we don't check as From and Into are assumed as tracers no enforcables
-defined( Pid, From, Args ) :-
-    \+ var(Args),                   % fixme: error
+defined( Pid, From, ArgS ) :-
+    \+ var(ArgS),                   % fixme: error
     defined_defaults( Defs ),
     ( is_list(ArgS) -> Args = ArgS; Args = [ArgS] ),
     append( Args, Defs, Opts ),
     memberchk( load(Load), Opts ),
-    defined_load( Load, Pid, From, Args ).
+    defined_if_load( Load, Pid, From, Args ).
 
-defined_if_load( false, Pid, From, Args ) :-
-    throw( expected_from(Pid,From), Opts ).
-defined_if_load( true, Pid, From, Args ) :-
-    defined_load( From, Pid, From, Args ).
-defined_if_load( Other, Pid, From, Args ) :-
-    defined_load( Other, Pid, From, Args ).
+defined_if_load( false, Pid, From, Opts ) :-
+    throw( expected_from(false,Pid,From), Opts ).
+defined_if_load( true, Pid, From, Opts ) :-
+    !,
+    defined_load( From, Pid, From, Opts ).
+defined_if_load( Other, Pid, From, Opts ) :-
+    defined_load( Other, Pid, From, Opts ).
 
+defined_load( lib(This), Pid, From, Args ) :-
+    !,
+    lib:lib(This),
+    defined_loaded( Pid, From, Args ).
 defined_load( LoadThis, Pid, From, Args ) :-
     % fixme: check is not loaded ?
-    ensure_loaded( LoadThis ),
+    user:ensure_loaded( LoadThis ),
     defined_loaded( Pid, From, Args ).
 
-defined_loaded( Pid, _From, _Args ) :-
-    current_predicate( Pid ),
+defined_loaded( Pid, _From, _Opts ) :-
+    current_predicate( user:Pid ),
     !. % fixme: need version where From and Into are checked ? 
-defined_loaded( Pid, From, Args ) :-
-    throw( expected_from(Pid,From), Opts ).
+defined_loaded( Pid, From, Opts ) :-
+    throw( expected_from(true,Pid,From), Opts ).
 
 /** pack_errors.
 
@@ -622,7 +648,9 @@ message( type_error(Type,Term) ) -->
     ['Object of type: ~w, expected but found term: ~w'-[Type,Term]].
 message( unknown_token(Tkn,Cat) ) -->
     ['Token: ~w, is not a recognisable: ~w'-[Tkn,Cat]].
-message( expected_from(Pid,false) ) -->
-    ['Predicate is not defined: ~w'-[Pid]].
-message( expected_from(Pid,From) ) -->
-    ['Predicate is not defined: ~w, (source apparently available at: ~w)'-[Pid,From]].
+message( expected_from(_,Pid,false) ) -->
+    ['Predicate: ~w is not defined'-[Pid]].
+message( expected_from(false,Pid,From) ) -->
+    ['Predicate: ~w is not defined (source apparently available at: ~w; not asked to load)'-[Pid,From]].
+message( expected_from(true,Pid,From) ) -->
+    ['Predicate: ~w is not defined (source apparently available at: ~w; which was loaded).'-[Pid,From]].
