@@ -79,6 +79,7 @@
             % term
               arg/4, arg/5,            % ?N, +TermIn, [+NewNth,] ?Nth, -TermOut
               arity/2,arity/3,         % ?Term[, ?Name], ?Arity
+              functor_term/2,          % ?Pid, ?Term
               compare/4,               % +Type, ?Op, +Term1, +Term
               compound/3,              % +Term, -Name, -Args 
               curtail/3,               % +Term, -Max, -Curtailed
@@ -166,6 +167,7 @@
 :- lib(letter_strings/3).
 :- lib(arity/2).
 :- lib(arity/3).
+:- lib(functor_term/2).
 :- lib(compound/3).
 :- lib(en_list/2).
 :- lib(op_compare/3).

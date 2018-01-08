@@ -2,6 +2,7 @@
 --------------------
 
 1.6
+    18.01.08   ADDED:   lib_promise/2. hot swapping of promised code
     18.01.06   IFACE:   suggests/2 allow for promised loads via hot-swapping
     17.03.12   ADDED:   ??? debug() -> listing of all tables in lib_tables:
 

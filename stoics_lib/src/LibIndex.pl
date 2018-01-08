@@ -30,6 +30,7 @@ lib_index(has_length, 4, any, user, 'term/has_length').
 lib_index(en_append, 3, any, user, 'list/en_append').
 lib_index(en_list, 2, any, user, 'term/en_list').
 lib_index(expand_spec, 2, any, user, 'file/expand_spec').
+lib_index(functor_term, 2, any, user, 'term/functor_term').
 lib_index(get_datetime, 1, any, user, 'date_time/get_datetime' ).
 lib_index(goal, 4, any, user, 'meta/goal').
 lib_index(goal_spec, 2, any, user, 'meta/goal_spec').

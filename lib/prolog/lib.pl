@@ -2,7 +2,8 @@
                     lib/1, lib/2   % +Repo[, +Opts]
         ] ).
 
-                     % lib_suggests/1+2,  % fixme: feature()
+                     % lib_suggests/1,  % fixme: feature()
+                     % lib_promise/2,
                      % lib_expects/1+2,
                      % lib_init/1
 
@@ -276,7 +277,7 @@ Operands
        case for lib_mkindex/1)
     * suggests(Lib)
        it is likely you need Lib for full functionalilty
-    * suggests(Pred,Load)
+    * promise(Pred,Load)
        Pred is needed for functionality and it can be found by loading Load, but it will only happen at Pred's first call
     * expects(Pid,Mess)
     * expects(Pid,Mess,Call)
@@ -406,9 +407,9 @@ lib( version(V,D), _, _Args ) :-
 lib( suggests(Lib), _, _Args ) :-  % fixme: add note() option
     !,
     lib_suggests( Lib ).
-lib( suggests(PidS,Load), _, _Args ) :-  % fixme: add note() option
+lib( promise(PidS,Load), _, _Args ) :-  % fixme: add note() option
     !,
-    lib_suggests( PidS, Load ).
+    lib_promise( PidS, Load ).
 lib( expects(Lib,Mess), _, _Opts ) :-  % fixme: add note() option 
     !,
     lib_expects( Lib, Mess ).
