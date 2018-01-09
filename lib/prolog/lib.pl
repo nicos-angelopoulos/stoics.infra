@@ -35,6 +35,7 @@
 :- dynamic( lib_tables:lib_attached_homonyms/2 ).% +Ctx, Repo
 :- dynamic( lib_tables:lib_lazy/1 ).             % +Repo
 :- dynamic( lib_tables:lib_full/2 ).             % +Repo
+:- dynamic( lib_tables:lib_packs_at/2 ).         % +Repo, +Dir
 
 
 % fixme: user defined ones
@@ -352,7 +353,8 @@ code but their code base can be loaded on demand and piece-meal. That is if a sp
 predicate is required, it will be located and loaded along with all its dependencies.
 
 An example of such a pack is =|stoics_lib|=. 
-The following commands: 1. load the minimal interface, 2, load the code for a specific non-interface predicate.
+The following commands: 1. load the minimal interface,,
+ 2, load the code for a specific non-interface predicate.
 ==
 ?- lib(stoics_lib).
 ?- lib(kv_decompose/3).
@@ -432,6 +434,18 @@ lib( Repo, Cxt, Opts ) :-
     lib_tables:lib_lazy( Repo ),
     !,
     lib_lazy_no_more( Repo, Cxt, Opts ).
+lib( Repo, Cxt, _Args ) :-
+    lib_tables:lib_packs_at( Cxt, PrivPacksD ),
+    directory_file_path( PrivPacksD, Repo, PackRoot ),
+    directory_file_path( PackRoot, prolog, PackPrologD ),
+    directory_file_path( PackPrologD, Repo, PrologStem ),
+    file_name_extension( PrologStem, pl, PlF ),
+    exists_file( PlF ),
+    !,
+    debug( lib, 'Loading from private pack with entry point: ~p', PlF ),
+    % ensure_loaded( PlF ).
+    lib_defaults( pack, PackLoadDefs ),
+    lib( Repo, PackRoot, PlF, Cxt, PackLoadDefs ).
 lib( Repo, Cxt, Args ) :-
     lib_type( Repo, RepoType, RepoMod, RepoRoot, RepoLoad ),
     !,
@@ -637,6 +651,11 @@ lib_repo( Repo, Type, Root, Load, Cxt, Args ) :-
 lib_source( Repo, Opts ) :-
     prolog_load_context( directory, Base ), 
     directory_file_path( Root, prolog, Base ),
+    % next N lines accommodate for private packs...
+    directory_file_path( Root, src, Srot ),
+    directory_file_path( Srot, packs, PrivP ),
+    ( exists_directory(PrivP) -> assert( lib_tables:lib_packs_at(Repo,PrivP) ); true ),
+    % end of N lines
     asserta( lib_tables:lib_context(Repo,Root) ),
     ( memberchk(index(Idx),Opts) -> true; Idx = false ),
     lib_source_index( Idx, Root, Repo ),
@@ -659,9 +678,5 @@ lib_source_homonyms( true, Repo ) :-
 lib_source_homonyms( false, _Repo ).
 
 lib_source_end( Repo, _Opts ) :-
-    ( lib_tables:lib_context(Repo,_Root) ->
-        retract( lib_tables:lib_context(Repo,_Root1) )
-        ;
-        true
-    ).
-
+    retractall( lib_tables:lib_context(Repo,_Root1) ),
+    retractall( lib_tables:lib_packs_at(Repo,_) ).
