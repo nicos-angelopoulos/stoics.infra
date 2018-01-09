@@ -39,6 +39,8 @@
               kv_decompose/3,          % +Pairs, -Ks, -Vs
               kv_ks/2,                 % +KVs, -Ks
               kv_vs/2,                 % +KVs, -Vs
+              kvo_k_memberchk/3,       % +K, +KVs, -V
+              kvs_k_memberchk/3,       % +K, +KVs, -V
             % list/
               break_on_list/4,         % +List, +Partial, -Left, -Right
               break_nth/4,             % +Nth, +List, -Left, -Right
@@ -136,6 +138,8 @@
 :- lib(kv_decompose/3).
 :- lib(kv_ks/2).
 :- lib(kv_vs/2).
+:- lib(kvo_k_memberchk/3).
+:- lib(kvs_k_memberchk/3).
 :- lib(break_on_list/4).
 :- lib(break_nth/4).
 :- lib(has_at_least/3).
