@@ -2,7 +2,9 @@
 --------------------
 
 0.7
-      17.08.11   DOC:     fixed intendantion in options_append/4 options
+      18.01.18   DOC:     removed scale/1 first option in options append doc !
+                 IFACE:   added args(Opts)
+      17.08.11   DOC:     fixed indentation in options_append/4 options
 
 0.6   17.03.14   FIXED:  return values (findall in options_append_types_remove)
                  ADDED:  options_remainder/4 (interal at options_auxil.pl)

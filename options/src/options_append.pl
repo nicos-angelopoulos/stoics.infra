@@ -12,9 +12,8 @@ The predicate can process debug(Dbg) a commonly used option. Default should be p
 The infrastructure allows for other options to be added easily.
 
 OAopts term or list of
-  * scale(Scale=false)
-      or true (full scale, subtract mean and divide by stadard deviation)
-      or centre (subtract mean)
+  * args(Opts=en_list(OptS,Opts))
+      the input OptS, but guaranteed to be a list
 
   * arity(Arity= -1)
       the arity of the caller, only used for reporting
@@ -138,7 +137,8 @@ options_append( Pname, ArgS, Opts, OAoptS ) :-
         ;
         options_en_list( ArgS, ArgsPrv )
     ),
-    ( select(atoms(Atoms),OAoptsWA,OAoptsNA) ->
+    ( select(args(ArgsPrv),OAoptsWA,OAoptsWA1) -> true; OAoptsWA = OAoptsWA1),
+    ( select(atoms(Atoms),OAoptsWA1,OAoptsNA) ->
         % fixme: ensure Atoms is unbound
         partition( atomic, ArgsPrv, Atoms, Args )
         ;
