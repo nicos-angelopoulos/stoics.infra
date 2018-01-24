@@ -2,6 +2,10 @@
 --------------------
 
 1.6
+    18.01.24   ERROR:   typo in lib_suggests error message
+               IFACE:   lib_suggests/2
+               OPTS:    lib/2 suggests()
+               DOC:     added mode() opt doc in lib/2
     18.01.08   IFACE:   lib_promise/2. hot swapping of promised code
     18.01.06   IFACE:   suggests/2 allow for promised loads via hot-swapping
     17.03.12   ADDED:   ??? debug() -> listing of all tables in lib_tables:

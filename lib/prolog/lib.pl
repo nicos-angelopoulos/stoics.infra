@@ -290,16 +290,17 @@ Operands
     
 Opts
   * index(Idx)
-    whether to load indices
-
+     whether to load indices
   * homonym(Hnym)
-    whether to load homonym file-locators
-
+     whether to load homonym file-locators
   * load(Load)
-    whether to load the main entry point of Repo
-
+     whether to load the main entry point of Repo
+  * mode(Mode=self)
+     makes miising message more acurate (other value: _suggests_)
+  * suggest(Dn=true)
+     suggest the library is downloaded if it is not locally installed ?
   * type(Type)
-    enforce a particular type of repository (pack or lib)
+     enforce a particular type of repository (pack or lib)
   
 The defaults depend on whether Repo is a pack or a lib. 
 * Packs get defaults
@@ -406,13 +407,17 @@ lib( version(V,D), _, _Args ) :-
     % V = 1:2, D = date(2017,3,11).
     % V = 1:4:0, D = date(2017,8,8).
     V = 1:5:0, D = date(2017,8,15).
-lib( suggests(Lib), _, _Args ) :-  % fixme: add note() option
+lib( suggests(Lib), _, _Args ) :- 
     !,
     lib_suggests( Lib ).
-lib( promise(PidS,Load), _, _Args ) :-  % fixme: add note() option
+lib( suggests(Lib,SgOptS), _, _Args ) :-
+    !,
+    lib_en_list( SgOptS, SgOpts ),
+    lib_suggests( Lib, SgOpts ).
+lib( promise(PidS,Load), _, _Args ) :-
     !,
     lib_promise( PidS, Load ).
-lib( expects(Lib,Mess), _, _Opts ) :-  % fixme: add note() option 
+lib( expects(Lib,Mess), _, _Opts ) :-
     !,
     lib_expects( Lib, Mess ).
 lib( expects(Lib,Mess,Goal), _, _Opts ) :-  % fixme: add note() option 
@@ -480,7 +485,8 @@ lib( Root, Cxt, Args ) :-
     !,
     lib_repo( Repo, Type, Root, Load, Cxt, Args ).
 lib( Pack, Cxt, Opts ) :-
-    lib_missing( Pack, Cxt, Opts, true ),
+    memberchk( suggest(Sugg), Opts ),
+    lib_missing( Sugg, Pack, Cxt, Opts, true ),
     !.
 lib( Repo, Cxt, Opts ) :-
     memberchk( mode(Mode), Opts ),
@@ -528,7 +534,8 @@ lib_explicit( Repo, Pn, Pa, Cxt, Opts ) :-
     lib_explicit_repo( Type, Repo, Rmod, Root, Load, Pn, Pa, Cxt, Opts ),
     !.
 lib_explicit( Repo, Pn, Pa, Cxt, Opts ) :-
-    lib_missing( Repo, Cxt, Opts, false ),
+    memberchk( suggest(Sugg), Opts ),
+    lib_missing( Sugg, Repo, Cxt, Opts, false ),
     !,
     lib_explicit( Repo, Pn, Pa, Cxt, Opts ).
 lib_explicit( Repo, Pn, Pa, Cxt, _Args ) :-
@@ -562,7 +569,9 @@ lib_repo_lazy_assert( Repo ) :-
 lib_repo_lazy_assert( Repo ) :-
     asserta( lib_tables:lib_lazy(Repo) ).
 
-lib_missing( Pack, Cxt, Args, Load ) :-
+lib_missing( false, Pack, Cxt, _Args, _Load ) :-
+    debug( lib, 'Instructed to skip contacting server for:~w and context:~w', [Pack,Cxt] ).
+lib_missing( true, Pack, Cxt, Args, Load ) :-
 	prolog_pack:confirm( contact_server(Pack), yes, [] ),
     G = query_pack_server(search(Pack), Result, [] ),
     catch( prolog_pack:G, _Ball, fail ),

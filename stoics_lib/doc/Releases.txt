@@ -1,6 +1,7 @@
 ---   Releases   ---
 --------------------
 0.7
+      18.01.24   DOC:    typos in doc of term_type/2
       18.01.09   IFACE:  kvs_k_memberchk/3
                  IFACE:  kvo_k_memberchk/3
       18.01.08   IFACE:  functor_term/2

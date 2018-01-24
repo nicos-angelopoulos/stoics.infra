@@ -1,7 +1,7 @@
 %% term_type( +Term, -Type ).
 % 
 %  Type is the type of Term. One of: _var_, _list_, _compound_, _string_, _dict_, 
-%  number(_integer_), number(_float_) and _atom_.
+%  number(_integer_), number(_float_), number(rational) and _atom_.
 %  
 % Top: document the order
 %
@@ -14,14 +14,14 @@
 %==
 %
 % @author nicos angelopoulos
-% @version  0.1 2017/11/21,  copy from pack(term_type) % which currently private
+% @version  0.1 2017/11/21,  copy from pack(term_type) % which is currently private
 % @tbd  implement in C ? (if it is faster...)
 % 
 term_type( Term, Type ) :-
 	( var(Term) -> 
 		Type = var
 	;
-	( (Term = [_|_];Term=[]) ->
+	( (Term = [_|_];Term==[]) ->
 		Type = list
 	;
     ( Term = _X rdiv _Y ->   % this is new to this predicate ... we can test X&Y for being integer
