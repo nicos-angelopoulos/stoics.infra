@@ -2,35 +2,37 @@
 --------------------
 
 1.6
-    18.01.24   ERROR:   typo in lib_suggests error message
-               IFACE:   lib_suggests/2
-               OPTS:    lib/2 suggests()
-               DOC:     added mode() opt doc in lib/2
-    18.01.08   IFACE:   lib_promise/2. hot swapping of promised code
-    18.01.06   IFACE:   suggests/2 allow for promised loads via hot-swapping
-    17.03.12   ADDED:   ??? debug() -> listing of all tables in lib_tables:
+   18.01.24   ERROR:    typo in lib_suggests error message
+              IFACE:    lib_suggests/2
+              OPTS:     lib/2 suggests()
+              DOC:      added mode() opt doc in lib/2
+   18.01.08   IFACE:    lib_promise/2. hot swapping of promised code
+   17.08.22   ADDED:    ??? debug() -> listing of all tables in lib_tables:
 
-1.5 17.08.15   VER:     version 1.5
-               ADDED:   rel(Rel) for local locations rather than packs
-    17.08.08   VER:     version 1.5
-               CHANGED: local dirs should now either by absolute locations or wrapped in dir() or a compound that can be expanded to an abs location
-1.4 17.08.08   VER:     version 1.4
-               FIXED:   install missing pack while lazy loading one of its predicates
-1.3 17.08.08   VER:     version 1.3
-               ADDED:   question whether to contact the server when lib not local
-               FIXED:   broken downloading from pack server
-    17.04.27   ADDED:   more debug messages
-               FIXED:   attaching repo that is already loaded
-    17.03.24   FIXED:   cyclic execution when looking for non loadable explicit (b_real:mtx_heatmap/2 where b_real_lazy.pl does not exist).
-               ADDED:   warning if explicitly loaded pred is attempted from repo that has no lazy loader
-    17.03.12   FIXED:   when Repo & Cxt are both user, could get duplicate sourcing
-               CHANGED: import debugs are now before call
-               FIXED:   do not export->import if context = repo
+1.5       @   17.08.15
+   17.08.15   ADDED:    rel(Rel) for local locations rather than packs
+   17.08.08   CHANGE:   local dirs should now either by absolute locations or wrapped in dir() or a compound that can be expanded to an abs location
 
-1.2 17.03.11   FIXED:   missing cut in lib/3.
-    17.03.10   FIXED:   lib_mkindex remove .pl which causes dict read problems
+1.4       @   17.08.08
+   17.08.08   FIXED:    install missing pack while lazy loading one of its predicates
 
-1.1 17.03.10   ADDED:   full lazy mode that can intermingle with full loading
-               FIXED:   innumerable bugs
+1.3       @   17.08.08
+   17.08.08   ADDED:    question whether to contact the server when lib not local
+              FIXED:    broken downloading from pack server
+   17.04.27   ADDED:    more debug messages
+              FIXED:    attaching repo that is already loaded
+   17.03.24   FIXED:    cyclic execution when looking for non loadable explicit (b_real:mtx_heatmap/2 where b_real_lazy.pl does not exist).
+              ADDED:    warning if explicitly loaded pred is attempted from repo that has no lazy loader
+   17.03.12   FIXED:    when Repo & Cxt are both user, could get duplicate sourcing
+              CHANGE:   import debugs are now before call
+              FIXED:    do not export->import if context = repo
 
-1.0 17.03.08   VER:     first public release
+1.2       @   17.03.11
+   17.03.11   FIXED:    missing cut in lib/3.
+   17.03.10   FIXED:    lib_mkindex remove .pl which causes dict read problems
+
+1.1       @   17.03.10
+   17.03.10   ADDED:    full lazy mode that can intermingle with full loading
+              FIXED:    innumerable bugs
+
+1.0       @   17.03.08  first public release

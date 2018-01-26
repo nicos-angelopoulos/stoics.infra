@@ -2,55 +2,58 @@
 --------------------
 
 0.7 
-    17.09.24  IFACE:   os_abs/3, with option access(new) (non absolute_file_name/3)
-              FIX:     new os_abs implementation (call a_f_n/3 on empty opts list)
-    17.09.20  OPTS:    with_ext(WithExt) @ os_postfix/4, with example
-              DOC:     made call modes of os_ext/4,3 more precise
-              FIXED:   groundess error in os_ext/3, now uses new pack_errors version (and distinct error for os_ext/4)
-              DOC:     more examples @ os_ext/4,3
-    17.08.04  DOC:     os_postfix/3 one more example
-              FIXED:   os_postfix/4 instantiation error when ignore_post(IpostB) was used
-              FIXED:   os_postfix/2 instantiation error when Postfix (arg 1) was variable
-              RETAB:   replaced tabs by spaces in src/os_postfix.pl
-    17.07.06  DOC:     os_dir_stem_ext/2 enhancements
-              IFACE:   os_dir_stem_ext/2
-              DEL:     loading library requires in os_mill.pl
-              OPTS:    new option type(Type) and associated options
-              IFACE:   delegate some of os_mill/4's options to os_dir_stem_ext/2  
-              DEL:     os_mill_milled/5 (internal, its function should now be in os_dir_stem_ext/2)
-              DEL:     os_mill_dir/5 (now in os_dir_stem_ext/2, was already commented out)
-    17.03.23  FIXED:   use read_link's 2nd rather than 3rd argument (posted bug to SWI) in os_exists/1+2
-    17.03.12  ADDED:   @(Goal) as an allowed first argument to os_mill/4
-    17.03.12  TYPO:    access_file/2 highlighting
+   17.09.24   IFACE:    os_abs/3, with option access(new) (non absolute_file_name/3)
+              FIX:      new os_abs implementation (call a_f_n/3 on empty opts list)
+   17.09.20   OPTS:     with_ext(WithExt) @ os_postfix/4, with example
+              DOC:      made call modes of os_ext/4,3 more precise
+              FIXED:    groundness error in os_ext/3, now uses new pack_errors version (and distinct error for os_ext/4)
+              DOC:      more examples @ os_ext/4,3
+   17.08.04   DOC:      os_postfix/3 one more example
+              FIXED:    os_postfix/4 instantiation error when ignore_post(IpostB) was used
+              FIXED:    os_postfix/2 instantiation error when Postfix (arg 1) was variable
+              RETAB:    replaced tabs by spaces in src/os_postfix.pl
+   17.07.06   DOC:      os_dir_stem_ext/2 enhancements
+              IFACE:    os_dir_stem_ext/2
+              DEL:      loading library requires in os_mill.pl
+              OPTS:     new option type(Type) and associated options
+              IFACE:    delegate some of os_mill/4's options to os_dir_stem_ext/2  
+              DEL:      os_mill_milled/5 (internal, its function should now be in os_dir_stem_ext/2)
+              DEL:      os_mill_dir/5 (now in os_dir_stem_ext/2, was already commented out)
+   17.03.23   FIXED:    use read_link's 2nd rather than 3rd argument (posted bug to SWI) in os_exists/1+2
+   17.03.12   ADDED:    @(Goal) as an allowed first argument to os_mill/4
+   17.03.12   TYPO:     access_file/2 highlighting
 
-0.6 17.03.10  version: for pack(lib) v1.1
-    17.03.10  changed: doc for os_exists/2
-    17.03.03  changed: os_exists/2 option reports(Rep) to error(false). Fixed its implementation for some of the cases
-                           as it was always erroring
+0.6       @   17.03.10  for pack(lib) v1.1
+   17.03.10   CHANGE:   doc for os_exists/2
+   17.03.03   CHANGE:   os_exists/2 option reports(Rep) to error(false). Fixed its implementation for some of the cases
+                             as it was always erroring
+   16.12.19   ADDED:    call_options(Copts) can now carry the value false, which excludes options argument from the os_mill/4 call.
+              CHANGE:   in file + dir are now casted to file's type (previsously always \ () )
+              FIXED:    os_postfix( rho_and_psi, 'PD21872a2_refit_rho_and_psi.txt' ).  % now it succeeds
+              UPDATE:   os_unique_by_name/2,3 -> os_unique/2,3 now it additionally supports versioning 
+              ADDED:    os_cp/2
+              ADDED:    os_mv/2
+              ADDED:    os_sel/3,4
+              ADDED:    os_un_zip/3
+              FIXED:    os_path stripped unessecary /() in os_path_ground
+              FIXED:    os_mill call to os_path with /() to \()
+              FIXED:    os_ext( srt, file, file.srt ).
+              FIXED:    os_cast( file, atom, file ).
+              ADDED:    os_plate_cast/3 error
+  
+0.5       @   16.03.01
+   16.03.01   ADDED:    os_lib.pl in the distro !
+  
+0.4       @   16.03.01
+   16.03.01   TYPO:     @see corrected to project page
+              IFACE:    Use Jan Wielemakers two liner for os_lib.pl
+                              :- module(os_lib, []).
+                              :- reexport(os)                     .
 
-    16.12.19  added:   call_options(Copts) can now carry the value false, which excludes options argument from the os_mill/4 call.
-						changed: in file + dir are now casted to file's type (previsously always \ () )
-						fixed:   os_postfix( rho_and_psi, 'PD21872a2_refit_rho_and_psi.txt' ).  % now it succeeds
-						updated: os_unique_by_name/2,3 -> os_unique/2,3 now it additionally supports versioning 
-						added:   os_cp/2
-						added:   os_mv/2
-                  added:   os_sel/3,4
-						added:   os_un_zip/3
-						fixed:   os_path stripped unessecary /() in os_path_ground
-						fixed:   os_mill call to os_path with /() to \()
-                  fixed:   os_ext( srt, file, file.srt ).
-                  fixed:   os_cast( file, atom, file ).
-						added:   os_plate_cast/3 error
-
-0.5  2016/03/01   added os_lib.pl in the distro !
-
-0.4  2016/03/01   @see corrected to project page
-                  Use Jan Wielemakers two liner for os_lib.pl
-						:- module(os_lib, []).
-						:- reexport(os).
-
-0.3  2016/03/01   Added requires dependency to pack.pl
-
-0.2  2016/03/01   Mono-module + all pack dependencies fixed
-
-0.1  2016/01/31   First public release
+0.3       @   16.03.01
+   16.03.01   ADDED:     requires dependency to pack.pl
+  
+0.2       @   16.03.01
+   16.03.01   CHANGE:    Mono-module + all pack dependencies fixed
+  
+0.1       @   16.01.31   First public release

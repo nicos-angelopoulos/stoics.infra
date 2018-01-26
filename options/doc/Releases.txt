@@ -2,21 +2,23 @@
 --------------------
 
 0.7
-      18.01.18   DOC:     removed scale/1 first option in options append doc !
-                 IFACE:   added args(Opts)
-      17.08.11   DOC:     fixed indentation in options_append/4 options
+   18.01.18   DOC:      removed scale/1 first option in options append doc !
+              IFACE:    added args(Opts)
+   17.08.11   DOC:      fixed indentation in options_append/4 options
 
-0.6   17.03.14   FIXED:  return values (findall in options_append_types_remove)
-                 ADDED:  options_remainder/4 (interal at options_auxil.pl)
+0.6       @   17.03.14
+   17.03.14   FIXED:    return values (findall in options_append_types_remove)
+              ADDED:    options_remainder/4 (interal at options_auxil.pl)
 
-0.5   17.03.10   Works with pack(lib) v1.1
-		16.12.10   Args = true is dealt as a synonym for Args = []
-		16.12.10   added atoms(Atoms) option to options_append
-		16.12.10   moved throw/2 to pack(pack_errors)
-		16.11.14   fix for locating profile user file by Jan Wielemaker
-      16.09.09   added throw/2
-      16.08.22   added options_debug/2
+0.5       @   17.03.10  Works with pack(lib) v1.1
+   16.12.10   CHANGE:   Args = true is dealt as a synonym for Args = []
+   16.12.10   ADDED:    atoms(Atoms) option to options_append
+   16.12.10   MOVED:    throw/2 to pack(pack_errors)
+   16.11.14   FIXED:    locating user profile by Jan Wielemaker
+   16.09.09   ADDED:    throw/2
+   16.08.22   ADDED:    options_debug/2
 
-0.4   16.02.29   dangling reference to debug_call removed
+0.4       @   16.02.29   
+   16.02.29   RMV:       dangling reference to debug_call
 
-0.3   16.02.29   for os_lib 0.5
+0.3       @   16.02.29   for os_lib 0.5

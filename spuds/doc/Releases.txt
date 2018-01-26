@@ -1,7 +1,12 @@
-0:1:5                        added --debug=true option to swipl-spuds and some reporting via repo/1 to /tmp/repo.txt
-                             changed swipl-spuds, to include some environment variables that enable the script 
-									  to run properly at start-up (in my set-up).
-									  added icons/ with svg and png at 96x96 of Swi's owl
+0:2
+   18.01.26   SCRIPT:   spudlike
+              DIR:      scripts
+
+
+   17.??.??             added --debug=true option to swipl-spuds and some reporting via repo/1 to /tmp/repo.txt
+                        changed swipl-spuds, to include some environment variables that enable the script 
+								to run properly at start-up (in my set-up).
+								added icons/ with svg and png at 96x96 of Swi's owl
 
 0:1:4     2014 Jan  1        moved spuds_docs to prolog/ so it can be loaded as library(spuds_docs).
                              made displaying of all source files the default.

@@ -15,6 +15,9 @@ Packs:
   + spuds         http://stoics.org.uk/~nicos/sware/spuds
   + stoics_lib    http://stoics.org.uk/~nicos/sware/stoics_lib
 
+Major release points
+   17.03
+
 Nicos Angelopoulos
 ---
-London, 2017
+London, 2017-2018

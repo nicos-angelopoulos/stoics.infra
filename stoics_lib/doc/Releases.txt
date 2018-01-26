@@ -1,76 +1,83 @@
 ---   Releases   ---
 --------------------
+
 0.7
-      18.01.24   DOC:    typos in doc of term_type/2
-      18.01.09   IFACE:  kvs_k_memberchk/3
-                 IFACE:  kvo_k_memberchk/3
-      18.01.08   IFACE:  functor_term/2
-      18.01.03   IFACE:  en_append/3
-      17.12.21   TYPO:   portray_clauses/2 version tag
-                 DOC:    proper formatting
-      17.11.21   IFACE:  added term_length/2 to term/
-                 MOVED:  has_length/2,3,4 to term/ (from list/)
-                 FIXED:  has_length/4 was not in LibIndex.pl
-                 ADDED:  length for vars and strings in has_length/2,3,4
-                 IFACE:  curtail/3 in term/
-                 IFACE:  term_type/2 in term/
+   18.01.24   DOC:      typos in doc of term_type/2
+   18.01.09   IFACE:    kvs_k_memberchk/3
+              IFACE:    kvo_k_memberchk/3
+   18.01.08   IFACE:    functor_term/2
+   18.01.03   IFACE:    en_append/3
+   17.12.21   TYPO:     portray_clauses/2 version tag
+              DOC:      proper formatting
+   17.11.21   IFACE:    added term_length/2 to term/
+              MOVED:    has_length/2,3,4 to term/ (from list/)
+              FIXED:    has_length/4 was not in LibIndex.pl
+              ADDED:    length for vars and strings in has_length/2,3,4
+              IFACE:    curtail/3 in term/
+              IFACE:    term_type/2 in term/
 
-0.6   17.10.13   VER:    0.6
-      17.10.13   FIXED:  de-comment dependency to break_nth/4 in codes_n_digits.pl
-      17.10.04   IFACE:  allow list and atoms in 1st arg of termplate/2,3
-                 ERR:    handling of var input for 1st arg of termplate/2,3
-                 DOC:    document list and atom inputs to termplate/2,3
-      17.09.26   CHANGE: pass meta-goals in on_fail/3 through mod_goal/2
-                 CHANGE: pass meta-goals in which/3 through mod_goal/2
-                 FIXED:  add lib(mod_goal/n) to all meta/ files that use the predicates
-                 FIXED:  added mod_goal/2 into stoics_lib/LibIndex.pl
-                 RETAB:  all files in src/meta/
-      17.09.25   IFACE:  mod_goal/2
-                 CHANGE: default Override in mod_goal/3 is now false (previously true)
-                 CHANGE: pass meta-goals in current_call/1,2 via mod_goal/2
-                 DOC:    improvement for goal/4
-                 CHANGE: pass meta-goal in holds/2 through mod_goal/2
-                 CHANGE: pass meta-goal in known/3 through mod_goal/2
-                 FIXED:  collecting of unknown values in known/3
-                 FIXED:  mod_call/3 change ground(Goal) to \+ var(Goal)
-                 FIXED:  maparg/4 Npos was not allowed -1
-                 CHANGE: pass meta-goals in maparg/2,3,4 through mod_goal/2
-      17.09.20   IFACE:  map_list_options/3,4
-      17.08.23   TYPO:   doc of has_length/2,3,4
-      17.08.22   IFACE:  has_length/2,3,4
-      17.08.21   IFACE:  added op_compare/3 to full interface (already was in sources)
+0.6       @   17.10.13  
+   17.10.13   FIXED:    de-comment dependency to break_nth/4 in codes_n_digits.pl
+   17.10.04   IFACE:    allow list and atoms in 1st arg of termplate/2,3
+              ERR:      handling of var input for 1st arg of termplate/2,3
+              DOC:      document list and atom inputs to termplate/2,3
+   17.09.26   CHANGE:   pass meta-goals in on_fail/3 through mod_goal/2
+              CHANGE:   pass meta-goals in which/3 through mod_goal/2
+              FIXED:    add lib(mod_goal/n) to all meta/ files that use the predicates
+              FIXED:    added mod_goal/2 into stoics_lib/LibIndex.pl
+              RETAB:    all files in src/meta/
+   17.09.25   IFACE:    mod_goal/2
+              CHANGE:   default Override in mod_goal/3 is now false (previously true)
+              CHANGE:   pass meta-goals in current_call/1,2 via mod_goal/2
+              DOC:      improvement for goal/4
+              CHANGE:   pass meta-goal in holds/2 through mod_goal/2
+              CHANGE:   pass meta-goal in known/3 through mod_goal/2
+              FIXED:    collecting of unknown values in known/3
+              FIXED:    mod_call/3 change ground(Goal) to \+ var(Goal)
+              FIXED:    maparg/4 Npos was not allowed -1
+              CHANGE:   pass meta-goals in maparg/2,3,4 through mod_goal/2
+   17.09.20   IFACE:    map_list_options/3,4
+   17.08.23   TYPO:     doc of has_length/2,3,4
+   17.08.22   IFACE:    has_length/2,3,4
+   17.08.21   IFACE:    added op_compare/3 to full interface (already was in sources)
 
-0.5   17.08.15   VER:    0.5
-                 FIXED:  spurious incomplete call to mod_goal/n
-      17.08.11   FIXED:  remove stoics_lib: from lib(stoics_lib:mod_goal/4), in map_succ_list.pl
-                 DOC:    fixed intendantion in options_append/4 options
-                 PRED:   on_fail/2,3, lil'B
-0.4   17.08.08   VER:    version 0.4
-      17.05.17   FIX:    Added mod_goal/4 loading to map_succ_list/4
-      17.05.17   DOC:    Typos in mod_goal/3+4
-      17.05.17   ADDED:  Pass 1st arg of map_succ_list/3+4 via mod_goal/4
-      17.05.17   PRED:   op_compare/3
-      17.05.08   DOC:    fixed options list layout in list_frequency/2
-      17.04.27   DOC:    typo in current_call/1+2
-      17.04.25   PRED:   io_sections/3
-      17.03.13   CHANGED:io_{get,put}_line/2 -> io_line/2 
-                 ADDED:  nth1/5, (was nth_replace/5), arg/4+5
-                 ADDED:  maparg/2+3+4
-                 ADDED:  atom_replace/4
-      17.03.12   ADDED:  kv_ks/2, kv_vs/2
-                 ADDED:  goal/4
-      17.03.10   ADDED:  n_digit_min/3
-                 ADDED:  max_list/3
-                 RMV:    nth_add/4   
-                 RMV:    a couple of options dependencies
-                 ADDED:  n_breaks/4
-0.3   17.03.09   ADDED:  compare/4 + compare_arithmetic)
-0.2   17.03.07   ADDED:  predicates, and fixed pack.pl ("empty" dir) (+pack(lib))
-      17.02.24   ADDED:  kv_compose/4
+0.5       @   17.08.15  
+   17.08.15   FIXED:    spurious incomplete call to mod_goal/n
+   17.08.11   FIXED:    remove stoics_lib: from lib(stoics_lib:mod_goal/4), in map_succ_list.pl
+              DOC:      fixed intendantion in options_append/4 options
+              PRED:     on_fail/2,3, lil'B
 
-0.1   17.02.21   VER:    first public release
-      16.12.10   ADDED:  en_list.pl portray_clauses
-      16.12.10   ADDED:  meta/: current_call.pl goal_sepc.pl holds.pl
-      16.12.10   ADDED:  list/select_all.pl
-      16.12.10   ADDED:  io/io_lines.pl and dependencies
-      16.12.10   ADDED:  the infrastructure
+0.4        @ 17.08.08
+   17.05.17   FIX:      Added mod_goal/4 loading to map_succ_list/4
+   17.05.17   DOC:      Typos in mod_goal/3+4
+   17.05.17   ADDED:    ass 1st arg of map_succ_list/3+4 via mod_goal/4
+   17.05.17   PRED:     op_compare/3
+   17.05.08   DOC:      fixed options list layout in list_frequency/2
+   17.04.27   DOC:      typo in current_call/1+2
+   17.04.25   PRED:     io_sections/3
+   17.03.13   CHANGE:   io_{get,put}_line/2 -> io_line/2 
+              ADDED:    nth1/5, (was nth_replace/5), arg/4+5
+              ADDED:    maparg/2+3+4
+              ADDED:    atom_replace/4
+   17.03.12   ADDED:    kv_ks/2, kv_vs/2
+              ADDED:    goal/4
+   17.03.10   ADDED:     n_digit_min/3
+              ADDED:    max_list/3
+              RMV:      nth_add/4   
+              RMV:      a couple of options dependencies
+              ADDED:    n_breaks/4
+
+0.3       @   17.03.09     
+   17.03.09   ADDED:    compare/4 + compare_arithmetic)
+
+0.2       @   17.03.07  
+   17.03.07   ADDED:    predicates, and fixed pack.pl ("empty" dir) (+pack(lib))
+   17.02.24   ADDED:    kv_compose/4
+
+0.1       @   17.02.21  
+   17.02.21   VER:      first public release
+   16.12.10   ADDED:    en_list.pl portray_clauses
+   16.12.10   ADDED:    meta/: current_call.pl goal_sepc.pl holds.pl
+   16.12.10   ADDED:    list/select_all.pl
+   16.12.10   ADDED:    io/io_lines.pl and dependencies
+   16.12.10   ADDED:    the infrastructure
