@@ -2,6 +2,7 @@
 --------------------
 
 0.7
+   18.02.04   DOC:      options_append/4, added user_profile/1 and indentation
    18.01.18   DOC:      removed scale/1 first option in options append doc !
               IFACE:    added args(Opts)
    17.08.11   DOC:      fixed indentation in options_append/4 options

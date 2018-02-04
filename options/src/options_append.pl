@@ -4,62 +4,67 @@ options_append_known_process_option( debug ).
 /** options_append( +PredName, +OptS, -All ).
     options_append( +PredName, +OptS, -All, +OAopts ).
 
-Look for PredName_defaults/1 and if that exists append it to the end of OptS to get All.
-OptS is casted to a list before the append, so single terms are allowed as options.
+Look for PredName_defaults/1 and if that exists append its argumetn to the end of OptS to get All.<br>
+OptS is casted to a list before the append, so single terms are allowed as options.<br>
+In addition, if file user_profile('.pl'/Pname) exists, its terms are appended between OptS and
+the argument of PredName_defaults/1.<br>
 Listens to debug(options_append).
  
-The predicate can process debug(Dbg) a commonly used option. Default should be provided by PredName caller.
-The infrastructure allows for other options to be added easily.
+The predicate can process debug(Dbg) a commonly used option (in All). When Dbg is set to true =|debug( PredName )|= is called.  <br>
+The default value of Dbg is provided by PredName_defaults/1.
+
+OptS and All are options of PredName, whereas OAopts are options of options_append/4 and control 
+how OptS are transformed into All.
+
 
 OAopts term or list of
   * args(Opts=en_list(OptS,Opts))
-      the input OptS, but guaranteed to be a list
+     the input OptS, but guaranteed to be a list
 
   * arity(Arity= -1)
-      the arity of the caller, only used for reporting
-      type errors for now
+     the arity of the caller, only used for reporting type errors for now
 
   * atoms(-Atoms)
-      removes atoms from input arguments, and instantiates them into Atoms. OptS == true, 
-      is an exception: Atoms is instantiated to []
+     removes atoms from input arguments, and instantiates them into Atoms. OptS == true, 
+     is an exception: Atoms is instantiated to []
 
   * check_types(ChkTypes=true)
-      if the defaults predicate returns a default of options_types(OTypes), 
-      this is removed and used to check the types of the supplied options. 
-      OTypes should be OptName-Type pairs list with Type being one of those
-      recognised by type/2 in pack(pack_errors).
+     if the defaults predicate returns a default of options_types(OTypes), 
+     this is removed and used to check the types of the supplied options. 
+     OTypes should be OptName-Type pairs list with Type being one of those
+     recognised by type/2 in pack(pack_errors).
 
   * extra_arg(Arg)          
-      multiple allowed. All Arg(s) so passed are added to the Args passed to the defaults predicate, 
-      but not to the generated options. Allows for instance to pass arguments of the call itself 
-      to the defaults predicate without those arguments being added to the Options list
+     multiple allowed. All Arg(s) so passed are added to the Args passed to the defaults predicate, 
+     but not to the generated options. Allows for instance to pass arguments of the call itself 
+     to the defaults predicate without those arguments being added to the Options list
 
   * foreign(-Foreign)
-      instantiates to all input options that do not have matching default
-      term structure
+     instantiates to all input options that do not have matching default
+     term structure
 
   * debug(Dbg=none)   
-      if _true_ debug this call, and call prolog_debug:debug_topic(Pname). 
-      if _false_ trun debugging off for this call.
-      Else Dbg can be a debug term (other than none,false,true) or list of debug terms.
+     if _true_ debug this call, and call prolog_debug:debug_topic(Pname). 
+     if _false_ trun debugging off for this call.
+     Else Dbg can be a debug term (other than none,false,true) or list of debug terms.
  
   * funnel(Proccess)    
-      as process() below, 
-      but leaves processed options in All.
+     as process() below, 
+     but leaves processed options in All.
 
   * pack(Pack)
-      caller pack. For now it is 
-      only used to report type errors
+     caller pack. For now it is 
+     only used to report type errors
 
   * process(Proccess)
-      with Proccess in 
-    * debug     
+     with Proccess in 
+     * debug     
         will turn on debugging according 
         to debug/0,1,2 options, see below
 
   * remove_types(Rtypes=true)
-      to pass options_types(OTypes) 
-      to the result Options use Rtypes == false
+     to pass options_types(OTypes) 
+     to the result Options use Rtypes == false
 
  When processing debugging options in All, the first matching term of the following is used: 
     * debug
@@ -105,7 +110,7 @@ All = [ls(true)].
 Turning debugging on for predicate handle: demo
 All = [ls(false), ls(true)].
  
-% Note that the debug(options_append) has been removed.
+% Note that the debug(options_append) has been removed in the following:
 ?- options_append( demo, debug, All, process(debug) ).
 All = [ls(true)].
 
