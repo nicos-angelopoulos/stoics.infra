@@ -1,9 +1,12 @@
-:- ensure_loaded( library(lib) ).
-:- lib(by_unix).
-:- lib(debug_call).
-:- lib(stoics_lib:atom_sub/2).
+:-  module( spudlike, [spudlike/0] ).
 
 :- debug(spudlike).
+
+/** <module> spudlike.
+
+See doc for spudlike/0.
+
+*/
 
 /** spudlike.
 
@@ -16,6 +19,7 @@
 ==
 @author nicos angelopoulos
 @version  0.2 2018/01/26
+@version  0.3 2018/02/07,  remove dependency to by_unix
 
 */
 
@@ -34,47 +38,70 @@ spudlike_restart :-
     doc_server( 3003 ),
     write( 'http://localhost:3003/pldoc' ), nl,  % fixme: do in same fashion as the server, highjack call after
     use_module( library(lib) ),
-    lib(os_lib),
-    file_search_path( pack, Pack ), 
+    user:file_search_path( pack, Pack ), 
     AbsOpts = [file_type(directory),file_errors(fail)],
     absolute_file_name( Pack, Packed, AbsOpts ),
     !,
     debug( spudlike, 'Packs directory: ~p', Packed ),
-    os_dir_dirs( Packed, Packs ),
-    maplist( spudlike_load, Packs ),
+    directory_files( Packed, AllSubs ),
+    once( select('.',AllSubs,NodSubs) ),
+    once( select('..',NodSubs,NtdSubs) ),
+    % os_dir_dirs( Packed, Packs ),
+    maplist( spudlike_load(Packed), NtdSubs ),
     write( 'http://localhost:3003/pldoc' ), nl.
 
-spudlike_load( 'Downloads' ) :-
+spudlike_load( _, 'Downloads' ) :-
     !.
-spudlike_load( Pack ) :-
+spudlike_load( Root, Pack ) :-
+    directory_file_path( Root, Pack, Path ),
+    exists_directory( Path ),
+    !,
     debug( spudlike, '...loading: ~w', Pack ),
     ( catch(lib(Pack),_,fail) -> 
         true
         ;
         debug( spudlike, '...FAILED to load it', true )
     ).
+spudlike_load( _Root, _Pack ).  % skipping litter files
 
 spudlike_kill :-
-    % fixme: from desktop invocation the 
     current_prolog_flag( pid, ThisPid ),
-    write( this_pid(ThisPid) ), nl,
-    % LnsPrv @@ psa('cline/spudlike.pl'),
-    LnsPrv @@ psa('spudlike'),
+    debug( spudlike, 'This process id: ~d', ThisPid ), nl,
+    % LnsPrv @@ psa('spudlike'),
+    psa_lines( spudlike, LnsPrv ),
     exclude( atom_sub('grep cline'), LnsPrv, LnsCline ),
     include( atom_sub('swipl -x'), LnsCline, LnsSwi ),
     include( atom_sub('upsh'), LnsSwi, LnsUpsh ),
-    % exclude( atom_sub('spudlike_open'), LnsCline, LnsOpen ),
     include( atom_sub('swipl'), LnsUpsh, Lns ),
     member( Ln, Lns ),
-    % Lns = [Ln|_],
-    % atom_codes( Tab, [0'\t] ),
     once( (atomic_list_concat([_|T],' ',Ln),member(Pid,T),Pid \== '',atom_number(Pid,PidNum) ) ),
     PidNum =\= ThisPid,
+    debug( spudlike, 'Killing process id: ~d', PidNum ), nl,
     !,
-    % debug_call( spudlike, ns_sel, Ln/Lns ),
-    debug( spudlike, 'Killing old spulike process: ~w', Pid ), nl,
-    % atom_number( Pid, PidNum ),
-    % @ kill( -9, PidNum ).
-    @ kill( -9, Pid ).
+    debug( spudlike, 'Killing old spudlike process: ~w', Pid ), nl,
+    % @ kill( -9, Pid ).
+    process_create( path(kill), ['-9',Pid], [] ).
 spudlike_kill :-
     debug( spudlike, 'No running spudlike found.', true ).
+
+psa_lines( spudlike, Lines) :-
+        setup_call_cleanup(
+            process_create(path(ps), [ '--columns',300, '-Af' ],
+                           [ stdout(pipe(Out))
+                           ]),
+            read_lines(Out, Lines),
+            close(Out)).
+
+read_lines(Out, Lines) :-
+        read_line_to_codes(Out, Line1),
+        read_lines(Line1, Out, Lines).
+
+read_lines(end_of_file, _, []) :- !.
+read_lines(Codes, Out, [Line|Lines]) :-
+        atom_codes(Line, Codes),
+        read_line_to_codes(Out, Line2),
+        read_lines(Line2, Out, Lines).
+
+atom_sub( Sub, Atom ) :-
+    sub_atom( Atom, _, _, _, Sub ),
+    !.

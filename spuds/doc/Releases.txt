@@ -1,4 +1,5 @@
 0:2
+   18.02.07   CHANGE:   spudlike has now no external dependencies
    18.01.26   SCRIPT:   spudlike
               DIR:      scripts
 
