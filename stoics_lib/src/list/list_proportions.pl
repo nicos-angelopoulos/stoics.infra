@@ -43,7 +43,6 @@ list_proportions( List, Props, Args ) :-
         ;
         Tfactor is 1, Tmin is 0
     ),
-    options( on_call(OnG), Opts ),
     Range is Rmax - Rmin,
     list_proportions( List, Rmin, Range, Tmin, Tfactor, Props ).
 
