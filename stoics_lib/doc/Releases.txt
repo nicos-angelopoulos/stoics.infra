@@ -4,6 +4,7 @@
 0.7
    18.02.16   IFACE:    changed max_min_list/3 to min_max/3
               IFACE:    added list_proportions/2,3 
+              IFACE:    new pred on_call/4
    18.02.14   DOC:      examples in skim/3
    18.01.24   DOC:      typos in doc of term_type/2
    18.01.09   IFACE:    kvs_k_memberchk/3

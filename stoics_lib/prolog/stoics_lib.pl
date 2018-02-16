@@ -73,6 +73,7 @@
               mod_goal/2,              % +Goal, -Moal
               mod_goal/3, mod_goal/4,  % +Mod, +Goal[, +Override], -Moal
               on_fail/2, on_fail/3,    % +Goal, +Call, +Opts
+              on_call/4,               % +OnB+ +Goal, +In, -Out
               which/3,                 % Goal, +Term, -Indices
             % number
               int_trailer/2,           % +Int, -Trailer
@@ -208,6 +209,7 @@
 :- lib(io_sections/3).
 :- lib(on_fail/2).
 :- lib(on_fail/3).
+:- lib(on_call/4).
 :- lib(term_length/2).
 :- lib(curtail/3).
 :- lib(term_type/2).
