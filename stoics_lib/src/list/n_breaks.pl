@@ -1,6 +1,6 @@
 
 :- lib(en_list/2).
-:- lib(max_min_list/3).
+:- lib(min_max/3).
 
 n_breaks_defaults( Defs ) :-
 	Defs = [centre(false),fixed_width(false)].
@@ -54,11 +54,11 @@ n_breaks_centre( Centre, Vals, N, Breaks, Opts ) :-
 	n_breaks_fixed_centre( Fixed, Centre, Vals, N, Breaks ).
 
 n_breaks_centre( _Centre, Vals, N, Breaks, _Opts ) :-
-	max_min_list( Vals, Max, Min ),
+	min_max( Vals, Min, Max ),
 	n_breaks_range( Min, Max, N, Breaks ).
 
 n_breaks_fixed_centre( true, Centre, Vals, N, Breaks ) :-
-	max_min_list( Vals, Max, Min ),
+	min_max( Vals, Min, Max ),
 	RelMax is max( abs(Max-Centre), abs(Centre - abs(Min)) ),
 	ConcMax is Centre + RelMax,
 	ConcMin is Centre - RelMax,
@@ -67,7 +67,7 @@ n_breaks_fixed_centre( true, Centre, Vals, N, Breaks ) :-
 	n_breaks_range( Centre, ConcMax, Half, [_|Right] ),
 	append( Left, Right, Breaks ).
 n_breaks_fixed_centre( false, Centre, Vals, N, Breaks ) :-
-	max_min_list( Vals, Max, Min ),
+	min_max( Vals, Min, Max ),
 	Half is floor( N ),
 	n_breaks_range( Min, Centre, Half, Left ),
 	n_breaks_range( Centre, Max, Half, [_|Right] ),

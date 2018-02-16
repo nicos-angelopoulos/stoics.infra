@@ -57,9 +57,11 @@ lib_index(kvs_k_memberchk, 3, any, user, 'kv/kvs_k_memberchk').
 lib_index(letter_strings, 3, any, user, 'string/letter_strings').
 lib_index(list_frequency, 2, any, user, 'list/list_frequency').
 lib_index(list_frequency, 3, any, user, 'list/list_frequency').
+lib_index(list_proportions, 2, any, user, 'list/list_proportions').
+lib_index(list_proportions, 3, any, user, 'list/list_proportions').
 lib_index(list_transpose, 2, any, user, 'list/list_transpose').
 lib_index(locate, 3, any, user, 'file/locate').
-lib_index(max_min_list, 3, any, user, 'list/max_min_list').
+lib_index(min_max, 3, any, user, 'list/min_max').
 lib_index(maparg, 2, any, user, 'meta/maparg').
 lib_index(maparg, 3, any, user, 'meta/maparg').
 lib_index(maparg, 4, any, user, 'meta/maparg').

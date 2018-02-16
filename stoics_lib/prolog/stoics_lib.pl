@@ -50,8 +50,10 @@
               has_at_most/3,           % +N, +X, +List
               list_frequency/2,        % +List, -Freqs
               list_frequency/3,        % +List, -Freqs, +Opts
+              list_proportions/2,      % +List, -Props
+              list_proportions/3,      % +List, -Props, +Opts
               list_transpose/2,        % +List, -Transpose
-              max_min_list/3,          % +List, -Max, -Min
+              min_max/3,               % +List, -Max, -Min
               select_all/4,            % +List, +Elem, -Select, -Rem
               select_first/3,          % +List, +Elem, -Rem
               skim/3,                  % +Nested, -Scum, -Remains
@@ -149,6 +151,8 @@
 :- lib(has_length/4).
 :- lib(list_frequency/2).
 :- lib(list_frequency/3).
+:- lib(list_proportions/2).
+:- lib(list_proportions/3).
 :- lib(list_transpose/2).
 :- lib(select_all/4).
 :- lib(select_first/3).
@@ -193,7 +197,7 @@
 :- lib(compare_arithmetic/3).
 :- lib(n_digits_min/3).
 :- lib(n_breaks/4).
-:- lib(max_min_list/3).
+:- lib(min_max/3).
 :- lib(nth1/5).
 :- lib(arg/4).
 :- lib(arg/5).
