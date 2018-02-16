@@ -1,5 +1,7 @@
 
-list_proportions_defaults( [min_max(false),to_range(false),on_call(false)] ).
+:- lib(options).
+
+list_proportions_defaults( [min_max(false),to_range(false)] ).
 
 /** list_proportions( +List, -Propos, +Opts ).
 
@@ -20,7 +22,6 @@ Props = [0, 0.3333333333333333, 0.6666666666666666, 1].
 ?- list_proportions( [1,2,3,4], Props, to_range(r(2,8)) ).
 Props = [2, 4.0, 6.0, 8].
 
-?- list_pro
 ==
 
 @author nicos angelopoulos
