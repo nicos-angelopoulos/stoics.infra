@@ -7,6 +7,7 @@
               OPTS:     lib/2 suggests()
               DOC:      added mode() opt doc in lib/2
    18.01.08   IFACE:    lib_promise/2. hot swapping of promised code
+              IFACE:    private packs (in src/packs) 
    17.08.22   ADDED:    ??? debug() -> listing of all tables in lib_tables:
 
 1.5       @   17.08.15
