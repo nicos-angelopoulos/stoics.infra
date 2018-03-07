@@ -332,13 +332,17 @@ debug_portray( _Topic, _Term ).
 %  * read
 %    reports reading from a file. Arg should be file specification suitable for locate/3.
 %    Either loc(File,Exts) or simply File in which case Exts = ''.
+%  * start 
+%    translates to starting ~Arg or starting ~Topic if Arg == true
 %  * task(Wch)  
 %    time of start/stop of a task. Other values are allowed put printed as is. 
+%  * term
+%    simply spew the input term
+%  * var
+%    reports variable name (arg(1)) and its current instantiation (arg(2))
 %  * wrote 
 %    reports the writting of output on a file. Arg should be file specification suitable for locate/3.
 %    Either loc(File,Exts) or simply File in which case Exts = ''.
-%  * start 
-%    translates to starting ~Arg or starting ~Topic if Arg == true
 %
 %==
 % ?- debug( ex ).
@@ -471,7 +475,6 @@ debug_call_topic( list, _Pfx, InArg, Topic ) :-
     debug_call_topic_list_delim( Hdr, Topic, Pfx, 'Starting enumeration of list: ~w' ),
     maplist( debug_message(Topic,'~w'), List ),
     debug_call_topic_list_delim( Ftr, Topic, Pfx, 'Ended enumeration of list: ~w' ).
-
 debug_call_topic( dims, Pfx, NamesPrv/MtxsPrv, Topic ) :-
     ( is_list(NamesPrv) -> Names=NamesPrv, MtxsPrv=Mtxs, With = 'Dimensions for matrices, '
                            ; [NamesPrv] = Names, [MtxsPrv]=Mtxs, With = 'Dimensions for matrix, ' 
@@ -485,6 +488,16 @@ debug_call_topic( dims, Pfx, NamesPrv/MtxsPrv, Topic ) :-
     flatten( NNest, Vars ),
     atom_concat( Prefixed, Right, Message ),
     debug_message( Topic, Message, Vars ). % do the messaging !
+debug_call_topic( var, Pfx, DbgTerm, Topic ) :-
+    arg( 1, DbgTerm, Var ),
+    arg( 2, DbgTerm, Val ),
+    Mess = 'Variable: ~a, value: ~w',
+    debug_message_prefixed( Pfx, Mess, Prefixed ),
+    debug_message( Topic, Prefixed, [Var,Val] ).
+debug_call_topic( term, Pfx, DbgTerm, Topic ) :-
+    Mess = '~w',
+    debug_message_prefixed( Pfx, Mess, Prefixed ),
+    debug_message( Topic, Prefixed, [DbgTerm] ).
 debug_call_topic( odir, Pfx, Odir, Topic ) :-
     ( exists_directory(Odir) ->
         Mess = 'Ouput in directory: ~w'

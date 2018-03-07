@@ -6,6 +6,7 @@ TBD
 ---
 
 0.4 
+   18.03.07  IFACE:    var & term pre-canned calls in debug_call/3,4
    17.12.20  FIXED:    ns_sel condition that left message uninstantiated
    17.11.24  IFACE:    ns_sel pre-canned call in debug_call/3,4
    17.09.27  CHANGE:   start/stop recognise true as default but now accept other args too
