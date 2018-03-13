@@ -103,7 +103,8 @@
               position_type/2,         % +Term, -PosType
               term_length/2,           % +Term, -Length
               term_type/2,             % +Term, -Type
-              termplate/2,termplate/3  % +Term[, Arity3], -Termplate
+              termplate/2,termplate/3, % +Term[, -Arity], -Termplate
+              url_file/2,url_file/3    % +Url, +File[, +Opts]
     ] ).
 
 % :- ensure_loaded( '../src/auxil/stoics_lib_module.pl' ).
@@ -214,5 +215,6 @@
 :- lib(curtail/3).
 :- lib(term_type/2).
 :- lib(en_append/3).
+:- lib(url_file/2).
 
 :- lib( end(stoics_lib) ).

@@ -349,6 +349,7 @@ option_name( Name, Term ) :-
     atomic( Term ),
     Name = Term.
 
+% fixme: needs cut ???
 predicate_name_defined_in( Pname, Mod ) :-
     current_module( Mod ),
     current_predicate( Mod:Pname/_).

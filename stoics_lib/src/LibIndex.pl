@@ -106,4 +106,6 @@ lib_index(term_length, 2, any, user, 'term/term_length').
 lib_index(term_type, 2, any, user, 'term/term_type').
 lib_index(termplate, 2, any, user, 'term/termplate').
 lib_index(termplate, 3, any, user, 'term/termplate').
+lib_index(url_file, 2, any, user, 'web/url_file').
+lib_index(url_file, 3, any, user, 'web/url_file').
 lib_index(which, 3, any, user, 'meta/which').

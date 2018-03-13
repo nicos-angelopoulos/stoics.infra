@@ -2,6 +2,9 @@
 --------------------
 
 0.7
+   18.03.13   IFACE:    added url_file/2,3 (from pack(bio_db)).
+              NEW:      sub src/ directory web (has url_file.pl)
+              FIXED:    url_file/3 option dnt(false) was failing
    18.02.16   IFACE:    changed max_min_list/3 to min_max/3
               IFACE:    added list_proportions/2,3 
               IFACE:    new pred on_call/4
