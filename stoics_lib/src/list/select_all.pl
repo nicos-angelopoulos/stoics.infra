@@ -19,8 +19,6 @@
 % @author nicos angelopoulos
 % @version  0.2 2014/4/7
 %
-% :- ensure_loaded( library(terms) ).
-
 select_all( [], _Elem, [], [] ).
 select_all( [H|T], Elem, Sel, NonSel ) :-
      subsumes_term( Elem, H ),

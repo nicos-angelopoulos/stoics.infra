@@ -2,6 +2,7 @@
 --------------------
 
 0.7
+   18.03.15   DOC:      removed spurious, commented (select_all/4)
    18.03.13   IFACE:    added url_file/2,3 (from pack(bio_db)).
               NEW:      sub src/ directory web (has url_file.pl)
               FIXED:    url_file/3 option dnt(false) was failing

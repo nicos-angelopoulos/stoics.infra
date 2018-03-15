@@ -7,7 +7,8 @@ options_append_known_process_option( debug ).
 Look for PredName_defaults/1 and if that exists append its argumetn to the end of OptS to get All.<br>
 OptS is casted to a list before the append, so single terms are allowed as options.<br>
 In addition, if file user_profile('.pl'/Pname) exists, its terms are appended between OptS and
-the argument of PredName_defaults/1.<br>
+the argument of PredName_defaults/1.<br> 
+Appending of the profile terms, can be by passed with options append_profile(false).<br>
 Listens to debug(options_append).
  
 The predicate can process debug(Dbg) a commonly used option (in All). When Dbg is set to true =|debug( PredName )|= is called.  <br>
@@ -20,6 +21,9 @@ how OptS are transformed into All.
 OAopts term or list of
   * args(Opts=en_list(OptS,Opts))
      the input OptS, but guaranteed to be a list
+
+  * append_profile(AppProf=true)
+     if false do not append the profile options
 
   * arity(Arity= -1)
      the arity of the caller, only used for reporting type errors for now
@@ -153,8 +157,10 @@ options_append( Pname, ArgS, Opts, OAoptS ) :-
     ( select(check_types(ChkTypes),OAoptsNA,OAoptsNT) -> true; ChkTypes=true, OAoptsNT=OAoptsNA ),
     ( select(remove_types(RmvTypes),OAoptsNT,OAoptsNR) -> true; RmvTypes=true, OAoptsNR=OAoptsNT ),
     ( select(arity(PArity),OAoptsNR,OAoptsAri) -> true; PArity= -1, OAoptsAri=OAoptsNR ),
-    ( select(pack(Pack),OAoptsAri,OAopts) -> true; Pack=[], OAopts=OAoptsAri ),
-    options_append_profile_options( Pname, Args, ProfArgs ),
+    ( select(pack(Pack),OAoptsAri,OAoptsPack) -> true; Pack=[], OAoptsPack=OAoptsAri ),
+    ( select(append_profile(AppProf),OAoptsPack,OAOptsApP) -> true; AppProf=true, OAoptsApF=OAoptsPack ),
+    OAopts = OAoptsApF,
+    options_append_profile_options( AppProf, Pname, Args, ProfArgs ),
     % options_append_args( OAopts, Args, Arity ),
     % options_def_append( Dname, Pname, Opts, Args, Arity, Defs, All ),
     findall( Xarg, member(extra_arg(Xarg),OAopts), Xargs ),
@@ -185,11 +191,11 @@ options_append_types_remove( _Defaulty, OptsWT, Opts ) :-
     % findall( Other, (member(Other,OptsWT),\+ functor(Other,options_types,1)), Opts ).
     options_remainder( OptsWT, remove_types, 1, Opts ).
 
-% options_append_profile_options( Pname, Args, ProfArgs ),
+% options_append_profile_options( +AddB, +Pname, +Args, -ProfArgs ),
 % 
-% If file $HOME/.pl/Pname.pl exists, append its terms to Args.
+% If AddB is true and file $HOME/.pl/Pname.pl exists, append its terms to Args.
 %
-options_append_profile_options( Pname, Args, Semi ) :-
+options_append_profile_options( true, Pname, Args, Semi ) :-
     % JW: 16.11.14
     AbsOpts = [access(read), file_errors(fail), file_type(prolog)],
     absolute_file_name(user_profile('.pl'/Pname), File, AbsOpts ),
@@ -197,7 +203,7 @@ options_append_profile_options( Pname, Args, Semi ) :-
     read_file_to_terms( File, Terms, [] ),
     append( Args, Terms, Semi ),
     !.
-options_append_profile_options( _Pname, Args, Args ).
+options_append_profile_options( _, _Pname, Args, Args ).
 
 /*
 options_append_args( Opts, ArgsList, Arity ) :-
