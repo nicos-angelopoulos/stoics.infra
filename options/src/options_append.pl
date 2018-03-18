@@ -158,7 +158,7 @@ options_append( Pname, ArgS, Opts, OAoptS ) :-
     ( select(remove_types(RmvTypes),OAoptsNT,OAoptsNR) -> true; RmvTypes=true, OAoptsNR=OAoptsNT ),
     ( select(arity(PArity),OAoptsNR,OAoptsAri) -> true; PArity= -1, OAoptsAri=OAoptsNR ),
     ( select(pack(Pack),OAoptsAri,OAoptsPack) -> true; Pack=[], OAoptsPack=OAoptsAri ),
-    ( select(append_profile(AppProf),OAoptsPack,OAOptsApP) -> true; AppProf=true, OAoptsApF=OAoptsPack ),
+    ( select(append_profile(AppProf),OAoptsPack,OAoptsApF) -> true; AppProf=true, OAoptsApF=OAoptsPack ),
     OAopts = OAoptsApF,
     options_append_profile_options( AppProf, Pname, Args, ProfArgs ),
     % options_append_args( OAopts, Args, Arity ),

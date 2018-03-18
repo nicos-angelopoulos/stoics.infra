@@ -1,5 +1,5 @@
 name(spuds).
-version('0.1.5').
+version('1.0').
 title('Persistent, user code inclusive, documentation server for linux').
 keywords([documentation,http,server,linux,unix]).
 author( 'Nicos Angelopoulos', 'http://stoics.org.uk/~nicos' ).

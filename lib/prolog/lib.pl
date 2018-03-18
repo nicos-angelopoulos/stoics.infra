@@ -229,6 +229,7 @@ Listens to =|debug(lib)|=.
 @version  1.2 2017/3/11, fixed missing cut, added lib(version(V,D))
 @version  1.3+4 2017/8/8, fixed multi-source for user, improved contact to server, install while lazy loading
 @version  1.5 2017/8/15
+@version  1.6 2018/3/18,  lib/2 suggests(), lib/2, promise() via hot-swapping, private packs
 @see http://stoics.org.uk/~nicos/sware/lib
 
 */
@@ -406,7 +407,7 @@ lib( version(V,D), _, _Args ) :-
     !,
     % V = 1:2, D = date(2017,3,11).
     % V = 1:4:0, D = date(2017,8,8).
-    V = 1:5:0, D = date(2017,8,15).
+    V = 1:5:0, D = date(2018,3,18).
 lib( suggests(Lib), _, _Args ) :- 
     !,
     lib_suggests( Lib ).

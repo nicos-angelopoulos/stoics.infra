@@ -1,5 +1,5 @@
 name(options).
-version('0.5').
+version('1.0').
 title('Options handling.').
 keywords([options]).
 author('Nicos Angelopoulos', 'http://stoics.org.uk/~nicos').

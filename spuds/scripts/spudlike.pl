@@ -65,13 +65,14 @@ spudlike_load( Root, Pack ) :-
 spudlike_load( _Root, _Pack ).  % skipping litter files
 
 spudlike_kill :-
+    current_prolog_flag( unix, true ),
     current_prolog_flag( pid, ThisPid ),
     debug( spudlike, 'This process id: ~d', ThisPid ), nl,
     % LnsPrv @@ psa('spudlike'),
     psa_lines( spudlike, LnsPrv ),
     exclude( atom_sub('grep cline'), LnsPrv, LnsCline ),
-    include( atom_sub('swipl -x'), LnsCline, LnsSwi ),
-    include( atom_sub('upsh'), LnsSwi, LnsUpsh ),
+    ( (include( atom_sub('swipl -x'),LnsCline,LnsSwi),LnsSwi\==[]) -> true; LnsSwi = LnsCline ),
+    ( (include(atom_sub('upsh'),LnsSwi,LnsUpsh),LnsUpsh \==[]) -> true; LnsUpsh = LnsSwi ),
     include( atom_sub('swipl'), LnsUpsh, Lns ),
     member( Ln, Lns ),
     once( (atomic_list_concat([_|T],' ',Ln),member(Pid,T),Pid \== '',atom_number(Pid,PidNum) ) ),
@@ -80,9 +81,13 @@ spudlike_kill :-
     !,
     debug( spudlike, 'Killing old spudlike process: ~w', Pid ), nl,
     % @ kill( -9, Pid ).
-    process_create( path(kill), ['-9',Pid], [] ).
+    process_create( path(kill), ['-9',Pid], [] ),
+    sleep(3).
 spudlike_kill :-
+    current_prolog_flag( unix, true ),
+    !,
     debug( spudlike, 'No running spudlike found.', true ).
+spudlike_kill. % SWI will throw an error if an old instance is running... so let it succeed here
 
 psa_lines( spudlike, Lines) :-
         setup_call_cleanup(

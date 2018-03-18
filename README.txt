@@ -16,6 +16,7 @@ Packs:
   + stoics_lib    http://stoics.org.uk/~nicos/sware/stoics_lib
 
 Major release points
+   18.03  versions v1.?
    17.03
 
 Nicos Angelopoulos

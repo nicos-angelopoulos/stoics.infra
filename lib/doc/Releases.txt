@@ -1,7 +1,7 @@
 ---   Releases   ---
 --------------------
 
-1.6
+1.6       @   18.03.18
    18.01.24   ERROR:    typo in lib_suggests error message
               IFACE:    lib_suggests/2
               OPTS:     lib/2 suggests()

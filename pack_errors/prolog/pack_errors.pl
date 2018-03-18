@@ -111,6 +111,7 @@ The library listens to =|debug(pack_errors)|=.
 @version 0.1 2016/01/30
 @version 0.2 2016/02/24
 @version 0.3 2017/03/06
+@version 1.0 2018/03/18
 @see     http://stoics.org.uk/~nicos/sware/pack_errors
 @tbd     equal length list checking
 @see     lib predicates:
@@ -530,9 +531,11 @@ pack_errors :-
 
 Current version and release date for the library.
 
-Currently: pack_errors_version( 0:3:0, date(2017,3,6) ).
+==
+?- pack_errors_version( 0:3:0, date(2017,3,6) ).
+==
 */
-pack_errors_version( 0:3:2, date(2018,1,5) ).
+pack_errors_version( 1:0:0, date(2018,3,18) ).
 
 prolog:message(unhandled_exception(pack_error(Message))) -->
      { debug( pack_errors, 'Unhandled pack_error/1 ~w', Message ) },

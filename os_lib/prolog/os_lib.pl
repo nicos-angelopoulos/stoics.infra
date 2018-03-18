@@ -219,6 +219,7 @@ The library predicates can be split to 4 groups.
 @version  0.0.3 2015/12/10 redone the typing and added better alias support, started custom errors
 @version  0.1.0 2016/2/24  first publisc release
 @version  0.6.0 2017/3/10  works with pack(lib)
+@version  1.0.0 2018/3/18  
 @see http://www.stoics.org.uk/~nicos/sware/os
 @see http://www.stoics.org.uk/~nicos/sware/os/html/os_lib.html
 @see doc/Releases.txt
@@ -277,6 +278,9 @@ The library predicates can be split to 4 groups.
 
 Current version and release date for the library.
 
+==
+?- os_version( 1:0:0, date(2018,3,18) ).
+==
+
 */
-% os_version( 0:5:0, date(2016,3,1) ).
-os_version( 0:6:0, date(2017,3,10) ).
+os_version( 1:0:0, date(2018,3,18) ).

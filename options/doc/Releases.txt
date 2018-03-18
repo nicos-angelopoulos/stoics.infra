@@ -1,7 +1,7 @@
 ---   Releases   ---
 --------------------
 
-0.7
+1.0       @   18.03.18
    18.03.15   IFACE:    options_append/4, added option append_profile(App:)
    18.02.04   DOC:      options_append/4, added user_profile/1 and indentation
    18.01.18   DOC:      removed scale/1 first option in options append doc !

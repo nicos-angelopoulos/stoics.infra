@@ -1,26 +1,26 @@
 ---   Releases   ----
 ---------------------
 
-0.4
-   18.01.06   IFACE:    defined/2;3 
-              ADDED:    tracer options: pack, pred & pack_format options to throw/2
-   17.08.22   IFACE:    lengths_mismatch/5, generalised /4 for terms and op
-   17.06.27   ADDED:    @() as an alias to call() in type/3's 1st argument
+1.0         @   18.03.18
+     18.01.06   IFACE:    defined/2;3 
+                ADDED:    tracer options: pack, pred & pack_format options to throw/2
+     17.08.22   IFACE:    lengths_mismatch/5, generalised /4 for terms and op
+     17.06.27   ADDED:    @() as an alias to call() in type/3's 1st argument
 
-0.3 17.03.06  
-   17.03.06   CLEAN:    removed refs to pack(lib/requires)
-   17.03.06   CHANGE:   interface to arg_ground related preds
-   16.12.10   MOVED:    throw/2 into the pack from pack(options)
-   16.11.23   ADDED:    type/2,3
-              ADDED:    handling of pack_error/1
-   16.11.10   ADDED:    error unknown_token/2
-              ADDED:    ground/2
-   16.09.09   CLEAN:    split throw/2 from caught/3 and moved it to pack(options)
-              IFACE:    global flag for controlling printing of Arg in arg_ errorrs prolog_flag(pack_errors_arg,false)
-              ERROR:    arg_enumerate/3
-              CHANGE:   arg related errors should now start with arg_
+0.3         @   17.03.06  
+     17.03.06   CLEAN:    removed refs to pack(lib/requires)
+     17.03.06   CHANGE:   interface to arg_ground related preds
+     16.12.10   MOVED:    throw/2 into the pack from pack(options)
+     16.11.23   ADDED:    type/2,3
+                ADDED:    handling of pack_error/1
+     16.11.10   ADDED:    error unknown_token/2
+                ADDED:    ground/2
+     16.09.09   CLEAN:    split throw/2 from caught/3 and moved it to pack(options)
+                IFACE:    global flag for controlling printing of Arg in arg_ errorrs prolog_flag(pack_errors_arg,false)
+                ERROR:    arg_enumerate/3
+                CHANGE:   arg related errors should now start with arg_
 
-0.2       @   16.02.24 
-   16.02.24   UPDATE:   for os_lib (0.5) 
+0.2         @   16.02.24 
+     16.02.24   UPDATE:   for os_lib (0.5) 
 
-0.1       @   16.01.30  first public release
+0.1         @   16.01.30  first public release
