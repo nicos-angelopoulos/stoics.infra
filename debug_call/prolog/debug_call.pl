@@ -44,6 +44,9 @@ relevant while debugging. Includes pre-canned, often used calls.
 ?- debug_call( ex, task(stop), 'write on file' ).
 At 15:44:1 on 2nd of Jul 2014 finished task: write on file.
 
+?- assert( (simple_mess(KVs,Mess,Args):- KVs =[a=A,b=B], atom_concat(A,B,Mess), Args=[]) ).
+?- debug_call( ex, simple_mess([a=1,b=2],
+
 ==
 
 ---+++ Variable topics 
@@ -63,7 +66,7 @@ debug_calls uses dynamic -..
 @version 0.1 2016/3/5
 @version 0.2 2016/11/01
 @version 0.3 2017/3/9
-@version 1.0 2018/3/18
+@version 1.1 2018/3/20
 
 */
 
@@ -72,31 +75,60 @@ debug_calls uses dynamic -..
 Current version and release date for the library.
 
 ==
-?- debug_call_version( 1:0:0, date(2016,3,9) ).
+?- debug_call_version( 1:1:0, date(2018,3,20) ).
 ==
 */
-debug_call_version( 1:0:0, date(2018,3,18) ).
+debug_call_version( 1:1:0, date(2018,3,20) ).
 
 :- use_module(library(lib)).
 
-:- lib( source(debug_call), [homonyms(true),index(false)] ).
-:- lib( stoics_lib:message_report/3 ).
-:- lib( stoics_lib:en_list/2 ).
-:- lib( stoics_lib:datime_readable/1 ).
-:- lib( stoics_lib:locate/3 ).
-:- lib( end(debug_call) ).
+:- lib(source(debug_call), [homonyms(true),index(false)]).
+:- lib(stoics_lib:locate/3 ).
+:- lib(stoics_lib:en_list/2).
+:- lib(stoics_lib:message_report/3).
+:- lib(stoics_lib:datime_readable/1).
+:- lib(end(debug_call) ).
 
 %% debug_call( +Topic, +Goal ).
 %
 %  Only call debug if we are debugging Topic.
 %
-% propose this to be included to debug.pl
+%  If Goal with arity +2 is available call that instead of Goal with extra arguemnts Mess and Args
+%  that will be passed to debug/3. If the goal (original or +2) fail, nothing is printed by
+%  debug_call and the debug_call(T,G) itself succeeds.
+% 
+%==
+% ?- goal( Goal, Mess, Args ).
+%==
+% 
+% Examples
+%==
+% ?- assert( (simple_mess(KVs,Mess,Args):- KVs =[a=A,b=B], atom_concat(A,B,Mess), Args=[]) ).
+% ?- debug_call( ex, simple_mess([a=1,b=2], 
+%==
+%
+% @author nicos angelopoulos
+% @version  0.2 2018/3/20
 %
 debug_call( Topic, Goal ) :-
     debugging_topic( Topic ),
     !,
-    call( Goal ).
+    debug_call_goal( Topic, Goal ).
 debug_call( _Topic, _Goal ).
+
+debug_call_goal( Topic, Moal ) :-
+    ( Moal = Mod:Goal -> true; Goal = Moal, Mod=user ),
+    functor( Goal, Functor, Arity ),
+    Extra is Arity + 2,
+    current_predicate( Mod:Functor/Extra ),
+    !,
+    ( call(Mod:Goal,Mess,Args) ->
+        debug( Topic, Mess, Args )
+        ;
+        true
+    ).
+debug_call_goal( _Topic, Goal ) :-
+    ( call(Goal) -> true; true ).
 
 %% debug_chain( +TopicCond, +TopicDep ).
 %% debug_chain( +TopicCond, +TopicDep, -TDprior ).
@@ -379,6 +411,7 @@ debug_portray( _Topic, _Term ).
 % @version  0.3 2014/07/2   added task
 % @version  0.4 2014/09/22  renamed from debug_call/3
 % @version  0.5 current     added ns_sel
+% @version  1.1 2018/3/20   prefer +2 arity in debug_call/2
 %
 debug_call( Topic, Goal, Args ) :-
     debug_call( Topic, Goal, '', Args ).
