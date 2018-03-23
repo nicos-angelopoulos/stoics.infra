@@ -1,6 +1,9 @@
 ---   Releases   ---
 --------------------
 
+1.1
+     18.03.23  FIX:     options/3 option rem_opts(Rem) was broken
+
 1.0       @   18.03.18
    18.03.15   IFACE:    options_append/4, added option append_profile(App:)
    18.02.04   DOC:      options_append/4, added user_profile/1 and indentation

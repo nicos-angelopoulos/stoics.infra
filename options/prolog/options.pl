@@ -139,7 +139,8 @@ Vers = 1:0:0.
 */
 % options_version( 0:4:0, date(2016,2,29) ).
 % options_version( 0:5:0, date(2017,3,10) ).
-options_version( 1:0:0, date(2018,3,18) ).
+% options_version( 1:0:0, date(2018,3,18) ).
+options_version( 1:0:1, date(2018,3,23) ).
 
 % options_defaults( [rem_opts(_),en_list(false),ground(false)] ).
 options_defaults( [en_list(false),ground(false)] ).
@@ -169,7 +170,6 @@ options_defaults( [en_list(false),ground(false)] ).
 % * rem_opts(RemOpts)
 %    RemOpts is Opts after all functor/shape matching mentions of Required have been removed.
 %
-% 
 % The predicate fails silently if the first Required option with equivalent "shape"
 % in Opts fails to pattern match (unlike classic memberchk/2).
 %
@@ -248,7 +248,8 @@ options_required( [Needed|T], Opts, Enlist, OwnOpts, Rem ) :-
 options_option_required( Opts, Needed, Enlist, OwnOpts, Rest ) :-
     functor( Needed, Tname, Tarity ),
     functor( Termplate, Tname, Tarity ),
-    select( Termplate, Opts, Rest ),
+    option_select_functor( Opts, Tname, Tarity, Sel, Rest ),
+    memberchk( Termplate, Sel ),
     !,
     memberchk( ground(Ground), OwnOpts ),
     ( ground(Termplate) -> IsGround = true; IsGround = false ),
@@ -276,3 +277,14 @@ option_arg_enlist( true, Termlate, Needed ) :-
     options_en_list( Arg1, Enlist1 ),
     Needed =.. [Name,Enlist1|Args].
 option_arg_enlist( false, Needed, Needed ).
+
+option_select_functor( [], _Tname, _Tarity, [], [] ).
+option_select_functor( [H|T], Tname, Tarity, Sel, Rest ) :-
+    ( functor(H,Tname,Tarity) -> 
+        Sel = [H|TSel],
+        Rest = TRest
+        ;
+        Sel = TSel,
+        Rest = [H|TRest]
+    ),
+    option_select_functor( T, Tname, Tarity, TSel, TRest ).
