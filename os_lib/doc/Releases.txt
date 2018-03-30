@@ -1,7 +1,10 @@
 ---   Releases   ---
 --------------------
 
-1.0 
+1.1 
+     18.03.30   IFACE:    option make_path(MkPath) in os_make_path/2
+
+1.0         @   18.03.18  
      17.09.24   IFACE:    os_abs/3, with option access(new) (non absolute_file_name/3)
                 FIX:      new os_abs implementation (call a_f_n/3 on empty opts list)
      17.09.20   OPTS:     with_ext(WithExt) @ os_postfix/4, with example

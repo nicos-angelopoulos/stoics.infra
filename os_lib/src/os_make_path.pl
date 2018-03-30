@@ -2,7 +2,7 @@
 % :- lib(options).  % assume
 % :- lib(error).    % autoload...?
 
-os_make_path_defaults( [ debug(false),afresh(false),debug_exists(false),descend(false),parent(_)] ).
+os_make_path_defaults( [ debug(false),afresh(false),debug_exists(false),descend(false),parent(_),make_path(true)] ).
 
 /** os_make_path( +Path ).
     os_make_path( +Path, +Opts ).
@@ -34,6 +34,9 @@ Opts
 
   * descend(Desc=false)
     whether to move to newly created directory
+
+  * make_path(MkPath=true)
+    do not go on with operation if MkPath is =false=
 
   * parent(Par)
     returns current directory (useful when Move == true)
@@ -80,6 +83,10 @@ true.
 
 ERROR: Domain error: `Path, first argument in os_path_make/2 ground, or options containing dir/1 or odir/2' expected, found `'Opts'=['$restore'(os_make_path,debug,false),true,debug(false),afresh(false),debug_exists(false)]'
 
+?- os_make_path( '/tmp/new1', [make_path(false),debug(true)] ).
+% Skipping creation of path: '/tmp/new1'
+true.
+
 ==
 
 @see options_append/4  (pack(options))
@@ -120,17 +127,27 @@ os_make_path_report( Path, Opts ) :-
 	!,
 	os_make_path_report_exists( Path, Opts ),
 	options( afresh(Afresh), Opts ),
-	os_make_path_afresh( Afresh, Path ).
+	os_make_path_afresh( Afresh, Path, Opts ).
 os_make_path_report( Path, Opts ) :-
+	os_make_directory_path( Path, Opts ).
+
+os_make_directory_path( Path, Opts ) :-
+    options( make_path(Mk), Opts ),
+    os_make_directory_path_bool( Mk, Path, Opts ).
+
+os_make_directory_path_bool( true, Path, Opts ) :-
 	Mess = 'Creating path: ~p',
 	options_debug( Mess, Path, Opts ),
 	make_directory_path( Path ).
+os_make_directory_path_bool( false, Path, Opts ) :-
+	Mess = 'Skipping creation of path: ~p',
+	options_debug( Mess, Path, Opts ).
 
-os_make_path_afresh( true, Path ) :-
+os_make_path_afresh( true, Path, Opts ) :-
 	!,
 	delete_directory_and_contents( Path ),
-	make_directory_path( Path ).
-os_make_path_afresh( _Other, _Path ).
+	os_make_directory_path( Path, Opts ).
+os_make_path_afresh( _Other, _Path, _Opts ).
 
 os_make_path_report_exists( Path, Opts ) :-
 	options( debug_exists(true), Opts ),

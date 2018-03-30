@@ -2,6 +2,7 @@
 :- use_module(library(http/http_open)). % fixme: doit dynamically
 
 :- lib(get_datetime/1).
+:- lib(options).
 
 url_file_defaults( [overwrite(error),dnt(false)] ).
 
