@@ -1,6 +1,8 @@
 ---   Releases   ---
 --------------------
 
+1.7       @   18.04.05
+   18.04.05   FIXED:    auto-load of missing packs was broken ...
 1.6       @   18.03.18
    18.01.24   ERROR:    typo in lib_suggests error message
               IFACE:    lib_suggests/2

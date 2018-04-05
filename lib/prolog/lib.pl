@@ -230,12 +230,14 @@ Listens to =|debug(lib)|=.
 @version  1.3+4 2017/8/8, fixed multi-source for user, improved contact to server, install while lazy loading
 @version  1.5 2017/8/15
 @version  1.6 2018/3/18,  lib/2 suggests(), lib/2, promise() via hot-swapping, private packs
+@version  1.7 2018/4/5,   auto-install missing was broken
 @see http://stoics.org.uk/~nicos/sware/lib
 
 */
 
 lib_defaults( pack, [load(true),index(true),homonym(true),type(pack),mode(self)] ).
 lib_defaults( lib, [load(false),index(true),homonym(true),type(lib),mode(self)] ).
+lib_defaults( [suggest(true)] ).
 
 /**  lib( +Operand ).
      lib( +Operand, +Opts )
@@ -377,7 +379,9 @@ lib( Repo ) :-
 lib( Repo, ArgS ) :-
     lib_loading_context( Cxt ),
     lib_en_list( ArgS, Args ),
-    lib( Repo, Cxt, Args ).
+    lib_defaults( Defs ),
+    append( Args, Defs, Opts ),
+    lib( Repo, Cxt, Opts ).
 
 lib( Lib, Cxt, Args ) :-
     debug( lib, 'lib directive: ~w, in context: ~w, with opts: ~w', [Lib,Cxt,Args] ),
@@ -403,11 +407,20 @@ lib( end(Src), _Cxt, Opts ) :-
 % lib( alias(Alias), Cxt, Opts ) :-
     % !,
     % lib_alias( Alias, Cxt, Opts ).
+/** lib( version(V,D), _, _Args ).
+
+Version and Date of installed pack.
+
+==
+?- lib( version(0:1:7, date(2018.4,5) ).
+==
+
+*/
 lib( version(V,D), _, _Args ) :-
     !,
     % V = 1:2, D = date(2017,3,11).
     % V = 1:4:0, D = date(2017,8,8).
-    V = 1:5:0, D = date(2018,3,18).
+    V = 1:7:0, D = date(2018,4,5).
 lib( suggests(Lib), _, _Args ) :- 
     !,
     lib_suggests( Lib ).
