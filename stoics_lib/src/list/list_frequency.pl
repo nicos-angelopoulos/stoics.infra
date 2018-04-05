@@ -22,7 +22,7 @@ Opts
   * variant(Var=true)
      when false compare elements with ==
   * zero(Zero=false)
-     whether to include zero counter elements (Zero should be list of expected elements)
+     whether to include zero counter elements (Zero should be the list of expected elements)
 
 ==
 ?- list_frequency( [c,a,b,a,b,c], Freqs ).
@@ -62,7 +62,7 @@ list_frequency( List, Freqs ) :-
 list_frequency( List, Freqs, ArgS ) :-
     en_list( ArgS, Args ),
     list_frequency_defaults( Defs ),
-    append( Defs, Args, Opts ),
+    append( Args, Defs, Opts ),
     memberchk( order(Ord), Opts ),
     memberchk( transpose(T), Opts ),
     memberchk( variant(Vnt), Opts ),
