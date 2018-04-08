@@ -1,4 +1,6 @@
 
+:- lib(debugging_status/2).
+
 options_append_known_process_option( debug ).
 
 /** options_append( +PredName, +OptS, -All ).

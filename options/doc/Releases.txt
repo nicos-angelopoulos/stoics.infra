@@ -1,8 +1,10 @@
 ---   Releases   ---
 --------------------
 
-1.1
-     18.03.23  FIX:     options/3 option rem_opts(Rem) was broken
+1.1         @  18.04.08
+     18.04.08  FIXED:   missing lib/ dir and lib/debuggin_status.pl
+               ADDED:   lib(debuggin_status/2 in options_append/4)
+     18.03.23  FIXED:   options/3 option rem_opts(Rem) was broken
 
 1.0       @   18.03.18
    18.03.15   IFACE:    options_append/4, added option append_profile(App:)
