@@ -1,6 +1,9 @@
 ---   Releases   ---
 --------------------
 
+1.8
+     18.04.13  FIXED:   remove extra comment for lib/2 (version )  
+
 1.7       @   18.04.05
    18.04.05   FIXED:    auto-load of missing packs was broken ...
 1.6       @   18.03.18

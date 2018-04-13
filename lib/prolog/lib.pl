@@ -369,6 +369,13 @@ The above two directives can be shortened to:
 ?- lib(stoics_lib:kv_decompose/3).
 ==
 
+==
+?- lib( version(1:7:0, date(2018.4,5)) ).
+true.
+==
+
+@author nicos angelopoulos
+@version  1:7 2018/4/5
 @tbd when predicate is missing from stoics_lib while loading from b_real, we get clash between main and lazy, error should be clearer (the pred select_all/3 was actually not defined in file either)
 
 */
@@ -407,15 +414,6 @@ lib( end(Src), _Cxt, Opts ) :-
 % lib( alias(Alias), Cxt, Opts ) :-
     % !,
     % lib_alias( Alias, Cxt, Opts ).
-/** lib( version(V,D), _, _Args ).
-
-Version and Date of installed pack.
-
-==
-?- lib( version(0:1:7, date(2018.4,5) ).
-==
-
-*/
 lib( version(V,D), _, _Args ) :-
     !,
     % V = 1:2, D = date(2017,3,11).
