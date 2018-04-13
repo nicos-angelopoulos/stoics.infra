@@ -1,4 +1,4 @@
-/** on_call( +OnB, +Call, +ArgIn, -ArgOut ),
+/** on_call( +OnB, +Call, +ArgIn, -ArgOut ).
 
 A generic caller of Call iff OnB is _true_. <br>
 The call incorporates as its two last args ArgIn and ArgOut.<br>
