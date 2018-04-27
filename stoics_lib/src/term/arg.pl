@@ -52,14 +52,15 @@ Rem = a(y, z).
 */
 arg( List, Tin, Nths, Tout ) :-
     is_list(List),
+    sort( 0, @>, List, Set ),
     !,
-    arg_list_nths( List, Tin, Nths, Tout ).
+    arg_set_nths( Set, Tin, Nths, Tout ).
 arg( N, Tin, Nth, Tout ) :-
 	Tin =.. [Name|Args],
 	nth1( N, Args, Nth, RArgs ),
 	Tout =.. [Name|RArgs].
 
-arg_list_nths( [], Tout, [], Tout ).
-arg_list_nths( [H|T], Tin, [Nth|Nths], Tout ) :-
+arg_set_nths( [], Tout, [], Tout ).
+arg_set_nths( [H|T], Tin, [Nth|Nths], Tout ) :-
     arg( H, Tin, Nth, Tmd ),
-    arg_list_nths( T, Tmd, Nths, Tout ).
+    arg_set_nths( T, Tmd, Nths, Tout ).

@@ -3,6 +3,7 @@
 
 1.1
      18.04.27   NEW:    first argument of arg/4 can now be a list
+                FIXED:  use set and move from right to left when 1st arg of arg/4 is a list
      18.04.13   DOC:    replace dot for comma at end of predicate head, on/call/3
      18.04.05   FIXED:  append defaults after args in list_frequency/3
      18.03.30   FIXED:  load lib(options) in url_file/3
