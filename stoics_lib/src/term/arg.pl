@@ -39,8 +39,12 @@ Args = [2, 5, 8],
 Terms = [t(1, 3), t(4, 6), t(7, 9)].
 
 ?- arg( [1,3], a(x,y,z,w), Nths, Rem ).
-Nths = [x, w],
-Rem = a(y, z).
+Nths = [x, z],
+Rem = a(y, w).
+
+?- arg( [1,3,2,1], a(x,y,z,w), Nths, Rem ).
+Nths = [x, z, y, x],
+Rem = a(w).
 
 ==
 
@@ -54,13 +58,14 @@ arg( List, Tin, Nths, Tout ) :-
     is_list(List),
     sort( 0, @>, List, Set ),
     !,
-    arg_set_nths( Set, Tin, Nths, Tout ).
+    arg_set_nths( Set, Tin, NthPrs, Tout ),
+    findall( Nth, (member(Elem,List),memberchk(Elem-Nth,NthPrs)), Nths ).
 arg( N, Tin, Nth, Tout ) :-
 	Tin =.. [Name|Args],
 	nth1( N, Args, Nth, RArgs ),
 	Tout =.. [Name|RArgs].
 
 arg_set_nths( [], Tout, [], Tout ).
-arg_set_nths( [H|T], Tin, [Nth|Nths], Tout ) :-
+arg_set_nths( [H|T], Tin, [H-Nth|Nths], Tout ) :-
     arg( H, Tin, Nth, Tmd ),
     arg_set_nths( T, Tmd, Nths, Tout ).
