@@ -16,7 +16,7 @@ appear in the List.
 
 Opts
   * order(Ord=false)
-     order of results: elem sorts by element, freq sorts by frequency, and false for no sorting 
+     order of results: true sorts by element, freq sorts by frequency, and false for no sorting 
   * transpose(T=false)
      when true returns the elements of Frequencies as Freq-Term
   * variant(Var=true)
@@ -139,7 +139,7 @@ list_frequency_initial_counts( List, Ord, T, Counts, true ) :-
 	list_freqency_order( Ord, T, CountsPrv, Counts ).
 
 list_freqency_order( false, _T, Freqs, Freqs ).
-list_freqency_order( elem, T, CountsPrv, Counts ) :- 
+list_freqency_order( true, T, CountsPrv, Counts ) :- 
 	list_frequency_order_elem( T, CountsPrv, Counts ).
 list_freqency_order( freq, T, CountsPrv, Counts ) :-
 	list_frequency_order_freq( T, CountsPrv, Counts ).
