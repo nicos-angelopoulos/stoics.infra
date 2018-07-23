@@ -2,6 +2,8 @@
 --------------------
 
 1.1 
+     18.07.23   IFACE:    os_file/2 version, with options dir(Dir='.') and sub(Sub).
+                DOC:      added sub(Sub) in stem options
      18.03.30   IFACE:    option make_path(MkPath) in os_make_path/2
 
 1.0         @   18.03.18  

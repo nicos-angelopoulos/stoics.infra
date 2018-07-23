@@ -47,7 +47,7 @@
               % logical
               os_exists/1,               % +Os
               os_exists/2,               % +Os, +Opts
-              os_file/1,                 % ?Os
+              os_file/1,os_file/2,       % ?Os[,+Opts]
               os_files/1,                % -Os
               os_dir_files/2,            % +Dir, -Os
               os_dir/1,                  % ?Os
@@ -122,6 +122,7 @@ or
 The library attempts to keep a consistent set of options that are on occasions 
 funnelled through to either other interface or commonly used private predicates.
 
+Common options:
 
   * dir(Dir='.')
     directory for input and output
@@ -137,7 +138,10 @@ funnelled through to either other interface or commonly used private predicates.
     extension for file
 
    * stem(Stem)
-     stem to used for constructing os names
+     stem to be used for constructing os names
+
+   * sub(Sub)
+     apply operation recursive to sub directories
 
 Variable name conventions
   * var(Os)
