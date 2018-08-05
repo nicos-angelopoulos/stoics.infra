@@ -72,10 +72,12 @@ os_sel_patterns( [Pat|Ps], Oses, Sel ) :-
 os_sel_pattern( ext(Ext), Os ) :-
 	os_ext( Ext, Os ).
 os_sel_pattern( sub(Pat), Os ) :-
-	os_ext( _Ext, Stem, Os ),
+    os_cast( Os, +OsAtm ),
+	os_ext( _Ext, Stem, OsAtm ),
 	once( sub_atom(Stem,_,_,_,Pat) ).
 os_sel_pattern( prefix(Pfx), Os ) :-
-	os_ext( _Ext, Stem, Os ),
+    os_cast( Os, +OsAtm ),
+	os_ext( _Ext, Stem, OsAtm ),
 	once( sub_atom(Stem,0,_,_,Pfx) ).
 os_sel_pattern( postfix(Psf), Os ) :-
 	os_ext( _Ext, Stem, Os ),
@@ -83,12 +85,13 @@ os_sel_pattern( postfix(Psf), Os ) :-
 
 os_sel_oses( os_files, Dir, Oses ) :-
 	!,
-	os_dir_files( Dir, Oses ).
+    os_files( Oses, [dir(Dir),stem(rel)] ).
 os_sel_oses( os_dirs, Dir, Oses ) :-
 	!,
-	os_dir_dirs( Dir, Oses ).
+	os_dirs( Oses, [dir(Dir),stem(rel)] ).
 os_sel_oses( os_all, Dir, Oses ) :-
 	!,
-	directory_files( Dir, Oses ).
+    os_cast( Dir, +DirAtm ),
+	directory_files( DirAtm, Oses ).
 os_sel_oses( Other, _Dir, Oses ) :-
 	en_list( Other, Oses ).

@@ -72,20 +72,22 @@ os_dir( OsDir, Args ) :-
     options_append( os_dir, Args, Opts ),
     options( [dir(Dir),sub(Sub),stem(Stem)], Opts ),
     absolute_file_name( Dir, Abs, [file_type(directory),solutions(first)] ),
-    os_dir( OsDir, Dir, Abs, Stem, Sub ).
+    os_dir( OsDir, '', Dir, Abs, Stem, Sub ).
 
-os_dir( OsDir, Dir, Abs, Stem, Sub ) :-
-	directory_files( Dir, EntriesUno ),
+os_dir( OsDir, Rel, Dir, Abs, Stem, Sub ) :-
+    os_cast( Dir, +SysDir ),
+	directory_files( SysDir, EntriesUno ),
 	sort( EntriesUno, Entries ),
 	member( Entry, Entries ),
 	% \+ atom_concat( '.', _, Entry ),
     Entry \== '.', Entry \== '..',
     os_path( Abs, Entry, AbsEntry ),
 	os_exists( AbsEntry, type(dlink) ),
-    os_path( Dir, Entry, Rel ),
-    os_dir_obj( Rel, Entry, OsDir, Dir, AbsEntry, Stem, Sub ).
+    os_path( Dir, Entry, Desc ),
+    os_path( Rel, Entry, RelOs ),
+    os_dir_obj( Desc, RelOs, Entry, OsDir, Dir, AbsEntry, Stem, Sub ).
 
-os_dir_obj( Rel, Entry, OsDir, _Dir, Abs, Stem, _Sub ) :-    % first return the dir
+os_dir_obj( _Os, Rel, Entry, OsDir, _Dir, Abs, Stem, _Sub ) :-    % first return the dir
 	% os_exists( Rel, type(flink) ),
     % !,
     ( Stem == false ->
@@ -99,10 +101,10 @@ os_dir_obj( Rel, Entry, OsDir, _Dir, Abs, Stem, _Sub ) :-    % first return the 
             os_cast( Rel, OsDir )
         )
     ).
-os_dir_obj( Rel, _Entry, OsDir, _Dir, Abs, Stem, true ) :-  % then recurse into the dir if we have been asked
+os_dir_obj( Os, Rel, Entry, OsDir, _Dir, Abs, Stem, true ) :-  % then recurse into the dir if we have been asked
 	% os_exists( Rel, type(dlink) ),
-    os_path( Rel, Abs, Rbs ),
-    os_dir( OsDir, Rel, Rbs, Stem, true ).
+    os_path( Entry, Abs, Rbs ),
+    os_dir( OsDir, Rel, Os, Rbs, Stem, true ).
 
 %% os_dirs( -Dirs ).
 %% os_dirs( +AtDir, -Dirs ).

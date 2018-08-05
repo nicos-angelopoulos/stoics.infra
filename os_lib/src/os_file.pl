@@ -76,18 +76,20 @@ os_file( File, Args ) :-
     options( dir(Dir), Opts ),
     options( stem(Stem), Opts ),
     absolute_file_name( Dir, Abs, [file_type(directory),solutions(first)] ),
-    os_file( File, Dir, Abs, Stem, Sub ).
+    os_file( File, '', Dir, Abs, Stem, Sub ).
 
-os_file( File, Dir, Abs, Stem, Sub ) :-
-	directory_files( Dir, EntriesUno ),
+os_file( File, Rel, Dir, Abs, Stem, Sub ) :-
+    os_cast( Dir, +SysDir ),
+	directory_files( SysDir, EntriesUno ),
     sort( EntriesUno, Entries ),
 	member( Entry, Entries ),
     Entry \== '.', Entry \== '..',
-    os_path( Dir, Entry, Rel ),
-    os_file_obj( Rel, Entry, File, Dir, Abs, Stem, Sub ).
+    os_path( Dir, Entry, Desc ),
+    os_path( Rel, Entry, RelDesc ),
+    os_file_obj( Desc, RelDesc, Entry, File, Dir, Abs, Stem, Sub ).
 
-os_file_obj( Rel, Entry, File, _Dir, Abs, Stem, _Sub ) :-
-	os_exists( Rel, type(flink) ),
+os_file_obj( Desc, Rel, Entry, File, _Dir, Abs, Stem, _Sub ) :-
+	os_exists( Desc, type(flink) ),
     !,
     ( Stem == false ->
 	    os_cast( Entry, File )
@@ -100,10 +102,10 @@ os_file_obj( Rel, Entry, File, _Dir, Abs, Stem, _Sub ) :-
             os_cast( Rel, File )
         )
     ).
-os_file_obj( Rel, _Entry, File, _Dir, Abs, Stem, true ) :-
-	os_exists( Rel, type(dlink) ),
-    os_path( Rel, Abs, Rbs ),
-    os_file( File, Rel, Rbs, Stem, true ).
+os_file_obj( Desc, Rel, Entry, File, _Dir, Abs, Stem, true ) :-
+	os_exists( Desc, type(dlink) ),
+    os_path( Abs, Entry, Rbs ),
+    os_file( File, Rel, Desc, Rbs, Stem, true ).
 
 os_files_defaults( [dir('.'),sub(false)] ).
 
