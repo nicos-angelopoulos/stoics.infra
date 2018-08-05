@@ -1,7 +1,7 @@
 ---   Releases   ---
 --------------------
 
-1.1 
+1.1         @   18.08.05
      18.08.05   DOC:      fix commenting so os_file/2 is properly picked up
                 IFACE:    added os_files/2
                 IFACE:    removed os_dir_files/1

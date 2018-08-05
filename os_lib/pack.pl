@@ -1,6 +1,6 @@
 name( os_lib ).
 title( 'Operating system interaction predicates.' ).
-version( '1.0' ).
+version( '1.1' ).
 author( 'Nicos Angelopoulos', 'http://stoics.org.uk/~nicos' ).
 packager( 'Nicos Angelopoulos', 'http://stoics.org.uk/~nicos' ).
 maintainer( 'Nicos Angelopoulos', 'http://stoics.org.uk/~nicos' ).
