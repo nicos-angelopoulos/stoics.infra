@@ -1,7 +1,7 @@
 os_file_defaults( [dir('.'),sub(false)] ).
 
 %% os_file( ?File ).
-%  os_file( ?File, +Opts ).
+%% os_file( ?File, +Opts ).
 %
 % True iff File is a file or a link to an existing file, in the current directory.
 % Can be used to enumerate all files.
@@ -9,14 +9,18 @@ os_file_defaults( [dir('.'),sub(false)] ).
 % Opts
 %   * sub(Sub=false)
 %      find files within sub directories when true
+%
 %==
 % ?- absolute_file_name( pack(os/src), Abs ), os_dir_files( Abs, Files ).
 % Abs = '/usr/local/users/nicos/local/git/lib/swipl-7.3.16/pack/os/src',
 % Files = [os_repoint.pl, os_unique_by_date.pl, os_make_path.pl, os_term.pl, os_path.pl, os_ext.pl, os_abs.pl, os_slashify.pl, os_base.pl|...].
+%
 % ?- cd( pack(os_lib) ).
+%
 % ?- os_file( File ).
 % File = pack.pl ;
 % false.
+%
 % ?- os_file( & File ).
 % File = "pack.pl";
 % false.
