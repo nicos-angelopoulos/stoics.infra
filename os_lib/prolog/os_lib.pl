@@ -45,11 +45,9 @@
               os_version/2,              % -Vers, -Date
 
               % logical
-              os_exists/1,               % +Os
-              os_exists/2,               % +Os, +Opts
+              os_exists/1,os_exists/2,   % +Os[, +Opts]
               os_file/1,os_file/2,       % ?Os[,+Opts]
-              os_files/1,                % -Os
-              os_dir_files/2,            % +Dir, -Os
+              os_files/1,os_files/2,     % -Os[,+Opts]
               os_dir/1,                  % ?Os
               os_dirs/1,                 % -Os
               os_dir_dirs/2,             % +Dir, -Os
@@ -200,10 +198,9 @@ The library predicates can be split to 4 groups.
   * os_dir/1
   * os_dirs/1
   * os_dir_dirs/2
-  * os_dir_files/2
   * os_exists/2
-  * os_file/1
-  * os_files/1
+  * os_file/1,2
+  * os_files/1,2
 
 4. Helpers
   * os_cast/3

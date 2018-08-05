@@ -1,4 +1,11 @@
-os_file_defaults( [dir('.'),sub(false)] ).
+
+os_file_defaults( Args, Defs ) :-
+    ( (memberchk(dir(InDir),Args),\+ InDir == '.') ->
+            Stem = rel
+            ;
+            Stem = false
+    ),
+    Defs = [dir('.'), stem(Stem), sub(false)].
 
 %% os_file( ?File ).
 %% os_file( ?File, +Opts ).
@@ -7,13 +14,28 @@ os_file_defaults( [dir('.'),sub(false)] ).
 % Can be used to enumerate all files.
 %
 % Opts
+%   * dir(Dir='.')
+%      directory in which to find File
+%   * stem(Stem=false)
+%      what stem to add to returned files, 
+%      false: none (default when Dir='.'), abs: absolute, rel: relative (default else)
 %   * sub(Sub=false)
 %      find files within sub directories when true
 %
 %==
-% ?- absolute_file_name( pack(os/src), Abs ), os_dir_files( Abs, Files ).
-% Abs = '/usr/local/users/nicos/local/git/lib/swipl-7.3.16/pack/os/src',
-% Files = [os_repoint.pl, os_unique_by_date.pl, os_make_path.pl, os_term.pl, os_path.pl, os_ext.pl, os_abs.pl, os_slashify.pl, os_base.pl|...].
+% ?- absolute_file_name( pack(os_lib/src), Abs ), os_file( File, dir(Abs) ).
+% Abs = '/usr/local/users/nicos/local/git/lib/swipl-7.7.18/pack/os_lib/src',
+% File = '/usr/local/users/nicos/local/git/lib/swipl-7.7.18/pack/os_lib/src/os_make_path.pl' ;
+% Abs = '/usr/local/users/nicos/local/git/lib/swipl-7.7.18/pack/os_lib/src',
+% File = '/usr/local/users/nicos/local/git/lib/swipl-7.7.18/pack/os_lib/src/os_term.pl' ;
+% ...
+%
+% ?- absolute_file_name( pack(os_lib/src), Abs ), os_file( File, [dir(Abs),stem(false)] ).
+% Abs = '/usr/local/users/nicos/local/git/lib/swipl-7.7.18/pack/os_lib/src',
+% File = os_make_path.pl ;
+% Abs = '/usr/local/users/nicos/local/git/lib/swipl-7.7.18/pack/os_lib/src',
+% File = os_term.pl ;
+% ... 
 %
 % ?- cd( pack(os_lib) ).
 %
@@ -33,10 +55,16 @@ os_file_defaults( [dir('.'),sub(false)] ).
 % File = 'doc/html/h2-bg.png' ;
 % false.
 % 
+% [debug]  ?- absolute_file_name( pack(os_lib/src), Abs ), working_directory(_,Abs), os_file( File, [sub(true),stem(rel)] ).
+% Abs = '/usr/local/users/nicos/local/git/lib/swipl-7.7.18/pack/os_lib/src',
+% File = os_make_path.pl ;
+% Abs = '/usr/local/users/nicos/local/git/lib/swipl-7.7.18/pack/os_lib/src',
+% File = 'lib/inst_error_full.pl' ;
+% 
 %==
 % @author nicos angelopoulos
 % @version  0.1 2016/1/31, this version without ref to lib(os_sub)
-% @version  0.2 2018/7/23, added options, and in particular sub(true)
+% @version  0.2 2018/7/23, added options, dir(Dir) and sub(true)
 % 
 os_file( File ) :-
     os_file( File, [] ).
@@ -50,47 +78,57 @@ os_file( File, Args ) :-
     options_append( os_file, Args, Opts ),
     options( sub(Sub), Opts ),
     options( dir(Dir), Opts ),
-    os_file( File, Dir, Sub ).
+    options( stem(Stem), Opts ),
+    absolute_file_name( Dir, Abs, [file_type(directory),solutions(first)] ),
+    os_file( File, Dir, Abs, Stem, Sub ).
 
-os_file( File, Dir, Sub ) :-
+os_file( File, Dir, Abs, Stem, Sub ) :-
 	directory_files( Dir, Entries ),
 	member( Entry, Entries ),
     Entry \== '.', Entry \== '..',
     os_path( Dir, Entry, Rel ),
-    os_file_obj( Rel, Entry, File, Dir, Sub ).
+    os_file_obj( Rel, Entry, File, Dir, Abs, Stem, Sub ).
 
-os_file_obj( Rel, Entry, File, Dir, _Sub ) :-
+os_file_obj( Rel, Entry, File, _Dir, Abs, Stem, _Sub ) :-
 	os_exists( Rel, type(flink) ),
     !,
-    ( Dir == '.' ->
+    ( Stem == false ->
 	    os_cast( Entry, File )
         ;
-        os_cast( Rel, File )
+        ( Stem == abs ->
+            os_path( Abs, Entry, Path ),
+            os_cast( Path, File )
+            ; % defaulty for all other stem values
+            % os_path( Rel, Entry, Path )
+            os_cast( Rel, File )
+        )
     ).
-os_file_obj( Rel, _Entry, File, _Dir, true ) :-
+os_file_obj( Rel, _Entry, File, _Dir, Abs, Stem, true ) :-
 	os_exists( Rel, type(dlink) ),
-    os_file( File, Rel, true ).
+    os_path( Rel, Abs, Rbs ),
+    os_file( File, Rel, Rbs, Stem, true ).
+
+os_files_defaults( [dir('.'),sub(false)] ).
 
 %% os_files( -Files ).
-%% os_dir_files( +Dir, -Files ).
+%% os_files( -Files, +Opts ).
 %
-% Collects all files for which os_file(File) succeeds in directory Dir. 
-% When Dir is missing it is set to '.'.
-%
+% Collects all files for which os_file(File) or os_file(File,Opts) succeed.<br>
+% Opts are passed to os_file/2.
+% 
 %==
-% ?- absolute_file_name( pack(os/src), Abs ), os_dir_files( Abs, Files ).
-% Abs = '/usr/local/users/nicos/local/git/lib/swipl-7.3.16/pack/os/src',
-% Files = [os_repoint.pl, os_unique_by_date.pl, os_make_path.pl, os_term.pl, os_path.pl, os_ext.pl, os_abs.pl, os_slashify.pl, os_base.pl|...].
+% ?- absolute_file_name( pack(os_lib/src), Abs ), os_files( Files, dir(Abs) ).
+% Abs = '/usr/local/users/nicos/local/git/lib/swipl-7.7.18/pack/os_lib/src',
+% Files = ['/usr/local/users/nicos/local/git/lib/swipl-7.7.18/pack/os_lib/src/os_make_path.pl', '/usr/local/users/nicos/local/git/lib/swipl-7.7.18/pack/os_lib/src/os_term.pl', '/usr/local/users/nicos/local/git/lib/swipl-7.7.18/pack/os_lib/src/os_dir_stem_ext.pl', ... ]
+% 
 %==
 %
 % @author nicos angelopoulos
 % @version  0.1 2016/1/31, this version without ref to lib(os_sub)
+% @version  0.2 2018/8/05, added options, dir(Dir) and sub(true), removed os_dir_files/2
+% see os_file/2
 %
 os_files( Files ) :-
 	findall( File, os_file(File), Files ).
-
-os_dir_files( Dir, Files ) :-
-	os_cast( Dir, atom, ADir ),
-	working_directory( Old, ADir ),
-	os_files( Files ),
-	working_directory( _, Old ).
+os_files( Files, Opts ) :-
+	findall( File, os_file(File,Opts), Files ).
