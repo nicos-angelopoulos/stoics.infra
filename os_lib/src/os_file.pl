@@ -21,16 +21,24 @@ os_file_defaults( Defs ) :-
 %==
 % ?- absolute_file_name( pack(os_lib/src), Abs ), os_file( File, dir(Abs) ).
 % Abs = '/usr/local/users/nicos/local/git/lib/swipl-7.7.18/pack/os_lib/src',
-% File = '/usr/local/users/nicos/local/git/lib/swipl-7.7.18/pack/os_lib/src/os_make_path.pl' ;
+% File = 'LibIndex.pl' ;
 % Abs = '/usr/local/users/nicos/local/git/lib/swipl-7.7.18/pack/os_lib/src',
-% File = '/usr/local/users/nicos/local/git/lib/swipl-7.7.18/pack/os_lib/src/os_term.pl' ;
+% File = os_abs.pl ;
+% Abs = '/usr/local/users/nicos/local/git/lib/swipl-7.7.18/pack/os_lib/src',
+% File = os_base.pl ;
 % ...
 %
-% ?- absolute_file_name( pack(os_lib/src), Abs ), os_file( File, [dir(Abs),stem(false)] ).
+% ?- absolute_file_name( pack(os_lib/src), Abs ), os_file( File, [dir(Abs),sub(true)] ).
 % Abs = '/usr/local/users/nicos/local/git/lib/swipl-7.7.18/pack/os_lib/src',
-% File = os_make_path.pl ;
+% File = 'LibIndex.pl' ;
 % Abs = '/usr/local/users/nicos/local/git/lib/swipl-7.7.18/pack/os_lib/src',
-% File = os_term.pl ;
+% File = 'lib/inst_error_full.pl' ;
+% Abs = '/usr/local/users/nicos/local/git/lib/swipl-7.7.18/pack/os_lib/src',
+% File = 'lib/os_type_create.pl' ;
+% Abs = '/usr/local/users/nicos/local/git/lib/swipl-7.7.18/pack/os_lib/src',
+% File = os_abs.pl ;
+% Abs = '/usr/local/users/nicos/local/git/lib/swipl-7.7.18/pack/os_lib/src',
+% File = os_base.pl .
 % ... 
 %
 % ?- cd( pack(os_lib) ).
@@ -51,12 +59,12 @@ os_file_defaults( Defs ) :-
 % File = 'doc/html/h2-bg.png' ;
 % false.
 % 
-% [debug]  ?- absolute_file_name( pack(os_lib/src), Abs ), working_directory(_,Abs), os_file( File, [sub(true),stem(rel)] ).
+% ?- absolute_file_name( pack(os_lib/src), Abs ), working_directory(_,Abs), os_file( File, [sub(true),stem(abs)] ).
 % Abs = '/usr/local/users/nicos/local/git/lib/swipl-7.7.18/pack/os_lib/src',
-% File = os_make_path.pl ;
+% File = '/usr/local/users/nicos/local/git/lib/swipl-7.7.18/pack/os_lib/src/LibIndex.pl' ;
 % Abs = '/usr/local/users/nicos/local/git/lib/swipl-7.7.18/pack/os_lib/src',
-% File = 'lib/inst_error_full.pl' ;
-% 
+% File = '/usr/local/users/nicos/local/git/lib/swipl-7.7.18/pack/os_lib/src/lib/inst_error_full.pl' ;
+% ...
 %==
 % @author nicos angelopoulos
 % @version  0.1 2016/1/31, this version without ref to lib(os_sub)

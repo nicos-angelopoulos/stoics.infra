@@ -13,6 +13,7 @@
                 UPDATE:   os_files/2 call in os_sel.pl instead of os_dir_files/2.
                 UPDATE:   cast Os before sub_atom/5 in os_sel.pl 
                 FIXED:    stem(rel) in os_files/2 and os_dirs/2
+                DOC:      to reflect newest default value for stem(rel)
 
      18.07.23   IFACE:    os_file/2 version, with options dir(Dir='.') and sub(Sub).
                 DOC:      added sub(Sub) in stem options
