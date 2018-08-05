@@ -1,24 +1,20 @@
 
-os_file_defaults( Args, Defs ) :-
-    ( (memberchk(dir(InDir),Args),\+ InDir == '.') ->
-            Stem = rel
-            ;
-            Stem = false
-    ),
-    Defs = [dir('.'), stem(Stem), sub(false)].
+os_file_defaults( Defs ) :-
+    % ( (memberchk(dir(InDir),Args),\+ InDir == '.') -> Stem = rel ; Stem = false),
+    Defs = [dir('.'), stem(rel), sub(false)].
 
 %% os_file( ?File ).
 %% os_file( ?File, +Opts ).
 %
 % True iff File is a file or a link to an existing file, in the current directory.
-% Can be used to enumerate all files.
+% Can be used to enumerate all files. The order is via sort/2.
 %
 % Opts
 %   * dir(Dir='.')
 %      directory in which to find File
-%   * stem(Stem=false)
+%   * stem(Stem=rel)
 %      what stem to add to returned files, 
-%      false: none (default when Dir='.'), abs: absolute, rel: relative (default else)
+%      rel: relative (default else), abs: absolute, false: no, stem
 %   * sub(Sub=false)
 %      find files within sub directories when true
 %
@@ -83,7 +79,8 @@ os_file( File, Args ) :-
     os_file( File, Dir, Abs, Stem, Sub ).
 
 os_file( File, Dir, Abs, Stem, Sub ) :-
-	directory_files( Dir, Entries ),
+	directory_files( Dir, EntriesUno ),
+    sort( EntriesUno, Entries ),
 	member( Entry, Entries ),
     Entry \== '.', Entry \== '..',
     os_path( Dir, Entry, Rel ),
