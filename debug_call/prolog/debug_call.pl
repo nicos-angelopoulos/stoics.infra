@@ -78,7 +78,7 @@ Current version and release date for the library.
 ?- debug_call_version( 1:1:0, date(2018,3,20) ).
 ==
 */
-debug_call_version( 1:1:0, date(2018,3,20) ).
+debug_call_version( 1:1:1, date(2018,9,11) ).
 
 :- use_module(library(lib)).
 
@@ -495,11 +495,15 @@ debug_call_topic( length, Pfx, NamesPrv/ListsPrv, Topic ) :-
     ),
     debug_message_prefixed( Pfx, With, Prefixed ),
     maplist( length, Lists, Lengths ),
-    Sep = ': ~w, ',
-    atomic_list_concat( Names, Sep, Right ),
-    atom_concat( Right, ': ~w', Rightmost ),
-    atom_concat( Prefixed, Rightmost, Message ),
-    debug_message( Topic, Message, Lengths ). % do the messaging !
+    findall( ['~w: ~w',', '], member(_,Lengths), WsNest ),
+    flatten( WsNest, WsL ),
+    once( append(WsLComma,[_],WsL) ),
+    append( WsLComma, ['.'], WsLDot ),
+    atomic_list_concat( WsLDot, '', Right ),
+    atom_concat( Prefixed, Right, Message ),
+    findall( [Name,Length], (nth1(N,Names,Name),nth1(N,Lengths,Length)), NLNest ),
+    flatten( NLNest, NLs ),
+    debug_message( Topic, Message, NLs ). % do the messaging
 debug_call_topic( list, _Pfx, InArg, Topic ) :-
     ground( InArg ),
     ( InArg = Left/List -> 
