@@ -5,6 +5,8 @@ TBD
    17.03.10   debug_call with Success/failure by colour too (see SWI installation)
 ---
 
+1.1
+     18.09.11   IFACE:    call length now allows compound list names
 1.1         @  18.03.20
      18.03.20  IFACE:    Goal+2 is looked first, for, in debug_call( Topic, Goal ). Make it to succeed no matter 
                          of the succeess of Goal. (see pack(chess_db) )
