@@ -219,7 +219,7 @@ The library predicates can be split to 4 groups.
 @version  0.1.0 2016/2/24  first publisc release
 @version  0.6.0 2017/3/10  works with pack(lib)
 @version  1.0.0 2018/3/18  
-@version  1.1.0 2018/8/5   added os_files/1,2 and os_dirs/1,2 (with options) and removed os_dir_files/2 and os_dir_dirs/2.  
+@version  1.2.0 2018/8/5   added os_files/1,2 and os_dirs/1,2 (with options) and removed os_dir_files/2 and os_dir_dirs/2.  
 @see http://www.stoics.org.uk/~nicos/sware/os
 @see http://www.stoics.org.uk/~nicos/sware/os/html/os_lib.html
 @see doc/Releases.txt
@@ -279,8 +279,8 @@ The library predicates can be split to 4 groups.
 Current version and release date for the library.
 
 ==
-?- os_version( 1:1:0, date(2018,8,5) ).
+?- os_version( 1:2:0, date(2018,8,5) ).
 ==
 
 */
-os_version( 1:1:0, date(2018,8,5) ).
+os_version( 1:2:0, date(2018,8,5) ).

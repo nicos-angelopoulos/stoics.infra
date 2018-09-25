@@ -1,9 +1,9 @@
 name( os_lib ).
 title( 'Operating system interaction predicates.' ).
-version( '1.1' ).
+version( '1.2' ).
 author( 'Nicos Angelopoulos', 'http://stoics.org.uk/~nicos' ).
 packager( 'Nicos Angelopoulos', 'http://stoics.org.uk/~nicos' ).
 maintainer( 'Nicos Angelopoulos', 'http://stoics.org.uk/~nicos' ).
-home( 'http://stoics.org.uk/~nicos/sware/os' ).
-download( 'http://stoics.org.uk/~nicos/sware/packs/os/os-*.tgz' ).
+home( 'http://stoics.org.uk/~nicos/sware/os_lib' ).
+download( 'http://stoics.org.uk/~nicos/sware/packs/os_lib/os_lib-*.tgz' ).
 requires(lib).
