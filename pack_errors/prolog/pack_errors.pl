@@ -6,6 +6,9 @@
                 throw/2,                    % +Error,+Opts
                 type/2,                     % +Type, +Term
                 type/3,                     % +Type, +Term, +Opts
+                of_same_length/1,           % +Lists
+                of_same_length/2,           % +List1, +List2; +Lists, +Opts
+                of_same_length/3,           % +List1, +List2, +Opts
                 pack_errors_version/2       % +Version, +Date
                         ] ).
 
@@ -59,24 +62,34 @@ Other errors
   * unknown_token(Tkn,Cat)
 
 ---+++ Examples
+
 ==
+?- throw( pack_error(lengths_mismatch(a,b,1,2),[pack(mypack)]) ).
+ERROR: mypack:_Unk: Lists for a and b have mismatching lengths: 1 and 2 respectively
+?- throw( pack_error(arg_ground(3,name),[pack(true)]) ).
+ERROR: true:_Unk: Ground argument expected at position: 3,  (found: name)
+
+?- set_prolog_flag(pack_errors_arg,true).
 ?- throw( pack_error(os,arg_ground(3,name(_))) ).
 ERROR: pack(os): Ground argument expected at position: 3 (found: name(_2064))
+
 ?- set_prolog_flag(pack_errors_arg,false).
-?- throw( pack_error(os,arg_ground(3,name(_))) ).
-ERROR: pack(os): Ground argument expected at position: 3
+?- throw( pack_error(arg_ground(3,name),[pack(true)]) ).
+ERROR: true:_Unk: Ground argument expected at position: 3
+
 ?- set_prolog_flag(pack_errors_arg,true).
-?- throw( pack_error(os,os_pred/3,arg_ground(3,name(_))) ).
-ERROR: os:os_pred/3: Ground argument expected at position: 3 (found: name(_2088))
-?- throw( pack_error(os,os_pred/3,arg_enumerate(3,[a,b,c],d)) ).
+?- throw( pack_error(arg_enumerate(3,[a,b,c],d), [pack(os),pred(os_pred/3)]) ).
 ERROR: os:os_pred/3: Term at position: 3, is not one of: [a,b,c], (found: d)
 
-?- throw( pack_error(mlu,lengths_mismatch(learners,predictions,3,4)) ).
-ERROR: pack(mlu): Lists for learners and predictions have mismatching lengths: 3 and 4 respectively
-?- throw( pack_error(mlu,k_fold_learn/3,lengths_mismatch(learners,predictions,3,4)) ).
-ERROR: mlu:k_fold_learn/3: Lists for learners and predictions have mismatching lengths: 3 and 4 respectively
-?- throw( pack_error(os,os_term/2,cast(abc('file.csv'),atom)) ).
+?- throw( pack_error(arg_enumerate(3,[a,b,c],d), os:os_pred/3) ).
+ERROR: os:os_pred/3: Term at position: 3, is not one of: [a,b,c], (found: d)
+
+?- throw( pack_error(arg_enumerate(3,[a,b,c],d), os_pred/3) ).
+ERROR: _Unk:os_pred/3: Term at position: 3, is not one of: [a,b,c], (found: d)
+
+?- throw( pack_error(cast(abc('file.csv'),atom),os:os_term/2) ).
 ERROR: os:os_term/2: Cannot cast: abc(file.csv), to type: atom
+
 ==
 
 ---+++ Defining new pack errors
@@ -238,7 +251,7 @@ ground_binary( Term, Type ) :-
     Type = true.
 ground_binary( _Term, false ).
 
-throw_defaults( [on_throw(error),pack_format(short),as_pack_err(true)] ).
+throw_defaults( [on_throw(error),pack_format(short),as_pack_err(true),severity(error)] ).
 
 /** throw( +Error, +Opts ).
 
@@ -252,7 +265,7 @@ As of version 0.3 this should be the adviced entry point for throwing pack traci
 
 Opts
  * on_throw(OnThrow=error)
-    one of [succeed,fail,error].
+    one of [succeed,fail,error]. (error is currently a bit of a misnomer, it should be throw)
 
  * as_pack_err(Perr=true)
     true wraps Error, as a pack_error
@@ -265,6 +278,9 @@ Opts
 
  * pack_format(Pfmt=short)
     output format for pack announcement
+
+ * severity(Severity=error)
+    Severity is passed to print_message/2 (first argument)
 
 ==
 ?- throw( my_error(x), true ).
@@ -308,21 +324,37 @@ throw_as_pack_error( false, Error, _Opts ) :-
     throw( Error ).
 throw_as_pack_error( _, Error, Opts ) :-
     memberchk( pack_format(Sil), Opts ),
+    memberchk( severity(Lvl), Opts ),
     ( memberchk(pack(Pack),Opts) -> 
         ( memberchk(pred(Pred),Opts) ->
             true
             ;
             Pred = '$unknown'/0
         ),
-        throw( pack_error(Pack,Pred,Sil,Error) )
+        % throw( pack_error(Pack,Pred,Sil,Error) )
+        throw_level( Lvl, pack_error(Pack,Pred,Sil,Error), Opts )
         ;
         ( memberchk(pred(Pred),Opts) ->
             Pred = Pname/Arity,
-            throw( pack_error(Pname/Arity,Error) )
+            throw_level( Lvl, pack_error(Pname/Arity,Error), Opts )
             ;
-            throw( pack_error(Error) )
+            throw_level( Lvl, pack_error(Error), Opts )
         )
     ).
+
+throw_level( Lvl, BallMark, Opts ) :-
+    ( BallMark =.. [pack_error,Barg] ->
+        Ball =.. [pack_error,Barg,Opts]
+        ;
+        ( BallMark =.. [pack_error,_Barg,_Opts] ->
+            Ball = BallMark
+            ;
+            Ball = pack_error(BallMark,Opts)
+        )
+    ),
+    debug( pack_errors, 'Leveled ball: ~w', Ball ),
+    prolog:message( Ball, Mess, [] ), % i thinks [] is correct
+	print_message_lines( current_output, kind(Lvl), Mess ).
 
 type_defaults( [error(true),pack(false),pred(false),arg(false)] ).
 
@@ -330,7 +362,7 @@ type_defaults( [error(true),pack(false),pred(false),arg(false)] ).
     type( +Type, @Term, +Opts ).
 
 type/2 is a superset of must_be, in that it adds Type = @(Callable), (equiv: Type = call(Callable)), which will succeed iff
-call( Callable, Term ) succeeds. It also enhances must_be/2 by adding options .
+call( Callable, Term ) succeeds. It also enhances must_be/2 by adding options.
 In the case of a call-wrapped type, the call to type/3 will succeed iff 
 call(Callable,Term) succeeds.
 
@@ -527,6 +559,129 @@ This is a documentation predicate, providing an anchor for documentation pointer
 pack_errors :-
     write( 'Contextual error handling for packs' ), nl.
 
+/** of_same_length( +Lists ).
+    of_same_length( +List1, +List2 ).
+    of_same_length( +Lists, +Opts ).
+    of_same_length( +List1, +List2, +Opts ).
+    
+Generic sanity predicate, checking that two or more lists are of the same length.
+
+In order to disambiguate between the two versions of the arity 2,
+in that scenario options should be a term of the form opts(OptsL).
+
+Opts are passed to throw/2, the only local one is:
+  * action(Act)
+     * error
+        prints error and fails (default)
+     * throw
+        throws a tuntrum of the form, of_same_length(Lng1,Lng2,Tkn1,Tkn2)
+     * warning(Tkn)
+        prints warning but succeeds
+     * warn_lists(Tkn)      
+        prints warning that includes lengths (?)
+  * token1(Tkn1=1)
+     name of List1 (used in error throwing to id the list)
+  * token1(Tkn1=n)
+     name of List2 (used in errors; 
+     in Lists scenario it will be the first list length-mismatch the first list)
+
+==
+?-
+    of_same_length( [a,b,c], [1,2,3] ).
+
+true.
+
+?- of_same_length( [[a,b,c],[1,2,3]] ).
+
+?- 
+    of_same_length( [1,2,3], [a,b], token1(first) ).
+
+ERROR: Lists for first and 2 have mismatching lengths: 3 and 2 respectively
+
+==
+@author nicos angelopoulos
+@version  0.1 2018/09/24
+
+*/
+
+of_same_length( [List1|Lists] ) :-
+    of_same_length_1( Lists, List1, [] ).
+
+of_same_length( [List1|Lists], opts(Opts) ) :-
+    !,
+    of_same_length_1( Lists, List1, Opts ).
+of_same_length( List1, List2 ) :-
+    of_same_length_1( [List2], List1, [] ).
+of_same_length( List1, List2, Opts ) :-
+    of_same_length_1( [List2], List1, Opts ).
+
+of_same_length_1( Lists, List1, Args ) :-
+    length( List1, Lng1 ),
+    \+ var(Args),
+    ( is_list(Args) -> append(Args,[action(throw)],Opts) ; Opts = [Args,action(throw)] ),
+    memberchk( action(Act), Opts ),
+    of_same_length_1( Lists, 2, Lng1, List1, Act, Opts ).
+
+% currently List1 is not used, but it could be passed to 
+% of_same_length_mismatch for reporting of clashing lists...
+of_same_length_1( [], _I, _Lng, _List1, _Act, _Opts ).
+of_same_length_1( [HList|T], I, Lng1, List1, Act, Opts ) :-
+     length( HList, HLng ),
+     ( HLng =:= Lng1 ->
+          true
+          ;
+          % throw( not_of_equal_length(HLng,Lng) )
+          ( memberchk(token1(Tkn1),Opts) -> true; Tkn1 = 1 ),
+          ( memberchk(token2(Tkn2),Opts) -> true; Tkn2 = I ),
+          of_same_length_mismatch( Act, Lng1, HLng, Tkn1, Tkn2, Opts )
+     ),
+     J is I + 1,
+     of_same_length_1( T, J, Lng1, List1, Act, Opts ).
+
+of_same_length_mismatch( error, Lng1, Lng2, Tkn1, Tkn2, Opts ) :-
+    throw( lengths_mismatch(Tkn1,Tkn2,Lng1,Lng2), Opts ).
+of_same_length_mismatch( fail, _Lng1, _Lng2, _Tkn1, _Tkn2, _Opts ) :-
+    fail.
+% throw_lists ? which will also include the offender & base lists ?
+of_same_length_mismatch( throw, Lng1, Lng2, Tkn1, Tkn2, _Opts ) :-
+    throw( of_same_length(Lng1,Lng2,Tkn1,Tkn2) ).
+of_same_length_mismatch( warning, Lng1, Lng2, Tkn1, Tkn2, _Opts ) :-
+    % % Format = 'Lists at:~w and ~w, have differing lengths: ~d and ~d',
+    % % message_report( Format, [Tkn1,Tkn2,Lng1,Lng2], informational ).
+
+    throw( lengths_mismatch(Tkn1,Tkn2,Lng1,Lng2), severity(warning) ).
+
+    % message( lengths_mismatch(Tkn1,Tkn2,Lng1,Lng2), List, [] ),
+	% print_message_lines(current_output, kind(warning), List ).
+% of_same_length_mismatch( warning, Lng1, Lng2, Tkn1, Tkn2, _Opts ) :-
+
+of_same_length_mismatch( error, Lng1, Lng2, Tkn1, Tkn2, _Opts ) :-
+    Format = 'Lists at:~p, have differing lengths, ~d and ~d',
+    message_report( Format, [Tkn1,Tkn2,Lng1,Lng2], error ),
+    fail.
+of_same_length_mismatch( warning(Tkn), Lng1, Lng2, _L1, _L2, _Opts ) :-
+    Format = 'Lists at:~p, have differing lengths, ~d and ~d',
+    message_report( Format, [Tkn,Lng1,Lng2], informational ).
+of_same_length_mismatch( warn_lists(Tkn), Lng1, Lng2, L1, L2, _Opts ) :-
+    Format = 'Lists at:~p, have differing lengths, ~d and ~d. The lists are as follows',
+    Args   = [Tkn,Lng1,Lng2],
+    message_report( Format, Args, informational ),
+    Format1 = 'Length mismatch list1:~p',
+    message_report( Format1, [L1], debug(_) ),
+    Format2 = 'Length mismatch List2:~p',
+    message_report( Format2, [L2], debug(_) ).
+
+pack_message_options_augment( Opts, Apts ) :-
+    ( select(Mod:Pred,Opts,Rem) ->
+        Apts = [pred(Mod:Pred)|Rem]
+        ;
+        ( select(Name/Arity,Opts,Rem) ->
+            Apts = [pred(Name/Arity)|Rem]
+            ;
+            Apts = Opts
+        )
+    ).
+
 /** pack_errors_version( -Version, -Date ).
 
 Current version and release date for the library.
@@ -535,8 +690,31 @@ Current version and release date for the library.
 ?- pack_errors_version( 0:3:0, date(2017,3,6) ).
 ==
 */
-pack_errors_version( 1:0:0, date(2018,3,18) ).
 
+% pack_errors_version( 0:3:0, date(2017,3,6) ).
+% pack_errors_version( 1:0:0, date(2018,3,18) ).
+pack_errors_version( 1:0:1, date(2018,9,24) ).
+
+% here new: 18.9.24
+prolog:message(unhadled_exception(pack_error(Message))) -->
+     { debug( pack_errors, 'Unhandled pack_error/1 ~w', [Message] ) },
+     % pack_errors:message(Message,[]).
+     pack_message(Message,[]).
+prolog:message(unhandled_exception(pack_error(Message,Opts))) -->
+     { debug( pack_errors, 'Unhandled pack_error/2 c ~w, ~w', [Message,Opts] ) },
+     pack_message(Message,Opts).
+
+prolog:message(pack_error(Message)) -->
+     { debug( pack_errors, 'Pack_error/1: ~w', [Message] ) },
+     pack_message(Message, []).
+prolog:message(pack_error(Message,Opts)) -->
+     { debug( pack_errors, 'Pack_error/2: ~w, ~w', [Message,Opts] ) },
+     pack_message(Message, Opts).
+
+% eoh, end of here
+
+
+/*
 prolog:message(unhandled_exception(pack_error(Message))) -->
      { debug( pack_errors, 'Unhandled pack_error/1 ~w', Message ) },
      pack_errors:message(Message).
@@ -555,28 +733,68 @@ prolog:message(unhandled_exception(pack_error(Pack,Pred,Sil,Message))) -->
 prolog:message(unhandled_exception(Message) ) -->
      { debug( pack_errors, 'Unhandled error, passing as is: ~w', Message ) },
      message(Message).
-
 prolog:message(pack_error(Message)) -->
      { debug( pack_errors, 'Pack_error/1: ~w', Message ) },
      message(Message).
 prolog:message(pack_error(Pname/Arity,Message)) -->
-     { debug( pack_errors, 'Pack_error/2 (first is predicate): ~w', Message ) },
+    { debug( pack_errors, 'Pack_error/2 (first is predicate): ~w', Message ) },
     message(from_pack_pred(Pname,Arity)),
-     message(Message).
+    message(Message).
 prolog:message(pack_error(Pack,Message)) -->
-     { debug( pack_errors, 'Pack_error/2: ~w', Message ) },
+    { debug( pack_errors, 'Pack_error/2 (x): ~w', Message ) },
+    { debug( pack_errors, 'calling from_pack/3 (x)', [] ) },
     message(from_pack(true,Pack,false)),
-     message(Message).
+    message(Message).
 prolog:message(pack_error(Pack,Pred,Message)) -->
-     { debug( pack_errors, 'Pack_error/3: ~w', Message ) },
+    { debug( pack_errors, 'Pack_error/3: ~w', Message ) },
     message(from_pack(true,Pack,Pred)),
-     message(Message).
+    message(Message).
 prolog:message(pack_error(Pack,Pred,Sil,Message)) -->
-     { debug( pack_errors, 'Pack_error/4: ~w', Message ) },
+    { debug( pack_errors, 'Pack_error/4: ~w', Message ) },
     message(from_pack(Sil,Pack,Pred)),
-     message(Message).
+    message(Message).
+*/
 
 :- multifile( pack_errors:message/3 ).
+
+% here
+pack_message( Mess, OptsPrv ) -->
+    % fixme: check for var(OptsPrv) ?
+    {( is_list(OptsPrv) -> OptsPrv = Opts; Opts = [OptsPrv] )},
+    {pack_message_options_augment(Opts,Apts)},
+    message_pack( Apts ),
+    pack_errors:message( Mess ).
+
+message_pack( Opts )  -->
+    { debug( pack_errors, 'message_pack options: ~w', [Opts] ) },
+    { (memberchk(pred(PredPrv),Opts)->true; PredPrv='_Unk'),
+      (memberchk(pack(Pack),Opts)->
+            ( PredPrv = PredMod:PredFct ->
+                ( PredMod = Pack -> 
+                    Pred = PredFct
+                    ;
+                    Pred = PredPrv   % both Pack and Mod will be displayed
+                ) 
+                ;
+                Pred = PredPrv
+            )
+            ; 
+            ( PredPrv = Pack:Pred ->
+                true
+                ;
+                PredPrv = Pred,
+                Pack='_Unk'
+            )
+      ),
+      debug( pack_errors, 'pack:predicate identified as: ~w:~w', [Pack,Pred] ),
+      \+ (Pack=='_Unk', Pred=='_Unk'),
+      !
+    },
+    ['~w:~w: '-[Pack,Pred] ].
+message_pack( _ )  --> [].
+
+
+% eoh: end of here
 
 % add cuts ? 
 %

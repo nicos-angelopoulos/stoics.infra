@@ -1,6 +1,14 @@
 ---   Releases   ----
 ---------------------
 
+1.1 
+     18.09.25   IFACE:     completetly switch to Options via throw/2
+                RMV:       alot of the old entry points
+                DOC:       all examples have been updated to new call methods
+                EXAMPLE:   new examples/fold_data_errors.pl from docs
+     18.09.24   IFACE:     of_same_length/1,2,3 added
+                OPTS:      severity(Svr) in throw/2
+
 1.0         @   18.03.18
      18.01.06   IFACE:    defined/2;3 
                 ADDED:    tracer options: pack, pred & pack_format options to throw/2
