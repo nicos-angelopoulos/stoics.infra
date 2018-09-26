@@ -7,6 +7,7 @@
                 DOC:       all examples have been updated to new call methods
                 EXAMPLE:   new examples/fold_data_errors.pl from docs
                 CLEAN:     streamlined options and throwing, more work on doc
+                ERROR:     changed unknown_token/2 to wrong_token/2
      18.09.24   IFACE:     of_same_length/1,2,3 added
                 OPTS:      severity(Svr) in throw/2
 

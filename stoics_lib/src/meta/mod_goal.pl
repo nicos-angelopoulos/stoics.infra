@@ -1,5 +1,5 @@
 
-:- lib(pack_errors).
+:- lib(suggests(pack_errors)).
 
 /** mod_goal( +Mod, +Goal, +Override, -Moal ).
     mod_goal( +Mod, +Goal, -Moal ).

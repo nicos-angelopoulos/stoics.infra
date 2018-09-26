@@ -22,14 +22,14 @@ This is a stoics.infrastructure pack for
   3. provide useful pre-canned errors.
 
 Version 0.3 introduced type errors via type/3 on top of must_be/2<br>
-Version 1.1 has been re-written to be Options centric, and introduced of_same_length/3.
+Version 2.0 has been re-written to be Options centric, and introduced of_same_length/3.
 
-The main aim is to create contextual version of messages that can be used 
-from different packs. In addition the library has evolved to provide some error related predicates.
+The main aim is to create contextual version of messages that can be used from different packs.<br>
+In addition the library has evolved to provide some error related predicates.
 
 ---+++ Throwing pack errors
 
-Any term recognised as the first argument by the defined pack_errors:message/3 can be made to spit<br>
+Any term recognised as the first argument of the defined pack_errors:message/3 can be made to spit<br>
 a token identifying the originating pack/module and predicate. The main intuition is that this is the<br>
 the predicate responsible for the error. You can do that by either wrapping the message or by using<br>
 pack_error's own version of throw, throw/2.
@@ -62,32 +62,36 @@ In both cases, you can drop the list if it contains a single element, thus
 ERROR: foo:bar/1: Lists for a and b have mismatching lengths: 1 and 2 respectively
 ==
 
-Note that in the latter case (throw/2) the options can also contain options to the execution of throw/2.
+Note that in the latter case (throw/2) the options can also contain terms controling the execution of throw/2.
 
 Options in both cases provide the context:
   * Pname/Arity
-     predicate for decoration
+     predicate for decoration 
   * Mod:Pname/Arity
      prefixed predicate and decoration
+  * pack(Pack)
+     pack of the originating predicate
+  * pred(Pname/Arity)
+     alternative have for identifying the predicate
 
 The library is designed on the loose concept that most packs will define a homonym module.  If both Pack and Mod 
-are given and are the same only one is printed, however if the differ, they will both be displayed.
+are given and are the same only one is printed, however if they differ, they will both be shown.
+The order of identification is that of going throough the list above from top to bottom.
+The first one matching will identify the predicate and stop looking, so alternatives will be ignored.
 
-==
-
-==
 ---+++ Prepacked errors
 
-Argument errors (printing of Arg itself can be surpressed with prolog_flag(pack_errors_arg,false)- useful for long data).
-Poss is a list of positions and Args a list of arguments.
+Argument errors. <br>
+Poss is a list of (argument) positions and Args a list of arguments.
   * arg_enumerate(Pos,Vals,Arg)
      see also type/3
-
   * arg_ground(Pos,Arg), 
-
+     ground argument(s) were expected at Pos
   * arg_ground_in_one_of(Poss,Args)
-
+     at least one ground argument was expected in a list of arguments (Args)
   * arg_ground_pattern(Poss,Args)
+     
+Printing of Arg(s) itself can be surpressed with prolog_flag(pack_errors_arg,false)- useful for long data.
 
 Other errors 
 
@@ -96,43 +100,49 @@ Other errors
   * lengths_mismatch(Tkn1,Tkn2,Op,Len1,Len2)
   * type_error(Type,Term)
   * type_error(Pos,Type,Term)
-  * unknown_token(Tkn,Cat)
+  * wrong_token(Tkn,Cat)
 
 ---+++ Examples
 
 ==
-?- throw( pack_error(lengths_mismatch(a,b,1,2),[pack(mypack)]) ).
-ERROR: mypack:_Unk: Lists for a and b have mismatching lengths: 1 and 2 respectively
+?- throw( pack_error(arg_ground(3,name), os:os_ext/3) ).
+ERROR: os:os_ext/3: Ground argument expected at position: 3,  (found: name)
 
-?- throw( pack_error(arg_ground(3,name),[pack(true)]) ).
-ERROR: true:_Unk: Ground argument expected at position: 3,  (found: name)
+?- throw( pack_error(arg_ground(3,name(_)), os:os_ext/3) ).
+ERROR: os:os_ext/3: Ground argument expected at position: 3,  (found: name(_4210))
 
-?- set_prolog_flag(pack_errors_arg,true).
-?- throw( pack_error(os,arg_ground(3,name(_))) ).
-ERROR: pack(os): Ground argument expected at position: 3 (found: name(_2064))
+?- set_prolog_flag(pack_errors_arg,true).   % this is the default, so no change in behaviour:
+?- throw( pack_error(arg_ground(3,name(_)), os:os_ext/3) ).
+ERROR: os:os_ext/3: Ground argument expected at position: 3,  (found: name(_4210))
 
 ?- set_prolog_flag(pack_errors_arg,false).
-?- throw( pack_error(arg_ground(3,name),[pack(true)]) ).
-ERROR: true:_Unk: Ground argument expected at position: 3
+?- throw( pack_error(arg_ground(3,name(_)), os:os_ext/3) ).
+ERROR: os:os_ext/3: Ground argument expected at position: 3
 
 ?- set_prolog_flag(pack_errors_arg,true).
 ?- throw( pack_error(arg_enumerate(3,[a,b,c],d), [pack(os),pred(os_pred/3)]) ).
 ERROR: os:os_pred/3: Term at position: 3, is not one of: [a,b,c], (found: d)
 
-?- throw( pack_error(arg_enumerate(3,[a,b,c],d), os:os_pred/3) ).
+% use throw/2 as it makes code clearer:
+?- throw( arg_enumerate(3,[a,b,c],d), os:os_pred/3 ).
 ERROR: os:os_pred/3: Term at position: 3, is not one of: [a,b,c], (found: d)
 
-?- throw( pack_error(arg_enumerate(3,[a,b,c],d), os_pred/3) ).
-ERROR: _Unk:os_pred/3: Term at position: 3, is not one of: [a,b,c], (found: d)
+?- throw( arg_enumerate(3,[a,b,c],d), [pack(os),os_pred/3] ).
+ERROR: os:os_pred/3: Term at position: 3, is not one of: [a,b,c], (found: d)
 
-?- throw( pack_error(cast(abc('file.csv'),atom),os:os_term/2) ).
+?- throw( lengths_mismatch(a,b,1,2), [pack(foo)] ).
+ERROR: foo:_Unk: Lists for a and b have mismatching lengths: 1 and 2 respectively
+
+?- throw( lengths_mismatch(a,b,1,2), pred(bar/1) ).
+ERROR: _Unk:bar/1: Lists for a and b have mismatching lengths: 1 and 2 respectively
+
+?- throw( cast(abc('file.csv'),atom), os:os_term/2 ).
 ERROR: os:os_term/2: Cannot cast: abc(file.csv), to type: atom
-
 ==
 
 ---+++ Defining new pack errors
 
-example file: 
+Example file: 
 
 ==
 :- multifile( pack_errors:message/3 ).
@@ -143,9 +153,11 @@ pack_errors:message( fold_data_residual(Dlen) ) -->
     ['Residual data of length: ~d while splitting folds'-[Dlen]].
 ==
 
-Once the above has been loaded, try with
+Load and try with
 
 ==
+?- [pack('pack_errors/examples/pack_errors')].
+
 ?- throw( fold_data_insufficient(10,20) ).
 ERROR: Insufficient length of data (10) as 20 folds are required
 ?- throw( pack_error(mlu,fold_data_insufficient(10,20) ) ).
@@ -156,22 +168,38 @@ ERROR: mlu:k_fold_learn/4: Insufficient length of data (10) as 20 folds are requ
 
 ---+++ Pack info
 
-The library listens to =|debug(pack_errors)|=.
+The library reacts to =|debug(pack_errors)|= spitting informational message along the execution of library predicates.
+
+Pack predicates:
+  * throw/2; =|+Error, +Opts|=
+  * caught/3; =|+Goal, +Error, +Opts|=
+  * type/2,3; =|+Type, +Term|=
+  * ground/2, ground_binary/2; =|+Term, -Groundness|=
+  * defined/2,3; =|+Pid,  +From, +Opts|=
+  * of_same_length/1; =|+Lists|=
+  * of_same_length/2,3; =|+List1, +List2, +Opts|=
+  * pack_errors_version/2; =|+Version, +Date|=
+  * pack_errors/0
+
+Pack defined errors selection: (see pack('pack_errors/prolog/pack_errors.pl') for a full list)
+  * arg_ground(Pos,Arg)
+  * arg_ground_in_one_of(Poss,Args) 
+  * lengths_mismatch(Tkn1,Tkn2,Len1,Len2)
+  * cast(Term,To)
 
 @author  nicos angelopoulos
 @version 0.1 2016/01/30
 @version 0.2 2016/02/24
 @version 0.3 2017/03/06
-@version 1.0 2018/03/18
+@version 2.0 2018/09/26
 @see     http://stoics.org.uk/~nicos/sware/pack_errors
-@tbd     equal length list checking
 @see     lib predicates:
 @see     caught/3                   args, +Goal, +Call, +Opts
 @see     ground/2, ground_binary/2  args: +Term, -Groundness
 @see     throw/2                args: +Ball, +Opts
 @see     type/2,  type/3        args: +Type, +Term [, +Opts]
 @see     pack_errors/0, pack_errors_version/2  args: +Version, +Date
-@see     defined/3              args: 
+@see     defined/3              args: 
 
 */
 
@@ -914,7 +942,7 @@ message( type_error(Pos,Type,Term) ) -->
     ['Object of type: ~w, expected at position:~w but found: ~w'-[Type,Pos,Term]].
 message( type_error(Type,Term) ) -->
     ['Object of type: ~w, expected but found term: ~w'-[Type,Term]].
-message( unknown_token(Tkn,Cat) ) -->
+message( wrong_token(Tkn,Cat) ) -->  % was: unknown_token/2
     ['Token: ~w, is not a recognisable: ~w'-[Tkn,Cat]].
 message( expected_from(_,Pid,false) ) -->
     ['Predicate: ~w is not defined'-[Pid]].

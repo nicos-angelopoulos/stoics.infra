@@ -1,4 +1,4 @@
-:- lib( pack_errors ).
+:- lib(suggests(pack_errors)).
 
 %% termplate( +Term, ?Arity, -Termplate ).
 %% termplate( +Term, -Termplate ).

@@ -1,5 +1,6 @@
 
-:- lib(pack_errors).
+:- lib(suggests(pack_errors)).
+
 :- lib(mod_goal/2).
 :- lib(imported_from/2).
 
@@ -74,14 +75,14 @@ known_not( values(), Pack, G, Gspc, Tkn ) :-
     known_goal_values( G, Vals ),
     term_to_atom( Vals, Vatm ),
     atom_concat( 'value in ', Vatm, ErrCat ),
-    throw( pack_error(Pack,Gspc,unknown_token(Tkn,ErrCat)) ).
+    throw( pack_error(Pack,Gspc,wrong_token(Tkn,ErrCat)) ).
 known_not( values(Cat), Pack, G, Gspc, Tkn ) :-
     known_goal_values( G, Vals ),
     term_to_atom( Vals, Vatm ),
     atomic_list_concat( [Cat,' (values: ',Vatm,')'], ErrCat ),
-    throw( pack_error(Pack,Gspc,unknown_token(Tkn,ErrCat)) ).
+    throw( pack_error(Pack,Gspc,wrong_token(Tkn,ErrCat)) ).
 known_not( ErrCat, Pack, _G, Gspc, Tkn ) :-
-    throw( pack_error(Pack,Gspc,unknown_token(Tkn,ErrCat)) ).
+    throw( pack_error(Pack,Gspc,wrong_token(Tkn,ErrCat)) ).
 
 known_goal_values( G, Vals ) :-
     imported_from( G, Gmod ),
