@@ -21,24 +21,61 @@ This is a stoics.infrastructure pack for
   2. provide a simple, uniform way for informing users where the errors come from, and 
   3. provide useful pre-canned errors.
 
-As of 0.3 the library also provides type errors on top of must_be/2
+Version 0.3 introduced type errors via type/3 on top of must_be/2<br>
+Version 1.1 has been re-written to be Options centric, and introduced of_same_length/3.
 
 The main aim is to create contextual version of messages that can be used 
 from different packs. In addition the library has evolved to provide some error related predicates.
 
----+++ Wrapper errors
+---+++ Throwing pack errors
 
-Providing the context:
-  * pack_error(Pack,Pred,Vrb,Message)
-     spew Message in the context of Pack and Predicate. Vrb controls printing of context info.
-     when Vrb is false there is no 
-     message about the pack the error originated from
-  * pack_error(Pack,Pred,Message)
-     as above 
-     with Vrb = true
-  * pack_error(Pack,Message)
-     as above without Predicate context
+Any term recognised as the first argument by the defined pack_errors:message/3 can be made to spit<br>
+a token identifying the originating pack/module and predicate. The main intuition is that this is the<br>
+the predicate responsible for the error. You can do that by either wrapping the message or by using<br>
+pack_error's own version of throw, throw/2.
 
+Wrapping is via pack_error/2 where the first argument is the message and second is a list of options.
+
+==
+?- throw( pack_error(lengths_mismatch(a,b,1,2),[]) ).
+ERROR: Lists for a and b have mismatching lengths: 1 and 2 respectively
+
+?- throw( pack_error(lengths_mismatch(a,b,1,2),[foo:bar/1]) ).
+ERROR: foo:bar/1: Lists for a and b have mismatching lengths: 1 and 2 respectively
+==
+
+You can also use throw/2 defined in the pack, without wrapping the Message,
+
+==
+?- 
+    throw( lengths_mismatch(a,b,1,2), [foo:bar/1] ).
+
+ERROR: foo:bar/1: Lists for a and b have mismatching lengths: 1 and 2 respectively
+==
+
+In both cases, you can drop the list if it contains a single element, thus
+
+==
+?-
+    throw( lengths_mismatch(a,b,1,2), foo:bar/1 ).
+
+ERROR: foo:bar/1: Lists for a and b have mismatching lengths: 1 and 2 respectively
+==
+
+Note that in the latter case (throw/2) the options can also contain options to the execution of throw/2.
+
+Options in both cases provide the context:
+  * Pname/Arity
+     predicate for decoration
+  * Mod:Pname/Arity
+     prefixed predicate and decoration
+
+The library is designed on the loose concept that most packs will define a homonym module.  If both Pack and Mod 
+are given and are the same only one is printed, however if the differ, they will both be displayed.
+
+==
+
+==
 ---+++ Prepacked errors
 
 Argument errors (printing of Arg itself can be surpressed with prolog_flag(pack_errors_arg,false)- useful for long data).
@@ -66,6 +103,7 @@ Other errors
 ==
 ?- throw( pack_error(lengths_mismatch(a,b,1,2),[pack(mypack)]) ).
 ERROR: mypack:_Unk: Lists for a and b have mismatching lengths: 1 and 2 respectively
+
 ?- throw( pack_error(arg_ground(3,name),[pack(true)]) ).
 ERROR: true:_Unk: Ground argument expected at position: 3,  (found: name)
 
@@ -323,8 +361,10 @@ throw_as_pack_error( false, Error, _Opts ) :-
     !,
     throw( Error ).
 throw_as_pack_error( _, Error, Opts ) :-
-    memberchk( pack_format(Sil), Opts ),
+    % memberchk( pack_format(Sil), Opts ),
     memberchk( severity(Lvl), Opts ),
+    throw_level( Lvl, pack_error(Error), Opts ).
+    /*
     ( memberchk(pack(Pack),Opts) -> 
         ( memberchk(pred(Pred),Opts) ->
             true
@@ -332,7 +372,7 @@ throw_as_pack_error( _, Error, Opts ) :-
             Pred = '$unknown'/0
         ),
         % throw( pack_error(Pack,Pred,Sil,Error) )
-        throw_level( Lvl, pack_error(Pack,Pred,Sil,Error), Opts )
+        throw_level( Lvl, pack_error(,Pred,Sil,Error), Opts )
         ;
         ( memberchk(pred(Pred),Opts) ->
             Pred = Pname/Arity,
@@ -341,6 +381,7 @@ throw_as_pack_error( _, Error, Opts ) :-
             throw_level( Lvl, pack_error(Error), Opts )
         )
     ).
+    */
 
 throw_level( Lvl, BallMark, Opts ) :-
     ( BallMark =.. [pack_error,Barg] ->
@@ -353,8 +394,16 @@ throw_level( Lvl, BallMark, Opts ) :-
         )
     ),
     debug( pack_errors, 'Leveled ball: ~w', Ball ),
+    throw_level_spit( Lvl, Ball ).
+
+throw_level_spit( error, Ball ) :-
+    throw( Ball ).
+
+throw_level_spit( Lvl, Ball ) :-
+    debug( pack_errors, 'Explicit layout at level: ~w', [Lvl] ),
     prolog:message( Ball, Mess, [] ), % i thinks [] is correct
 	print_message_lines( current_output, kind(Lvl), Mess ).
+    % fixme: fail ? particularly at some Lvl or under some indpendent control ?
 
 type_defaults( [error(true),pack(false),pred(false),arg(false)] ).
 
@@ -648,9 +697,7 @@ of_same_length_mismatch( throw, Lng1, Lng2, Tkn1, Tkn2, _Opts ) :-
 of_same_length_mismatch( warning, Lng1, Lng2, Tkn1, Tkn2, _Opts ) :-
     % % Format = 'Lists at:~w and ~w, have differing lengths: ~d and ~d',
     % % message_report( Format, [Tkn1,Tkn2,Lng1,Lng2], informational ).
-
     throw( lengths_mismatch(Tkn1,Tkn2,Lng1,Lng2), severity(warning) ).
-
     % message( lengths_mismatch(Tkn1,Tkn2,Lng1,Lng2), List, [] ),
 	% print_message_lines(current_output, kind(warning), List ).
 % of_same_length_mismatch( warning, Lng1, Lng2, Tkn1, Tkn2, _Opts ) :-
@@ -875,3 +922,5 @@ message( expected_from(false,Pid,From) ) -->
     ['Predicate: ~w is not defined (source apparently available at: ~w; not asked to load)'-[Pid,From]].
 message( expected_from(true,Pid,From) ) -->
     ['Predicate: ~w is not defined (source apparently available at: ~w; which was loaded).'-[Pid,From]].
+message( true ) -->
+    [].
