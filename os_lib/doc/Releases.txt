@@ -1,6 +1,8 @@
 ---   Releases   ---
 --------------------
 
+1.3 
+     18.09.26   CHANGE:   call convension to new pack_errors 2.0
 1.2         @   18.08.05
                 FIXED:     location pointing to in pack.pl
 1.1         @   18.08.05

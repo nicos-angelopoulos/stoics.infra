@@ -1,5 +1,5 @@
 name(pack_errors).
-version('1.0').
+version('2.0').
 title('Contextual error handling for packs.').
 keywords([error,handling,print,messages]).
 author( 'Nicos Angelopoulos', 'http://stoics.org.uk/~nicos' ).

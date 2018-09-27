@@ -16,22 +16,32 @@
 
 /**  <module> Contextual error handling for packs
 
-This is a stoics.infrastructure pack for 
-  1. mid-level management handling of pack errors, 
-  2. provide a simple, uniform way for informing users where the errors come from, and 
-  3. provide useful pre-canned errors.
+This is a stoics.infrastructure pack that
+  1. implements mid-level management handling of pack errors
+  2. provides a simple, uniform way for displaying originating pack/module and predicate
+  3. includes useful pre-canned errors
+  4. incorporates error related predicates
+  5. decouples the type of printing from the execution behaviour and controls both aspects
+     through simple options
 
-Version 0.3 introduced type errors via type/3 on top of must_be/2<br>
-Version 2.0 has been re-written to be Options centric, and introduced of_same_length/3.
+Version 0.3 introduced type errors via type/3 on top of must_be/2.<br>
+Version 2.0 has been re-written to be Options centric, fully decoupled  and introduced of_same_length/3.
 
-The main aim is to create contextual version of messages that can be used from different packs.<br>
-In addition the library has evolved to provide some error related predicates.
+The pack manage mid-level error handling in a uniform way so other packs can use SWI's infracture
+in a simple way. The user only needs to define the print messages (if the pre-canned ones are not suitable)
+and then throw the appropriate terms during execution.
+
+Two simple ways to identifying originating caller are provided by allowing options in either
+the message, or via using an new version of throw, throw/2.
+
+In addition the library includes a number or pre-canned messages and 
+has evolved to provide some error related predicates.
 
 ---+++ Throwing pack errors
 
 Any term recognised as the first argument of the defined pack_errors:message/3 can be made to spit<br>
 a token identifying the originating pack/module and predicate. The main intuition is that this is the<br>
-the predicate responsible for the error. You can do that by either wrapping the message or by using<br>
+the predicate responsible for the error. You can do this by either wrapping the message or by using<br>
 pack_error's own version of throw, throw/2.
 
 Wrapping is via pack_error/2 where the first argument is the message and second is a list of options.
@@ -47,18 +57,14 @@ ERROR: foo:bar/1: Lists for a and b have mismatching lengths: 1 and 2 respective
 You can also use throw/2 defined in the pack, without wrapping the Message,
 
 ==
-?- 
-    throw( lengths_mismatch(a,b,1,2), [foo:bar/1] ).
-
+?- throw( lengths_mismatch(a,b,1,2), [foo:bar/1] ).
 ERROR: foo:bar/1: Lists for a and b have mismatching lengths: 1 and 2 respectively
 ==
 
 In both cases, you can drop the list if it contains a single element, thus
 
 ==
-?-
-    throw( lengths_mismatch(a,b,1,2), foo:bar/1 ).
-
+?- throw( lengths_mismatch(a,b,1,2), foo:bar/1 ).
 ERROR: foo:bar/1: Lists for a and b have mismatching lengths: 1 and 2 respectively
 ==
 
@@ -74,7 +80,7 @@ Options in both cases provide the context:
   * pred(Pname/Arity)
      alternative have for identifying the predicate
 
-The library is designed on the loose concept that most packs will define a homonym module.  If both Pack and Mod 
+The library is loosely designed around the principle that most packs will define a homonym module.  If both Pack and Mod 
 are given and are the same only one is printed, however if they differ, they will both be shown.
 The order of identification is that of going throough the list above from top to bottom.
 The first one matching will identify the predicate and stop looking, so alternatives will be ignored.
@@ -112,14 +118,17 @@ ERROR: os:os_ext/3: Ground argument expected at position: 3,  (found: name)
 ERROR: os:os_ext/3: Ground argument expected at position: 3,  (found: name(_4210))
 
 ?- set_prolog_flag(pack_errors_arg,true).   % this is the default, so no change in behaviour:
+
 ?- throw( pack_error(arg_ground(3,name(_)), os:os_ext/3) ).
 ERROR: os:os_ext/3: Ground argument expected at position: 3,  (found: name(_4210))
 
 ?- set_prolog_flag(pack_errors_arg,false).
+
 ?- throw( pack_error(arg_ground(3,name(_)), os:os_ext/3) ).
 ERROR: os:os_ext/3: Ground argument expected at position: 3
 
 ?- set_prolog_flag(pack_errors_arg,true).
+
 ?- throw( pack_error(arg_enumerate(3,[a,b,c],d), [pack(os),pred(os_pred/3)]) ).
 ERROR: os:os_pred/3: Term at position: 3, is not one of: [a,b,c], (found: d)
 
@@ -142,7 +151,7 @@ ERROR: os:os_term/2: Cannot cast: abc(file.csv), to type: atom
 
 ---+++ Defining new pack errors
 
-Example file: 
+Example file (available at pack('pack_errors/examples/fold_data_errors.pl')):
 
 ==
 :- multifile( pack_errors:message/3 ).
@@ -156,14 +165,13 @@ pack_errors:message( fold_data_residual(Dlen) ) -->
 Load and try with
 
 ==
-?- [pack('pack_errors/examples/pack_errors')].
+?- [pack('pack_errors/examples/fold_data_errors')].
 
-?- throw( fold_data_insufficient(10,20) ).
+?- throw( pack_error(fold_data_insufficient(10,20),true) ).
 ERROR: Insufficient length of data (10) as 20 folds are required
-?- throw( pack_error(mlu,fold_data_insufficient(10,20) ) ).
-ERROR: pack(mlu): Insufficient length of data (10) as 20 folds are required
-?- throw( pack_error(mlu,k_fold_learn/4,fold_data_insufficient(10,20) ) ).
-ERROR: mlu:k_fold_learn/4: Insufficient length of data (10) as 20 folds are required
+
+?- throw( fold_data_insufficient(10,20), mlu:ten_fold/3 ).
+ERROR: mlu:ten_fold/3: Insufficient length of data (10) as 20 folds are required
 ==
 
 ---+++ Pack info
@@ -193,35 +201,29 @@ Pack defined errors selection: (see pack('pack_errors/prolog/pack_errors.pl') fo
 @version 0.3 2017/03/06
 @version 2.0 2018/09/26
 @see     http://stoics.org.uk/~nicos/sware/pack_errors
-@see     lib predicates:
-@see     caught/3                   args, +Goal, +Call, +Opts
-@see     ground/2, ground_binary/2  args: +Term, -Groundness
-@see     throw/2                args: +Ball, +Opts
-@see     type/2,  type/3        args: +Type, +Term [, +Opts]
-@see     pack_errors/0, pack_errors_version/2  args: +Version, +Date
-@see     defined/3              args: 
 
 */
 
 :- multifile prolog:message//1.
 
-caught_defaults( [report(error)] ).
+caught_defaults( [on_exit(error)] ).
 
 /** caught( +Goal, +Error, +Opts ).
 
 Catches all errors and failure of Goal. The idea is that
 all non-successful executions are handled identical by the call.
 If Goal errors, the primary thrown ball is caught and discarded. 
-If Goal errors or fails, behaviour depends on option value Report (see Opts below).
+If Goal errors or fails, behaviour depends on option value OnExit (see Opts below).
 
 Opts 
 
-  * report(Report=error)
-   * ignore 
-        ignores by reporting nothing and succeeding
-   * fail
+  * on_exit(OnExit=error)
+     what to do on failed and errored executions
+     * true
+        succeeds and repors nothing
+     * fail
         reports nothing but call itself fails
-   * error
+     * error
         throws the error (any unrecognised value defaults to error)
 
   * ball(Ball)
@@ -230,16 +232,25 @@ Opts
 
 ==
 ?- caught( fail, my_exception(on_data), true ).
-ERROR: Unhandled exception: my_exception(on_data)
+ERROR: Unhandled exception: pack_error(my_exception(on_data),[on_exit(error),severity(error)])
 
-?- caught( fail, my_exception(on_data), [report(ignore)] ).
-true
-
-?- caught( fail, my_exception(on_data), [report(fail)] ).
+?- caught( fail, my_exception(on_data), on_exit(true) ).
 false
+% it fails because the message writing fails, which is probably best
 
-?- caught( xyz, my_except(Ball), [ball(Ball)] ).
-ERROR: Unhandled exception: my_except(error(existence_error(procedure,pack_errors:xyz/0),context(system:catch/3,_11198)))
+?- caught( false,  os_exists_not(abc), [] ).
+ERROR: OS entity: abc, does not exist
+
+?- caught( false,  os_exists_not(abc), on_exit(error) ).
+ERROR: OS entity: abc, does not exist
+
+?- caught( false,  os_exists_not(abc), on_exit(fail) ).
+ERROR: OS entity: abc, does not exist
+false.
+
+?- caught( false,  os_exists_not(abc), on_exit(true) ).
+ERROR: OS entity: abc, does not exist
+true.
 ==
 
 @see throw/2 
@@ -255,22 +266,22 @@ caught_opts( Goal, Error, Opts ) :-
 caught_opts( _Goal, Error, Args ) :-
     pack_errors_options_append( caught, Args, Opts ),
     caught_opt_throw( OnThrow, Opts ),
-    throw( Error, on_throw(OnThrow) ).
+    throw( Error, on_exit(OnThrow) ).
 
 caught_error( _Goal, Ball, Error, Opts ) :-
     memberchk( ball(Ball), Opts ),
     !,
     caught_opt_throw( OnThrow, Opts ),
-    throw( Error, on_throw(OnThrow) ).
+    throw( Error, on_exit(OnThrow) ).
 caught_error( _Goal, _Ball, Error, Opts ) :-
     caught_opt_throw( OnThrow, Opts ),
-    throw( Error, on_throw(OnThrow) ).
+    throw( Error, on_exit(OnThrow) ).
 
 caught_opt_throw( OnThrow, Opts ) :-
-    memberchk( report(Rep), Opts ),
+    memberchk( on_exit(Rep), Opts ),
     caught_opt_report_throw( Rep, OnThrow ).
 
-caught_opt_report_throw( ignore, succeed ) :-
+caught_opt_report_throw( true, true ) :-
     !.
 caught_opt_report_throw( Rep, Rep ).
 
@@ -317,7 +328,12 @@ ground_binary( Term, Type ) :-
     Type = true.
 ground_binary( _Term, false ).
 
-throw_defaults( [on_throw(error),pack_format(short),as_pack_err(true),severity(error)] ).
+throw_defaults( [
+                    % on_exit(error), % now depends on severity/1
+                    % pack_format(short),
+                    % as_pack_err(true),
+                    severity(error)
+                    ] ).
 
 /** throw( +Error, +Opts ).
 
@@ -330,40 +346,55 @@ where is to thrown Error is assumed.
 As of version 0.3 this should be the adviced entry point for throwing pack tracing balls.
 
 Opts
- * on_throw(OnThrow=error)
-    one of [succeed,fail,error]. (error is currently a bit of a misnomer, it should be throw)
+  * on_exit(OnThrow=error)
+     defines what type of execution behaviour we are after with this
+     one of [true,fail,error], if not given the default depends on Severity
+    * informational & warning
+       succeed
+    * error
+       errors
 
- * as_pack_err(Perr=true)
-    true wraps Error, as a pack_error
+  * Pid
+     predicate indicator (=|foo:bar/1|= or =|bar/2|=)
 
- * pack(Pack=_)
-    originator pack
+  * pack(Pack)
+     originator pack/module
  
- * pred(Pred=_)
-    originator predicate
+  * pred(Pid)
+     originator predicate
 
- * pack_format(Pfmt=short)
-    output format for pack announcement
-
- * severity(Severity=error)
-    Severity is passed to print_message/2 (first argument)
+  * severity(Severity=error)
+     passed to print_message/2 (first argument)
 
 ==
-?- throw( my_error(x), true ).
-ERROR: Unhandled exception: my_error(x)
-
-?- throw( my_error(x), on_throw(succeed) ).
+?- throw( cast(abc('file.csv'),atom), on_exit(true) ), write(later), nl.
+ERROR: Cannot cast: abc(file.csv), to type: atom
+later
 true.
 
-?- throw( my_error(x), on_throw(fail) ).
+?- throw( cast(abc('file.csv'),atom), on_exit(fail) ), write(later), nl.
+ERROR: Cannot cast: abc(file.csv), to type: atom
 false.
 
-?- throw( my_error(x), on_throw(error) ).
-ERROR: Unhandled exception: my_error(x)
+?- throw( cast(abc('file.csv'),atom), on_exit(error) ), write(later), nl.
+ERROR: Cannot cast: abc(file.csv), to type: atom
 
-?- throw( my_error(x), on_throw(whatelse) ).
-ERROR: Unhandled exception: my_error(x)
+?- throw( cast(abc('file.csv'),atom), severity(warning) ).
 
+?- throw( cast(abc('file.csv'),atom), severity(warning) ).
+Warning: Cannot cast: abc(file.csv), to type: atom
+true.
+
+?- throw( cast(abc('file.csv'),atom), severity(informational) ).
+% Cannot cast: abc(file.csv), to type: atom
+true.
+
+?- throw( cast(abc('file.csv'),atom), [severity(informational),on_exit(fail)] ).
+% Cannot cast: abc(file.csv), to type: atom
+false.
+
+?- throw( cast(abc('file.csv'),atom), [severity(informational),on_exit(error)] ), write( when ), nl.
+% Cannot cast: abc(file.csv), to type: atom
 ==
 
 @author nicos angelopoulos
@@ -373,45 +404,40 @@ ERROR: Unhandled exception: my_error(x)
 */
 throw( Error, Args ) :-
     pack_errors_options_append( throw, Args, Opts ),
-    memberchk( on_throw(OnThrow), Opts ),
-    throw_if_on( OnThrow, Error, Opts ).
-
-throw_if_on( succeed, _Error, _Opts ) :- 
-    !.
-throw_if_on( fail, _Error, _Opts ) :-
-    !,
-    fail.
-throw_if_on( _, Error, Opts ) :-
-    memberchk( as_pack_err(Per), Opts ),
-    throw_as_pack_error( Per, Error, Opts ).
-
-throw_as_pack_error( false, Error, _Opts ) :-
-    !,
-    throw( Error ).
-throw_as_pack_error( _, Error, Opts ) :-
-    % memberchk( pack_format(Sil), Opts ),
     memberchk( severity(Lvl), Opts ),
-    throw_level( Lvl, pack_error(Error), Opts ).
-    /*
-    ( memberchk(pack(Pack),Opts) -> 
-        ( memberchk(pred(Pred),Opts) ->
-            true
-            ;
-            Pred = '$unknown'/0
-        ),
-        % throw( pack_error(Pack,Pred,Sil,Error) )
-        throw_level( Lvl, pack_error(,Pred,Sil,Error), Opts )
+    ( memberchk(on_exit(OnExit),Opts) ->
+        true
         ;
-        ( memberchk(pred(Pred),Opts) ->
-            Pred = Pname/Arity,
-            throw_level( Lvl, pack_error(Pname/Arity,Error), Opts )
-            ;
-            throw_level( Lvl, pack_error(Error), Opts )
-        )
-    ).
-    */
+        throw_severity_on( Lvl, OnExit )  % type checks severity too
+    ),
+    throw_on_valid( OnExit ),
+    throw_level( Lvl, Error, OnExit, Opts ).
 
-throw_level( Lvl, BallMark, Opts ) :-
+throw_on_valid( OnThrow ) :-
+    throw_on_known( OnThrow ),
+    !.
+throw_on_valid( OnThrow ) :-
+    % fixme: render it !
+    throw( unknown_option_value(throw/2,on_exit(OnThrow)) ).
+
+throw_on_known( error ).
+throw_on_known( true ).
+throw_on_known( false ).
+throw_on_known( fail ).
+
+throw_severity_on( Lvl, OnThrow ) :-
+    throw_severity_on_known( Lvl, OnThrow ),
+    !.
+throw_severity_on( Lvl, _OnThrow ) :-
+    % fixme: render it !
+    throw( unknown_option_value(throw/2,severity(Lvl)) ).
+
+throw_severity_on_known( error, error ).
+throw_severity_on_known( warning, true ).
+throw_severity_on_known( informational, true ).
+throw_severity_on_known( info, true ).
+
+throw_level( Lvl, BallMark, OnExit, Opts ) :-
     ( BallMark =.. [pack_error,Barg] ->
         Ball =.. [pack_error,Barg,Opts]
         ;
@@ -422,16 +448,24 @@ throw_level( Lvl, BallMark, Opts ) :-
         )
     ),
     debug( pack_errors, 'Leveled ball: ~w', Ball ),
-    throw_level_spit( Lvl, Ball ).
+    throw_level_on_exit( OnExit, Lvl, Ball ).
 
-throw_level_spit( error, Ball ) :-
+throw_level_on_exit( error, error, Ball ) :-
+    !,
     throw( Ball ).
-
-throw_level_spit( Lvl, Ball ) :-
+throw_level_on_exit( OnExit, Lvl, Ball ) :-
     debug( pack_errors, 'Explicit layout at level: ~w', [Lvl] ),
     prolog:message( Ball, Mess, [] ), % i thinks [] is correct
-	print_message_lines( current_output, kind(Lvl), Mess ).
-    % fixme: fail ? particularly at some Lvl or under some indpendent control ?
+	print_message_lines( current_output, kind(Lvl), Mess ),
+    throw_level_exit( OnExit ).
+
+throw_level_exit( error ) :-
+    !,
+    throw( true ).
+    % abort.
+throw_level_exit( Goal ) :-
+    call( Goal ),
+    !.
 
 type_defaults( [error(true),pack(false),pred(false),arg(false)] ).
 
@@ -464,21 +498,22 @@ Opts (unlisted is ok)
 ==
 ?- type( boolean, maybe ).
 ERROR: Object of type: boolean, expected but found term: maybe
+
 ?- type( boolean, maybe, error(false) ).
 false.
+
 ?- type( boolean, maybe, pack(sure) ).
 ERROR: pack(sure): Object of type: boolean, expected but found term: maybe
+
 ?- type( boolean, maybe, [pack(sure),pred(lost/2)] ).
 ERROR: sure:lost/2: Object of type: boolean, expected but found term: maybe
-?- type( boolean, maybe, [pack(sure),pred(lost/2@3)] ).
-ERROR: Syntax error: Operator expected
-ERROR: type( boolean, maybe, [pack(sure),pred(lost/
-ERROR: ** here **
-ERROR: 2@3)] ) . 
+
 ?- type( boolean, maybe, [pack(sure),pred(lost/2+3)] ).
 ERROR: sure:lost/2+3: Object of type: boolean, expected but found term: maybe
+
 ?- type( boolean, maybe, [pack(sure),pred(1+lost/2)] ).
 ERROR: sure:1+lost/2: Object of type: boolean, expected but found term: maybe
+
 ?- type( boolean, maybe, [pack(sure),pred(lost(arg1)/2)] ).
 ERROR: sure:lost(arg1)/2: Object of type: boolean, expected but found term: maybe
 ==
@@ -580,7 +615,7 @@ The above only succeeds if b_real is an install library and defines b_real/0.
 From or Load can have the special form: lib(CodeLib). This assumes pack(lib) is installed and lib/1
 will be used to load the requested CodeLib.
 ==
-?- defined( b_real/0, lib(b_real), load(true) ),
+?- defined( b_real/0, lib(b_real), load(true) ).
 ==
 Will again, only succeed if b_real is installed and defines b_real/0. In this occasion library(lib) should be also installed.
 
@@ -663,16 +698,13 @@ Opts are passed to throw/2, the only local one is:
      in Lists scenario it will be the first list length-mismatch the first list)
 
 ==
-?-
-    of_same_length( [a,b,c], [1,2,3] ).
-
+?- of_same_length( [a,b,c], [1,2,3] ).
 true.
 
 ?- of_same_length( [[a,b,c],[1,2,3]] ).
+true.
 
-?- 
-    of_same_length( [1,2,3], [a,b], token1(first) ).
-
+?- of_same_length( [1,2,3], [a,b], token1(first) ).
 ERROR: Lists for first and 2 have mismatching lengths: 3 and 2 respectively
 
 ==
@@ -762,16 +794,16 @@ pack_message_options_augment( Opts, Apts ) :-
 Current version and release date for the library.
 
 ==
-?- pack_errors_version( 0:3:0, date(2017,3,6) ).
+V = 2:0:0,
+D = date(2018, 9, 26).
 ==
 */
-
 % pack_errors_version( 0:3:0, date(2017,3,6) ).
 % pack_errors_version( 1:0:0, date(2018,3,18) ).
-pack_errors_version( 1:0:1, date(2018,9,24) ).
+pack_errors_version( 2:0:0, date(2018,9,26) ).
 
-% here new: 18.9.24
-prolog:message(unhadled_exception(pack_error(Message))) -->
+prolog:message(unhandled_exception(true)) --> [].
+prolog:message(unhandled_exception(pack_error(Message))) -->
      { debug( pack_errors, 'Unhandled pack_error/1 ~w', [Message] ) },
      % pack_errors:message(Message,[]).
      pack_message(Message,[]).
@@ -786,53 +818,6 @@ prolog:message(pack_error(Message,Opts)) -->
      { debug( pack_errors, 'Pack_error/2: ~w, ~w', [Message,Opts] ) },
      pack_message(Message, Opts).
 
-% eoh, end of here
-
-
-/*
-prolog:message(unhandled_exception(pack_error(Message))) -->
-     { debug( pack_errors, 'Unhandled pack_error/1 ~w', Message ) },
-     pack_errors:message(Message).
-prolog:message(unhandled_exception(pack_error(Pack,Message))) -->
-     { debug( pack_errors, 'Unhandled pack_error/2 ~w', Message ) },
-    pack_errors:message(from_pack(true,Pack,false)),
-     pack_errors:message(Message).
-prolog:message(unhandled_exception(pack_error(Pack,Pred,Message))) -->
-     { debug( pack_errors, 'Unhandled pack_error/3 ~w', Message ) },
-    message(from_pack(true,Pack,Pred)),
-     message(Message).
-prolog:message(unhandled_exception(pack_error(Pack,Pred,Sil,Message))) -->
-     { debug( pack_errors, 'Unhandled pack_error/4 ~w', Message ) },
-    message(from_pack(Sil,Pack,Pred)),
-     message(Message).
-prolog:message(unhandled_exception(Message) ) -->
-     { debug( pack_errors, 'Unhandled error, passing as is: ~w', Message ) },
-     message(Message).
-prolog:message(pack_error(Message)) -->
-     { debug( pack_errors, 'Pack_error/1: ~w', Message ) },
-     message(Message).
-prolog:message(pack_error(Pname/Arity,Message)) -->
-    { debug( pack_errors, 'Pack_error/2 (first is predicate): ~w', Message ) },
-    message(from_pack_pred(Pname,Arity)),
-    message(Message).
-prolog:message(pack_error(Pack,Message)) -->
-    { debug( pack_errors, 'Pack_error/2 (x): ~w', Message ) },
-    { debug( pack_errors, 'calling from_pack/3 (x)', [] ) },
-    message(from_pack(true,Pack,false)),
-    message(Message).
-prolog:message(pack_error(Pack,Pred,Message)) -->
-    { debug( pack_errors, 'Pack_error/3: ~w', Message ) },
-    message(from_pack(true,Pack,Pred)),
-    message(Message).
-prolog:message(pack_error(Pack,Pred,Sil,Message)) -->
-    { debug( pack_errors, 'Pack_error/4: ~w', Message ) },
-    message(from_pack(Sil,Pack,Pred)),
-    message(Message).
-*/
-
-:- multifile( pack_errors:message/3 ).
-
-% here
 pack_message( Mess, OptsPrv ) -->
     % fixme: check for var(OptsPrv) ?
     {( is_list(OptsPrv) -> OptsPrv = Opts; Opts = [OptsPrv] )},
@@ -868,38 +853,9 @@ message_pack( Opts )  -->
     ['~w:~w: '-[Pack,Pred] ].
 message_pack( _ )  --> [].
 
+:- multifile( pack_errors:message/3 ).
 
-% eoh: end of here
-
-% add cuts ? 
-%
-message( from_pack_pred(Pname,Arity) ) --> 
-     { debug( pack_errors, 'From pack_pred: ~w', Pname/Arity) },
-    ['~w/~w: '-[Pname,Arity] ].
-message( from_pack(false,_Pack,_Pred) ) --> [].
-message( from_pack(long,Pack,Pred) ) -->
-    pack_errors:message( from_pack_long(Pred,Pack) ).
-message( from_pack(true,Pack,Pred) ) -->
-    pack_errors:message( from_pack_short(Pred,Pack) ).
-message( from_pack(short,Pack,Pred) ) -->                % synonym to true
-    pack_errors:message( from_pack_short(Pred,Pack) ).
-
-message( from_pack_short(false,false) ) -->
-    { ! }.
-message( from_pack_short(Pred,false) ) -->
-    ['~w: '-[Pred] ].
-message( from_pack_short(false,Pack) ) -->
-     { debug( pack_errors, 'From pack short: ~w', Pack ) },
-    ['pack(~w): '-[Pack] ],
-     { debug( pack_errors, 'From pack short: ~w succeeded', Pack ) }.
-message( from_pack_short(Pred,Pack) ) -->
-    ['~w:~w: '-[Pack,Pred] ].
-    % ['[~w::~w]: '-[Pack,Pred] ].
-
-message( from_pack_long(false,Pack) ) -->
-    ['Following error generated from pack: ~w\n'-[Pack] ].
-message( from_pack_long(Pred,Pack) ) -->
-    ['Following error generated for predicate: ~w, from pack: ~w\n'-[Pred,Pack] ].
+message( true ) --> [].
 
 message( arg_enumerate(Pos,Vals,_Arg) ) --> 
     { current_prolog_flag(pack_errors_arg,false) },

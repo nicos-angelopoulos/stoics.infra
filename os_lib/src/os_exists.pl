@@ -16,7 +16,7 @@ directory pointing link or directory.
 
 Opts
   * error(Err=fail)
-    fail for failing, error for throwing an error and ignore for ignoring
+    fail for failing, error for throwing an error and true for ignoring/success
 
   * not(Not=false)
     reverse polarity, if true require Os not to exist
@@ -123,7 +123,7 @@ os_exists_true( _Os, _Type, _Mode, Opts ) :-
 
 os_esists_fail_error( true, Opts ) :-
 	memberchk( os(Os), Opts ),
-	Error = pack_error(os,os_exists/2,os_exists_not(Os)),
+	Error = pack_error(os_exists_not(Os),os:os_exists/2),
     options( error(ErrB), Opts ),
 	caught( false, Error, report(ErrB) ).
 os_esists_fail_error( false, _Opts ) :-
@@ -146,7 +146,7 @@ os_exists_dir( link, Os, Mode, Opts ) :-
 os_exists_dir( Other, Os, _Mode, Opts ) :-
     options( error(ErrB), Opts ),
 	os_is_dlink( Os, Which ),
-	Error = pack_error(os,os_exists/2,os_type(Os,Other,Which)),
+	Error = pack_error(os_type(Os,Other,Which),os:os_exists/2),
     caught( false, Error, report(ErrB) ).
 
 os_exists_dir_mode( exist, _Os, _Opts ) :- !.
@@ -164,13 +164,13 @@ os_exists_dir_mode( execute, Os, Opts ) :-
 	holds( var(Failed), Success ),
 	os_exists_dir_mode_execute( Success, Os, Opts, Old ).
 os_exists_dir_mode( append, Os, Opts ) :-
-	Error = pack_error(os,os_exists/2,os_mode_undefined(Os,dir,append)),
+	Error = pack_error(os_mode_undefined(Os,dir,append),os:os_exists/2),
     options( error(ErrB), Opts ),
 	caught( false, Error, report(ErrB) ).
 
 os_exists_dir_mode_read( true, _Os, _Opts ).
 os_exists_dir_mode_read( false, Os, Opts ) :-
-	Error = pack_error(os,os_exists/2,os_mode(Os,dir,read)),
+	Error = pack_error(os_mode(Os,dir,read),os:os_exists/2),
     options( error(ErrB), Opts ),
 	caught( false, Error, report(ErrB) ).
 
@@ -179,14 +179,14 @@ os_exists_dir_mode_write( true, _Os, _Opts, Out, OsTest ) :-
 	os_remove( OsTest ).
 os_exists_dir_mode_write( false, Os, Opts, _Out, _OsTest ) :-
 	% fixme: test OsTest ?
-	Error = pack_error(os,os_exists/2,os_mode(Os,write)),
+	Error = pack_error(os_mode(Os,write),os:os_exists/2),
     options( error(ErrB), Opts ),
 	caught( false, Error, report(ErrB) ).
 
 os_exists_dir_mode_execute( true, _Os, _Opts, Old ) :-
 	working_directory( _, Old ).
 os_exists_dir_mode_execute( false, Os, Opts, _Old ) :-
-	Error = pack_error(os,os_exists/2,os_mode(Os,execute)),
+	Error = pack_error(os_mode(Os,execute),os:os_exists/2),
 	caught( false, Error, Opts ).
 
 os_exists_file( any, Os, Mode, Opts ) :-
@@ -206,7 +206,7 @@ os_exists_file( link, Os, Mode, Opts ) :-
 	!.
 os_exists_file( Unmatched, Os, _Mode, Opts ) :-
 	os_is_flink( Os, Which ),
-	Error = pack_error(os,os_exists/2,os_type(Os,Unmatched,Which)),
+	Error = pack_error(os_type(Os,Unmatched,Which),os:os_exists/2),
     options( error(ErrB), Opts ),
     caught( false, Error, report(ErrB) ).
 
@@ -219,7 +219,7 @@ os_exists_file_mode( execute, Os, Opts ) :-
 os_exists_file_mode( execute, Os, Opts ) :-
 	\+ current_prolog_flag( windows, true ),
 	!,
-	Error = pack_error(os_exists,2,os_mode(Os,execute)),
+	Error = pack_error(os_mode(Os,execute),os:os_exists/2),
     options( error(ErrB), Opts ),
 	caught( access_file(Os,execute), Error, report(ErrB) ).
 os_exists_file_mode( Other, Os, Opts ) :-
@@ -231,14 +231,14 @@ os_exists_file_mode_stream( true, Out, _Mode, _Os, _Opts ) :-
 	close( Out ).
 os_exists_file_mode_stream( false, _Out, Mode, Os, Opts ) :-
 	% fixme: check Out is not bound
-	Error = pack_error(os,os_exists/2,os_mode(Os,Mode)),
+	Error = pack_error(os_mode(Os,Mode),os:os_exists/2),
     options( error(ErrB), Opts ),
 	caught( false, Error, report(ErrB) ).
 
 os_exists_file_mode_wins( fail, _Os ) :-  !, fail.
 os_exists_file_mode_wins( error, Os ) :-  !, 
 	Type = 'file (in windows)',
-	throw( pack_error(os,os_exists/2,os_mode_undefined(Os,Type,execute)) ).
+	throw( os_mode_undefined(Os,Type,execute), os:os_exists/2 ).
 os_exists_file_mode_wins( _, Os ) :-  % sys is the default
 	current_prolog_flag( windows, true ),
 	!,
@@ -250,7 +250,7 @@ os_exists_not( Os, _Opts ) :-
 	!.
 os_exists_not( _Os, Opts ) :-
 	memberchk( os(Os), Opts ),
-	Error = pack_error(os,os_exists/2,os_exists(Os)),
+	Error = pack_error(os_exists(Os),os:os_exists/2),
     options( error(ErrB), Opts ),
 	caught( false, Error, report(ErrB) ).
 
