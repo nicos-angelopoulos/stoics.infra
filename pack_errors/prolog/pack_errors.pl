@@ -199,7 +199,7 @@ Pack defined errors selection: (see pack('pack_errors/prolog/pack_errors.pl') fo
 @version 0.1 2016/01/30
 @version 0.2 2016/02/24
 @version 0.3 2017/03/06
-@version 2.0 2018/09/26
+@version 2.0 2018/09/30
 @see     http://stoics.org.uk/~nicos/sware/pack_errors
 
 */
@@ -232,7 +232,7 @@ Opts
 
 ==
 ?- caught( fail, my_exception(on_data), true ).
-ERROR: Unhandled exception: pack_error(my_exception(on_data),[on_exit(error),severity(error)])
+ERROR: Unhandled exception: pack_error(my_exception(on_data),[on_exit(error),message(error)])
 
 ?- caught( fail, my_exception(on_data), on_exit(true) ).
 false
@@ -328,31 +328,42 @@ ground_binary( Term, Type ) :-
     Type = true.
 ground_binary( _Term, false ).
 
-throw_defaults( [
-                    % on_exit(error), % now depends on severity/1
-                    % pack_format(short),
-                    % as_pack_err(true),
-                    severity(error)
-                    ] ).
+throw_defaults([err(error)]).
+
+% fixme: use _known and throw error else
+throw_err_opt_vals( error, error, error ).
+throw_err_opt_vals( test, quiet, true ).
+throw_err_opt_vals( exists, warning, fail ).
 
 /** throw( +Error, +Opts ).
 
-An optionised version of throw/1. Error is not thrown if OnThrow==fail 
-(see Opts below) and the call to throw/2 itself fails. When =|OnThrow==succeed|=
-Error is not thrown and the call itself succeeds.
-For all other values the default behaviour is that of =|OnThrow==error|=
-where is to thrown Error is assumed.
+An optionised version of throw/1. The Error is not  always thrown (eg OnThrow==fail, see Opts below).<br>
+This version of throw() decouples type of message printing and execution behaviour.<br>
 
-As of version 0.3 this should be the adviced entry point for throwing pack tracing balls.
+As of version 0.3 this should be the adviced entry point for message writing and ball throwing
+for stoics packs.
 
 Opts
-  * on_exit(OnThrow=error)
-     defines what type of execution behaviour we are after with this
-     one of [true,fail,error], if not given the default depends on Severity
-    * informational & warning
-       succeed
-    * error
-       errors
+  * err(Err=error)
+      convenenience option that sets both Level and OnExit, if they are absent
+      * error
+         =|Level = error|= and =|OnExit = error|=
+
+      * test
+          =|Level=quiet|= and =|OnExit = true|=
+
+      * exists
+          =|Level=warning|= and =|OnExit = fail|=
+
+  * on_exit(OnExit=error)
+     defines execution behaviour on exiting the printing of the error. One
+     of =|[true,fail,error]|=. if not given the default depends on Err,
+     * true
+        succeed
+     * false
+        fails
+     * error
+        errors
 
   * Pid
      predicate indicator (=|foo:bar/1|= or =|bar/2|=)
@@ -363,53 +374,130 @@ Opts
   * pred(Pid)
      originator predicate
 
-  * severity(Severity=error)
-     passed to print_message/2 (first argument)
+  * message(Level=error)
+     passed to print_message/2 (first argument), but also accepts quiet (as silent still prints things...)
 
 ==
-?- throw( cast(abc('file.csv'),atom), on_exit(true) ), write(later), nl.
+?- 
+    throw( cast(abc('file.csv'),atom) ).
+
+ERROR: Unhandled exception: cast(abc(file.csv),atom)
+
+?- 
+    throw( pack_error(cast(abc('file.csv'),atom),true) ).
+
+ERROR: Cannot cast: abc(file.csv), to type: atom
+
+?-
+    Opt = os:os_exists/2,
+    throw(pack_error(cast(abc('file.csv'),atom),Opt)), writeln(later).
+
+ERROR: os:os_exists/2: Cannot cast: abc(file.csv), to type: atom
+
+?- 
+    throw(cast(abc('file.csv'),atom), os:os_exists/2), writeln(later).
+
+ERROR: os:os_exists/2: Cannot cast: abc(file.csv), to type: atom
+
+?- 
+    throw(cast(abc('file.csv'),atom), err(test)), writeln(later).
+
+later
+true.
+
+?- 
+    _Opts = [message(quiet),on_exit(true)],
+    throw(cast(abc('file.csv'),atom), _Opts), writeln(later).
+
+later
+true.
+
+?- 
+    _Opts = [message(warning),on_exit(true)],
+    throw(cast(abc('file.csv'),atom), _Opts), writeln(later).
+
+Warning: Cannot cast: abc(file.csv), to type: atom
+later
+true.
+
+?- 
+    _Opts = [message(informational),on_exit(true)],
+    throw(cast(abc('file.csv'),atom), _Opts), writeln(later).
+
+% Cannot cast: abc(file.csv), to type: atom
+later
+true.
+
+?- 
+   _Opts = [message(warning),on_exit(false)],
+   throw(cast(abc('file.csv'),atom), _Opts), writeln(later).
+
+Warning: Cannot cast: abc(file.csv), to type: atom
+false.
+
+?- 
+    throw(cast(abc('file.csv'),atom), err(exists)), writeln(later).
+
+Warning: Cannot cast: abc(file.csv), to type: atom
+false.
+
+?- 
+    throw(cast(abc('file.csv'),atom), on_exit(true)), writeln(later).
+
 ERROR: Cannot cast: abc(file.csv), to type: atom
 later
 true.
 
-?- throw( cast(abc('file.csv'),atom), on_exit(fail) ), write(later), nl.
+?- 
+    throw(cast(abc('file.csv'),atom), on_exit(fail)), writeln(later).
+
 ERROR: Cannot cast: abc(file.csv), to type: atom
 false.
 
-?- throw( cast(abc('file.csv'),atom), on_exit(error) ), write(later), nl.
+?-
+    throw cast(abc('file.csv'),atom), on_exit(error)), writeln(later).
+
 ERROR: Cannot cast: abc(file.csv), to type: atom
 
-?- throw( cast(abc('file.csv'),atom), severity(warning) ).
+?- 
+    throw(cast(abc('file.csv'),atom), message(warning)), writeln(later).
 
-?- throw( cast(abc('file.csv'),atom), severity(warning) ).
 Warning: Cannot cast: abc(file.csv), to type: atom
-true.
 
-?- throw( cast(abc('file.csv'),atom), severity(informational) ).
+?- 
+    throw(cast(abc('file.csv'),atom), message(informational)), writeln(later).
+
 % Cannot cast: abc(file.csv), to type: atom
+later
 true.
 
-?- throw( cast(abc('file.csv'),atom), [severity(informational),on_exit(fail)] ).
+?-  
+    _Opts = [message(informational),on_exit(fail)],
+    throw(cast(abc('file.csv'),atom), _Opts), writeln(later).
+
 % Cannot cast: abc(file.csv), to type: atom
 false.
 
-?- throw( cast(abc('file.csv'),atom), [severity(informational),on_exit(error)] ), write( when ), nl.
+?- 
+    _Opts = [message(informational),on_exit(error)],
+    throw(cast(abc('file.csv'),atom), _Opts), writeln(later).
+
 % Cannot cast: abc(file.csv), to type: atom
+
 ==
 
 @author nicos angelopoulos
 @version  0.2 2017/3/6
-@version  0.3 2018/1/5  added tracer options: pack, pred & pack_format
+@version  0.3 2018/1/5   added tracer options: pack, pred & pack_format
+@version  0.4 2018/9/30  severe re-write, see docs
 
 */
 throw( Error, Args ) :-
     pack_errors_options_append( throw, Args, Opts ),
-    memberchk( severity(Lvl), Opts ),
-    ( memberchk(on_exit(OnExit),Opts) ->
-        true
-        ;
-        throw_severity_on( Lvl, OnExit )  % type checks severity too
-    ),
+    memberchk( err(Err), Opts ),
+    throw_err_opt_vals( Err, LvlDef, OnXDef ),
+    ( memberchk(message(Lvl),Opts)-> true; Lvl = LvlDef ),
+    ( memberchk(on_exit(OnExit),Opts) -> true ; OnExit = OnXDef ),
     throw_on_valid( OnExit ),
     throw_level( Lvl, Error, OnExit, Opts ).
 
@@ -425,18 +513,11 @@ throw_on_known( true ).
 throw_on_known( false ).
 throw_on_known( fail ).
 
-throw_severity_on( Lvl, OnThrow ) :-
-    throw_severity_on_known( Lvl, OnThrow ),
-    !.
-throw_severity_on( Lvl, _OnThrow ) :-
-    % fixme: render it !
-    throw( unknown_option_value(throw/2,severity(Lvl)) ).
-
-throw_severity_on_known( error, error ).
-throw_severity_on_known( warning, true ).
-throw_severity_on_known( informational, true ).
-throw_severity_on_known( info, true ).
-
+% fixme: ask in forum with silent in print_message/2 prints things ...
+%
+throw_level( quiet, _BallMark, OnExit, _Opts ) :-
+    !,
+    throw_level_exit( OnExit ).
 throw_level( Lvl, BallMark, OnExit, Opts ) :-
     ( BallMark =.. [pack_error,Barg] ->
         Ball =.. [pack_error,Barg,Opts]
@@ -757,7 +838,7 @@ of_same_length_mismatch( throw, Lng1, Lng2, Tkn1, Tkn2, _Opts ) :-
 of_same_length_mismatch( warning, Lng1, Lng2, Tkn1, Tkn2, _Opts ) :-
     % % Format = 'Lists at:~w and ~w, have differing lengths: ~d and ~d',
     % % message_report( Format, [Tkn1,Tkn2,Lng1,Lng2], informational ).
-    throw( lengths_mismatch(Tkn1,Tkn2,Lng1,Lng2), severity(warning) ).
+    throw( lengths_mismatch(Tkn1,Tkn2,Lng1,Lng2), message(warning) ).
     % message( lengths_mismatch(Tkn1,Tkn2,Lng1,Lng2), List, [] ),
 	% print_message_lines(current_output, kind(warning), List ).
 % of_same_length_mismatch( warning, Lng1, Lng2, Tkn1, Tkn2, _Opts ) :-
@@ -795,12 +876,12 @@ Current version and release date for the library.
 
 ==
 V = 2:0:0,
-D = date(2018, 9, 26).
+D = date(2018, 9, 30).
 ==
 */
 % pack_errors_version( 0:3:0, date(2017,3,6) ).
 % pack_errors_version( 1:0:0, date(2018,3,18) ).
-pack_errors_version( 2:0:0, date(2018,9,26) ).
+pack_errors_version( 2:0:0, date(2018,9,30) ).
 
 prolog:message(unhandled_exception(true)) --> [].
 prolog:message(unhandled_exception(pack_error(Message))) -->

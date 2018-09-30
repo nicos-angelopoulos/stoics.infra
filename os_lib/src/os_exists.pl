@@ -16,7 +16,8 @@ directory pointing link or directory.
 
 Opts
   * error(Err=fail)
-    fail for failing, error for throwing an error and true for ignoring/success
+    fail for failing, error for throwing an error and true for ignoring/success 
+    (see, caught/3's on_exit(OnExit) option
 
   * not(Not=false)
     reverse polarity, if true require Os not to exist
@@ -144,10 +145,20 @@ os_exists_dir( link, Os, Mode, Opts ) :-
 	os_exists_dir_mode( Mode, Os, Opts ),
 	!.
 os_exists_dir( Other, Os, _Mode, Opts ) :-
-    options( error(ErrB), Opts ),
+    % options( error(ErrB), Opts ),
 	os_is_dlink( Os, Which ),
 	Error = pack_error(os_type(Os,Other,Which),os:os_exists/2),
-    caught( false, Error, report(ErrB) ).
+    % caught( false, Error, Opts ).
+    % caught( false, Error, on_exit(ErrB) ).
+    throw( Error, Opts ).
+    % os_err_throw( ErrB, Error ).
+    % caught( false, Error, on_exit(ErrB) ).
+
+/*
+os_err_throw( true, _Error ).
+os_err_throw( ErrB, Error ) :-
+    throw( false, Error, on_exit(ErrB) ).
+    */
 
 os_exists_dir_mode( exist, _Os, _Opts ) :- !.
 os_exists_dir_mode( read, Os, Opts) :-

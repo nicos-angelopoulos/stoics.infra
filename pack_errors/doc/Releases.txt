@@ -1,7 +1,8 @@
 ---   Releases   ----
 ---------------------
 
-1.1 
+2.0         @   18.09.30   
+     18.09.30   OPTS:      err() and rename of severity() to message()
      18.09.25   IFACE:     completetly switch to Options via throw/2
                 RMV:       alot of the old entry points
                 DOC:       all examples have been updated to new call methods
