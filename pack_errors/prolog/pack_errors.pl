@@ -17,7 +17,7 @@
 /**  <module> Contextual error handling for packs
 
 This is a stoics.infrastructure pack that
-  1. implements mid-level management handling of pack errors
+  1. implements the mid layer for handling Prolog errors
   2. provides a simple, uniform way for displaying originating pack/module and predicate
   3. includes useful pre-canned errors
   4. incorporates error related predicates
@@ -54,7 +54,7 @@ ERROR: Lists for a and b have mismatching lengths: 1 and 2 respectively
 ERROR: foo:bar/1: Lists for a and b have mismatching lengths: 1 and 2 respectively
 ==
 
-You can also use throw/2 defined in the pack, without wrapping the Message,
+You can also use throw/2, which is defined in the pack, without wrapping the Message,
 
 ==
 ?- throw( lengths_mismatch(a,b,1,2), [foo:bar/1] ).
