@@ -144,6 +144,7 @@ os_exists_dir( link, Os, Mode, Opts ) :-
 	read_link( Os, _, _ ),
 	os_exists_dir_mode( Mode, Os, Opts ),
 	!.
+% 18.09.29: fixme: clarify the logic here... ?
 os_exists_dir( Other, Os, _Mode, Opts ) :-
     % options( error(ErrB), Opts ),
 	os_is_dlink( Os, Which ),

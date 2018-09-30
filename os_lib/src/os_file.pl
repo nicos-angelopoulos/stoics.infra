@@ -97,7 +97,7 @@ os_file( File, Rel, Dir, Abs, Stem, Sub ) :-
     os_file_obj( Desc, RelDesc, Entry, File, Dir, Abs, Stem, Sub ).
 
 os_file_obj( Desc, Rel, Entry, File, _Dir, Abs, Stem, _Sub ) :-
-	os_exists( Desc, type(flink) ),
+	os_exists( Desc, [type(flink),on_exit( ),
     !,
     ( Stem == false ->
 	    os_cast( Entry, File )
