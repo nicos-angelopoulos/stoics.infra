@@ -887,7 +887,7 @@ D = date(2018, 10, 1).
 */
 % pack_errors_version( 0:3:0, date(2017,3,6) ).
 % pack_errors_version( 1:0:0, date(2018,3,18) ).
-pack_errors_version( 2:0:0, date(2018,9,30) ).
+pack_errors_version( 2:0:0, date(2018,10,1) ).
 
 prolog:message(unhandled_exception(true)) --> [].
 prolog:message(unhandled_exception(pack_error(Message))) -->
