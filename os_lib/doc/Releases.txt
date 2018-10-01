@@ -7,7 +7,7 @@
                 UPDATE:   rewire lib calls to os_cast/3 (to match the above change)
                 OPTS:     os_remove/2 now uses throw/2 options
                 DOC:      more and all examples use new throw/2 options and work
-                OPTS:     dots(Dots=false) in os_file/2
+                OPTS:     dots(Dots=false) in os_file/2, and os_dir/2
                 ERROR:    messages os_exists and os_exists_not can now take the type of the OS as 2nd arg
      18.09.26   CHANGE:   call convension to new pack_errors 2.0
 1.2         @   18.08.05
