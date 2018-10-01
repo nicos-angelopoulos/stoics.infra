@@ -1,4 +1,4 @@
-os_remove_defaults( [exists(error),debug(false)] ).
+os_remove_defaults( [err(exists),debug(false)] ).
 os_remove_sub_debugs( [exists,missing] ). % sorted list
 
 /** os_remove( +File ).
@@ -6,62 +6,52 @@ os_remove_sub_debugs( [exists,missing] ). % sorted list
     os_rm( +File ).
     os_rm( +File, +OptS ).
 
-File will be deleted if it exists.
-Extends built-in delete_file/1.
-Version 1.2 added Options. Opts could be a single option term, see options_append/4.
+File will be deleted if it exists.  Extends built-in delete_file/1.<br>
+Version 1.2 added Options. Opts could be a single option term, see options_append/4.<br>
+Version 1.3 provides better messaging via throw/2.
 
 Opts
-  * exists(Ex=error)  
-  when 'true' predicate fails if file is missing, 'error' throws error if file is missing,
-  'false' does not check whether file exists
+  * err(Ex=exists)  
+     controls, messaging and execution if file does not exist (via throw/2).
+     values: error, test, exists; or use options on_exit(E) message(M)
 
-  * debug(Dbg=false) 
-    when 'true' report whether deleting or else, when 'exists' report existance only
+  * debug(Dbg=false)
+     allows informational message printing for deleting and failed operation
 
 ==
 ?- os_remove( sk, true ).
-ERROR: file `sk' does not exist (No such file or directory)
+Warning: os:os_rm/2: OS file: sk, does not exist
+false.
 
-?- os_remove( sk, debug(true) ).
-% Skipping deletion of non-existing file: sk
-true.
-
-?- shell( 'touch sk' ).
+?- @touch(sk).
 true.
 
 ?- os_remove( sk, debug(true) ).
 % Deleting existing file: sk
 true.
 
-?- os_remove( sk, debug(true) ).
-% Skipping deletion of non-existing file: sk
-true.
-
-?- os_remove( sk, [exists(true),debug(true)] ).
-% Expected file to exist: sk
-% failing.
+?- os_remove( sk, err(test) ).
 false.
 
-?- os_remove( sk, exists(true) ).
+?- os_remove( sk, err(error) ).
+ERROR: os:os_rm/2: OS file: sk, does not exist
+
+?- os_remove( sk, [on_exit(error),message(warning)] ).
+Warning: os:os_rm/2: OS file: sk, does not exist
+
+?- os_remove( sk, [on_exit(false),message(informational)] ).
+% os:os_rm/2: OS file: sk, does not exist
 false.
 
-?- os_remove( sk, [exists(error),debug(true)] ).
-% os_remove/2 expected file to exist: sk
-ERROR: delete_file/1: file `sk' does not exist (No such file or directory)
-
-?- shell( 'touch sk' ).
-true.
-
-?- os_remove( "sk" ).
-true.
-
-?- os_remove( sk/what, exists(true) ).
-ERROR: delete_file/1: file `'sk/what'' does not exist (No such file or directory)
+?- os_remove( sk, [on_exit(fail),message(warning)] ).
+Warning: os:os_rm/2: OS file: sk, does not exist
+false.
 
 ==
 
 @author Nicos Angelopoulos
 @version 0.1 2014/09/10
+@version 0.2 2018/10/1,    use throw/2
 
 */
 
@@ -76,7 +66,7 @@ os_remove( File ) :-
 os_remove( File, OptS ) :-
 	options_append( os_remove, OptS, Opts, [] ),
 	os_remove_debug( Opts, PrevDbg ),
-	os_cast( File, atom, Rmv ),
+	os_cast( atom, File, Rmv ),
 	os_remove_opts( Rmv, Opts ),
 	nodebug(os_remove(_)),
 	os_remove_debug_restore( PrevDbg ).
@@ -87,20 +77,8 @@ os_remove_opts( File, _Opts ) :-
 	debug( os_remove(exists), 'Deleting existing file: ~p', File ),
 	delete_file( File ).
 os_remove_opts( File, Opts ) :-
-	options( exists(Exists), Opts ),
-	os_remove_non_existant( Exists, File, Opts ).
-
-os_remove_non_existant( false, File, _Opts ) :-
-	debug( os_remove(missing), 'Skipping deletion of non-existing file: ~p', File ).
-os_remove_non_existant( true, File, _Opts ) :-
-	debug( os_remove(exists), 'Expected file to exist: ~p', File ),
-	debug( os_remove(exists), 'Failing.', [] ),
-	fail.
-os_remove_non_existant( error, File, _Opts ) :-
-	debug( os_remove(exists), 'os_remove/2 expected file to exist: ~p', File ),
-	% debug( os_remove(exists), 'Throwing a ball.', [] ),
-	% throw( os_remove_non_existing(File) ).
-	delete_file( File ). % to get the error
+	debug( os_remove(missing), 'Cannot remove non existing file: ~p', File ),
+    throw( os_exists_not(File,file), [os:os_rm/2|Opts] ).
 
 os_remove_debug( Opts, PrevDbgs ) :-
 	os_remove_sub_debugs( Subs ),
@@ -120,4 +98,3 @@ os_remove_debug_on( exists ) :-
 os_remove_debug_restore( [] ) :- !.
 os_remove_debug_restore( PrvDbgs ) :- % a list of os_remove debugging terms
 	findall( Dbg, (memberchk(Dbg,PrvDbgs),debug(os_remove(Dbg))), _ ).
-	

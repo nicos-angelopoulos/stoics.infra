@@ -1,3 +1,4 @@
+```
 stoics.infra
 
 This is a collection of SWI-Prolog packs that implement basic system functionality.
@@ -22,3 +23,4 @@ Major release points
 Nicos Angelopoulos
 ---
 London, 2017-2018
+```

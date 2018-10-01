@@ -116,17 +116,15 @@ os_ext_file( atom, Stem, Ext, Os ) :-
 	atomic_list_concat( OsParts, '.', Os ),
 	once(append(AStemParts,ExtParts,OsParts)), 
 	atomic_list_concat( AStemParts, '.', AStem ),
-	os_cast( AStem, atom, Stem ).
+	os_cast( atom, AStem, Stem ).
 os_ext_file( atom, Stem, Ext, Os ) :-  % os_ext( X, S, abc.def.ghi ).
 	file_name_extension( AStem, AExt, Os ),
-	os_cast( AStem, atom, Stem ),
-	os_cast( AExt, atom, Ext ).
+    maplist( os_cast(atom), [AStem,AExt], [Stem,Ext] ).
 %
 os_ext_file( string, Stem, Ext, Os ) :-
 	atom_string( OsAtom, Os ),
 	os_ext_file( atom, StemAtom, ExtAtom, OsAtom ),
-	os_cast( StemAtom, string, Stem ),
-	os_cast( ExtAtom, string, Ext ).
+    maplist( os_cast(string), [StemAtom,ExtAtom], [Stem,Ext] ).
 os_ext_file( slash, Stem, Ext, Path ) :-
 	Path = Dir/File,
 	ground(Ext),
@@ -134,7 +132,7 @@ os_ext_file( slash, Stem, Ext, Path ) :-
 	atomic_list_concat( ExtParts, '.', Ext ),
 	atomic_list_concat( [AStem|ExtParts], '.', File ),
 	% file_name_extension( AStem, Ext, File ),
-	os_cast( Dir/AStem, slash, Stem ).
+	os_cast( slash, Dir/AStem, Stem ).
 os_ext_file( slash, Stemmed, Ext, Path ) :-
 	Path = Dir/File,
 	file_name_extension( Stem, Ext, File ),
@@ -145,31 +143,31 @@ os_ext_file( alias, Stem, Ext, Os ) :-
 	os_name( Rel, RelType ),
 	os_ext_file_alias( RelType, Rel, RelStem, Ext ),
 	AStem  =.. [Alias,RelStem],
-	os_cast( AStem, alias, Stem ).
+	os_cast( alias, AStem, Stem ).
 
 os_ext_stem( alias, Stem, Ext, Os ) :-
 	Stem =.. [Alias,Rel],
 	os_name( Rel, RelType ),
 	os_ext_stem_alias( RelType, Rel, Ext, RelExt ),
 	AOs =.. [Alias,RelExt],
-	os_cast( AOs, alias, Os ).
+	os_cast( alias, AOs, Os ).
 os_ext_stem( atom, Stem, Ext, Os ) :-
 	file_name_extension( Stem, Ext, AOs ),
-	os_cast( AOs, atom, Os ).
+	os_cast( atom, AOs, Os ).
 os_ext_stem( slash, Stem, Ext, Os ) :-
 	% Stem = Dir/Bstem,  % fixme: / starting and no intermediate / ???
 	( Stem = Dir/Bstem ->
 		file_name_extension( Bstem, Ext, AOs ),
-		os_cast( Dir/AOs, slash, Os )
+		os_cast( slash, Dir/AOs, Os )
 		;
 		Stem = /Bstem,
 		file_name_extension( Bstem, Ext, AOs ),
-		os_cast( /AOs, slash, Os )
+		os_cast( slash, /AOs, Os )
 	).
 os_ext_stem( string, Stem, Ext, Os ) :-
 	atom_string( StemAtom, Stem ),
 	file_name_extension( StemAtom, Ext, AOs ),
-	os_cast( AOs, string, Os ).
+	os_cast( string, AOs, Os ).
 
 os_ext_stem_alias( alias, Rel, _Ext, _RelExt ) :-
 	!,

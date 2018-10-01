@@ -38,9 +38,9 @@
               os_sel/4,                  % +Oses, +Pattern, -Selected, +Opts
               os_term/2,                 % +-Atom, -+SlashTerm
               os_name/2,                 % +Os, -Type
-              os_type_entity/3,          % +Os, +Type, -Typed
+              % os_type_entity/3,          % +Os, +Type, -Typed
               os_cast/2,                 % +Os, -Typed
-              os_cast/3,                 % +Os, +Type, -Typed
+              os_cast/3,                 % +Type, +Os, -Typed
               os_tmp_dir/1,              % -Os
               os_version/2,              % -Vers, -Date
 
@@ -207,7 +207,6 @@ The library predicates can be split to 4 groups.
   * os_separator/2
   * os_term/2
   * os_name/2
-  * os_type_entity/3
   * os_tmp_dir/1
   * os_version/2
 
@@ -220,6 +219,7 @@ The library predicates can be split to 4 groups.
 @version  0.6.0 2017/3/10  works with pack(lib)
 @version  1.0.0 2018/3/18  
 @version  1.2.0 2018/8/5   added os_files/1,2 and os_dirs/1,2 (with options) and removed os_dir_files/2 and os_dir_dirs/2.  
+@version 1.3 2018/10/1 cleaner error handling via throw, new opt dots(D), os_cast/3 arguments swich
 @see http://www.stoics.org.uk/~nicos/sware/os
 @see http://www.stoics.org.uk/~nicos/sware/os/html/os_lib.html
 @see doc/Releases.txt
@@ -251,7 +251,6 @@ The library predicates can be split to 4 groups.
 :- lib(os_term/2).
 :- lib(os_tmp_dir/1).
 :- lib(os_name/2).
-:- lib(os_type_entity/3).
 :- lib(os_unique/2).
 :- lib(os_base/2).
 :- lib(os_cast/3).
@@ -279,8 +278,11 @@ The library predicates can be split to 4 groups.
 Current version and release date for the library.
 
 ==
-?- os_version( 1:2:0, date(2018,8,5) ).
+?- os_version( V, D ) :-
+    V = 1:3:0,
+    D = date(2018,10,1)
 ==
 
 */
+% os_version( 1:2:0, date(2018,8,5) ).
 os_version( 1:2:0, date(2018,8,5) ).

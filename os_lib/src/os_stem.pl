@@ -97,5 +97,5 @@ os_dir_exchange( FileFrom, File, Opts ) :-
 	os_base( FileFrom, Basename ),
 	os_name( FileFrom, Type ), 
 	os_path( Odir, Basename, FilePrv ),
-	os_cast( FilePrv, Type, File ).
+	os_cast( Type, FilePrv, File ).
 

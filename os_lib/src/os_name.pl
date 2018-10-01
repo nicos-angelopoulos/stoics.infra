@@ -1,6 +1,6 @@
-%% os_name( +Os, -Type ).
+%% os_name( +Os, -NameType ).
 % 
-% Type is of possibly signed entity Os. The possible types are atom, slash, string and alias.
+% NameType is the type of name for Os. The possible types are atom, slash, string and alias.
 % The alias type only succeeds if Os is a compound of arity one, and its functor matches a current
 % known alias. When Os is a variable, Type is atom.
 %

@@ -27,8 +27,7 @@ true.
 
 */
 os_mv( From, To ) :-
-	os_cast( From, atom, FromA ),
-	os_cast( To, atom, ToA ),
+    maplist( os_cast(atom), [From,To], [FromA,ToA] ),
 	( os_dir(ToA) ->
 		os_base(FromA,BaseA),
 		os_path( ToA, BaseA, ToP )

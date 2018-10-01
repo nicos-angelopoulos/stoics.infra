@@ -93,19 +93,19 @@ os_path( Dir, File, PathOut ) :-
 	ground( Dir ),
 	ground( File ),
 	os_path_ground( Dir, File, Type, Path ),
-	os_cast( Path, Type, PathOut ).
+	os_cast( Type, Path, PathOut ).
 
 os_path_ground( '', File, Type, Os ) :- 
 	!, 
 	os_name( File, Type ), 
-	os_cast( File, Type, Os ).
+	os_cast( Type, File, Os ).
 os_path_ground( Dire, '', Type, Os ) :- 
 	!,
 	os_name( Dire, Type ),
-	os_cast( Dire, Type, Os ).
+	os_cast( Type, Dire, Os ).
 os_path_ground( Dir, File, Type, Path ) :-
 	os_name( Dir, Type ),
-	os_cast( File, Type, Tile ),
+	os_cast( Type, File, Tile ),
 	os_path_type( Type, Dir, Tile, Path ).
 
 os_path_type( atom, Dir, File, Path ) :-
@@ -153,8 +153,7 @@ os_path_type_de( alias, Aliased, Dir, File ) :-
 os_path_type_de( string, String, Dir, File ) :-
 	atom_string( Atom, String ),
 	os_path_type_de( atom, Atom, DirAtom, FileAtom ),
-	os_cast( DirAtom, string, Dir ),
-	os_cast( FileAtom, string, File ).
+    maplist( os_cast(string), [DirAtom,FileAtom], [Dir,File] ).
 
 os_path_type_de_dir( '/', '' ) :- !.
 os_path_type_de_dir( Dir, Dir ).

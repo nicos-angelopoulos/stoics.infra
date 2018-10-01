@@ -1,9 +1,5 @@
-
-% :- use_module( library(options) ).   % assume
-:- lib( os_path/3 ).
 :- lib( os_sep/2 ).
 :- lib( os_name/2 ).
-:- lib( os_type_entity/3 ).
 
 os_postfix_defaults( Args, Defs ) :-
     Defs = [ sep(Sep),
@@ -122,19 +118,19 @@ os_postfix_1( Psfx, Fname, Posted, Opts ) :-
 
 os_postfix( atom, Psfx, File, Posted, Opts ) :-
     os_atom_postfix( File, Psfx, Pile, Opts ),
-    os_cast( Pile, atom, Posted ).
+    os_cast( atom, Pile, Posted ).
 os_postfix( string, Psfx, File, Posted, Opts ) :-
     os_string_postfix( File, Psfx, Pile, Opts ),
-    os_cast( Pile, string, Posted ).
+    os_cast( string, Pile, Posted ).
 os_postfix( slash, Psfx, Fname, Posted, Opts ) :-
     Fname = Dir/File,
     os_atom_postfix( File, Psfx, Pile, Opts ),
-    os_cast( Dir/Pile, slash, Posted ).
+    os_cast( slash, Dir/Pile, Posted ).
 os_postfix( alias, Psfx, Fname, Posted, Opts ) :-
     Fname =.. [Alias,AArg],
     os_postfix_1( Psfx, AArg, PArg, Opts ),
     Pname =.. [Alias,PArg], 
-    os_cast( Pname, alias, Posted ).
+    os_cast( alias, Pname, Posted ).
 
 os_postfix_parts( Psfx, Sep, PsfxParts ) :-
     ground( Psfx ),
@@ -180,44 +176,6 @@ os_postfix_with_ext( Xile, Pile, Opts ) :-
 os_atom_postfix_ext( true, WithExt, Xile, Pile ) :-
     os_ext( _, WithExt, Xile, Pile ).
 os_atom_postfix_ext( false, _WithExt, Pile, Pile ).
-
-/*
-    term_atom( PostfIn, Postfix ),
-    os_name( Fname, OsType ),
-    os_path( Dir, Bname, Fname ),
-     file_name_extension( Stem, Ext, Bname ),
-     % atom_concat( Stem, Postfix, PoStem ),
-     file_name_extension( PoStem, Ext, Bosted ),
-    os_type_entity( compound, Dir, CmpDir ),
-    os_type_entity( OsType, CmpDir/Bosted, Posted ).
-os_postfix( PostfIn, Fname, Posted, Args ) :-
-    ground( Posted ),
-    os_postfix_opts_ground( PostfIn, Args ),
-    term_atom( PostfIn, Postfix ),
-    os_name( Posted, OsType ),
-    os_path( Dir, PBname, Posted ),
-     file_name_extension( PStem, Ext, PBname ),
-     atom_concat( Stem, Postfix, PStem ),
-     file_name_extension( Stem, Ext, Bname ),
-    % os_type_entity( compound, Dir, CmpDir ),
-    os_path( Dir, Bname, FnamePrv ),
-    os_type_entity( OsType, FnamePrv, Fname ).
-os_postfix( _PostfIn, _Fname, _Posted, _Args ) :-
-    throw( os_postfix(non_ground_input_file_argument) ).
-
-os_postfix_opts_ground( PostfIn, ArgS ) :-
-    var( PostfIn ),
-    en_list( ArgS, Args ),
-    !,
-    os_postfix_opts_alternative( Args, PostfIn ).
-os_postfix_opts_ground( _PostfIn, _ArgS ).
-
-os_postfix_opts_alternative( Opts, PostfIn ) :-
-    memberchk( postfix(PostfIn), Opts ), 
-    !.
-os_postfix_opts_alternative( Opts, PostfIn ) :-
-    throw( cannot_locate_postfix_in_arg_or_options(PostfIn,Opts) ).
-*/
 
 os_postfix_stem( Stem, Sep, Rep, Prefix, Suffix, Opts ) :-
     atomic_list_concat( StemParts, Sep, Stem ),

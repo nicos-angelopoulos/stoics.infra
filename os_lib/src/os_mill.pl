@@ -92,7 +92,7 @@ os_mill( InFile, Goal, Milled, Args ) :-
     options( dir(Dir), Opts ),
     os_path( Dir, File, DirFile ),
     os_name( File, Ftype ),
-    os_cast( DirFile, Ftype, DFile ),
+    os_cast( Ftype, DirFile, DFile ),
     memberchk( milled(DMilled), Opts ),
     os_mill( Rcr, DFile, Type, Goal, DMilled, Opts ),
     ( var(Milled) -> Milled = DMilled; true ).

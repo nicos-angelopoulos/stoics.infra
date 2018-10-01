@@ -206,7 +206,7 @@ Pack defined errors selection: (see pack('pack_errors/prolog/pack_errors.pl') fo
 
 :- multifile prolog:message//1.
 
-caught_defaults( [on_exit(error)] ).
+caught_defaults( [on_exit(error),on_true(true)] ).
 
 /** caught( +Goal, +Error, +Opts ).
 
@@ -216,6 +216,9 @@ If Goal errors, the primary thrown ball is caught and discarded.
 If Goal errors or fails, behaviour depends on option value OnExit (see Opts below).
 
 Opts 
+  * ball(Ball)
+      instantiates the original exception Ball caught from calling Goal.
+      (So that parts of it can be included in Error.)
 
   * on_exit(OnExit=error)
      what to do on failed and errored executions
@@ -226,9 +229,8 @@ Opts
      * error
         throws the error (any unrecognised value defaults to error)
 
-  * ball(Ball)
-      instantiates the original exception Ball caught from calling Goal.
-      (So that parts of it can be included in Error.)
+  * on_true(OnTrue=true)
+     call OnTrue iff Goal was successful (and no handling was done)
 
 ==
 ?- caught( fail, my_exception(on_data), true ).
@@ -262,6 +264,8 @@ caught( Goal, Error, Args ) :-
 
 caught_opts( Goal, Error, Opts ) :-
     catch( Goal, Ball, pack_errors:caught_error(Goal,Ball,Error,Opts) ),
+    memberchk( OnTrue, Opts ),
+    call( OnTrue ),
     !.
 caught_opts( _Goal, Error, Args ) :-
     pack_errors_options_append( caught, Args, Opts ),
@@ -332,12 +336,12 @@ throw_defaults([err(error)]).
 
 % fixme: use _known and throw error else
 throw_err_opt_vals( error, error, error ).
-throw_err_opt_vals( test, quiet, true ).
-throw_err_opt_vals( exists, warning, fail ).
+throw_err_opt_vals( test, quiet, false ).
+throw_err_opt_vals( exists, warning, false ).
 
 /** throw( +Error, +Opts ).
 
-An optionised version of throw/1. The Error is not  always thrown (eg OnThrow==fail, see Opts below).<br>
+An optionised version of throw/1. The Error is not  always thrown (eg OnThrow==false, see Opts below).<br>
 This version of throw() decouples type of message printing and execution behaviour.<br>
 
 As of version 0.3 this should be the adviced entry point for message writing and ball throwing
@@ -350,14 +354,14 @@ Opts
          =|Level = error|= and =|OnExit = error|=
 
       * test
-          =|Level=quiet|= and =|OnExit = true|=
+          =|Level=quiet|= and =|OnExit = false|=
 
       * exists
-          =|Level=warning|= and =|OnExit = fail|=
+          =|Level=warning|= and =|OnExit = false|=
 
   * on_exit(OnExit=error)
      defines execution behaviour on exiting the printing of the error. One
-     of =|[true,fail,error]|=. if not given the default depends on Err,
+     of =|[true,false,error]|=. if not given the default depends on Err,
      * true
         succeed
      * false
@@ -449,7 +453,7 @@ later
 true.
 
 ?- 
-    throw(cast(abc('file.csv'),atom), on_exit(fail)), writeln(later).
+    throw(cast(abc('file.csv'),atom), on_exit(false)), writeln(later).
 
 ERROR: Cannot cast: abc(file.csv), to type: atom
 false.
@@ -472,7 +476,7 @@ later
 true.
 
 ?-  
-    _Opts = [message(informational),on_exit(fail)],
+    _Opts = [message(informational),on_exit(false)],
     throw(cast(abc('file.csv'),atom), _Opts), writeln(later).
 
 % Cannot cast: abc(file.csv), to type: atom
@@ -508,10 +512,10 @@ throw_on_valid( OnThrow ) :-
     % fixme: render it !
     throw( unknown_option_value(throw/2,on_exit(OnThrow)) ).
 
-throw_on_known( error ).
-throw_on_known( true ).
-throw_on_known( false ).
-throw_on_known( fail ).
+throw_on_known(error).
+throw_on_known(true).
+throw_on_known(fail).
+throw_on_known(false).
 
 % fixme: ask in forum with silent in print_message/2 prints things ...
 %
@@ -831,6 +835,8 @@ of_same_length_1( [HList|T], I, Lng1, List1, Act, Opts ) :-
 of_same_length_mismatch( error, Lng1, Lng2, Tkn1, Tkn2, Opts ) :-
     throw( lengths_mismatch(Tkn1,Tkn2,Lng1,Lng2), Opts ).
 of_same_length_mismatch( fail, _Lng1, _Lng2, _Tkn1, _Tkn2, _Opts ) :-
+    fail.
+of_same_length_mismatch( false, _Lng1, _Lng2, _Tkn1, _Tkn2, _Opts ) :-
     fail.
 % throw_lists ? which will also include the offender & base lists ?
 of_same_length_mismatch( throw, Lng1, Lng2, Tkn1, Tkn2, _Opts ) :-

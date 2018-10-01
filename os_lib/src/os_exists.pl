@@ -1,5 +1,5 @@
 
-os_exists_defaults( [error(fail),not(false),type(any),mode(exist)] ).
+os_exists_defaults( [err(test),not(false),type(any),mode(exist)] ).
 
 /** os_exists( +Os ).
     os_exists( +Os, +Opts ).
@@ -15,9 +15,9 @@ introduces two new file types: flink and dlink, for file point link or file, and
 directory pointing link or directory.
 
 Opts
-  * error(Err=fail)
-    fail for failing, error for throwing an error and true for ignoring/success 
-    (see, caught/3's on_exit(OnExit) option
+  * err(Err=test)
+    test for report and fail, fail for failing, error for throwing, true for success<br>
+    (see options: err(E), on_exit(O) and message(M) in throw/2)
 
   * not(Not=false)
     reverse polarity, if true require Os not to exist
@@ -32,69 +32,73 @@ Opts
     alternatively, use fail for failure and error for error
 
 ==
-?- cd( pack(os_lib/src) ).
-?- shell( 'ln -s os_file.pl os_file_ex_tmp.pl' ).
-
-?- os_exists( 'os_file.pl' ).
-true.
-
-?- os_exists( 'wrong_file.pl' ).
-false.
-
-?- os_exists( 'wrong_file.pl', error(true) ).
-ERROR: os:os_exists/2: OS entity: wrong_file.pl, does not exist
-
-?- os_exists( os_file.pl, type(file) ).
-true.
-
-?- os_exists( os_file.pl, type(link) ).
-false.
-
-?- os_exists( os_file.pl, [type(link),error(true)] ).
-ERROR: os:os_exists/2: OS entity: os_file.pl, not of requested type: link, but has type: file
-
-?- os_exists( os_file.pl, type(flink) ).
-true.
-
-?- os_exists( os_file_ex_tmp.pl, type(flink) ).
-true.
-
-?- os_exists( os_file_ex_tmp.pl, type(link) ).
-true.
-
-?- os_exists( os_file.pl, not(true) ).
-false.
-
-?- os_exists( os_file.pl, [not(true),error(true)] ).
-ERROR: os:os_exists/2: OS entity: os_file.pl, already exists
-
-?- os_remove( 'os_file_ex_tmp.pl' ).
-
 ?- os_exists( pack(os_lib/src) ).
 true.
 
 ?- os_exists( pack(os_lib/src), type(link) ).
-ERROR: os:os_exists/2: OS entity: /usr/local/users/nicos/local/git/lib/swipl-7.3.16/pack/os/src, not of requested type: link, but has type: dir
+false.
 
 ?- set_prolog_flag( allow_dot_in_atom, true ).
 ?- os_exists( pack(os_lib/prolog/os.pl), type(file) ).
 true.
 
-?- os_exists( os_exists.pl ).
-true
-?- os_exists( "os_exists.pl" ).
+?- cd( pack('os_lib/examples/testo') ).
+
+?- os_exists(file1).
+true.
+
+?- os_exists( "file1" ).
 true
 
-?- shell( 'touch /tmp/a_file.txt' ).
-?- os_exists( /tmp/a_file.txt ).
+?- os_exists( file2 ).
+false.
+
+?- os_exists( file2, err(error) ).
+ERROR: os:os_exists/2: OS entity: file2, does not exist
+
+?- os_exists( file2, err(exists) ).
+Warning: os:os_exists/2: OS entity: file2, does not exist
+false.
+
+?- os_exists( file2, [on_exit(fail),message(warning)] ).
+Warning: os:os_exists/2: OS entity: file2, does not exist
+false.
+
+?- os_exists( file2, [on_exit(error),message(informational)] ), writeln(later).
+% os:os_exists/2: OS entity: file2, does not exist
+?- 
+
+?- os_exists( file2, not(true) ).
 true.
+
+?- os_exists( file1, not(true) ).
+false.
+
+?- os_exists( file1, [not(true),err(error)] ).
+ERROR: os:os_exists/2: OS entity: file1, already exists
+
+?- os_exists( file1, type(dir) ).
+false.
+
+?- os_exists( file1, [type(dir),err(error)] ).
+ERROR: os:os_exists/2: OS entity: file1, not of requested type: dir, but has type: file
+
+?- os_exists( file1, type(flink) ).
+true.
+
+?- os_exists( file1, type(link) ).
+false.
+
+?- os_exists( dir1/link2, type(link) ).
+true.
+
 ==
 */
 os_exists( Os ) :-
 	os_exists( Os, [] ).
 
 os_exists( OsPrv, Args ) :-
-	os_cast( OsPrv, atom, Os ),
+	os_cast( atom, OsPrv, Os ),
 	options_append( os_exists, Args, Opts ),
 	options( not(Not), Opts ),
 	os_exists_1( Not, Os, [os(OsPrv)|Opts] ).
@@ -118,17 +122,8 @@ os_exists_true( Os, Type, Mode, Opts ) :-
 	read_link( Os, _, _ ),
 	!,
 	os_exists_file( Type, Os, Mode, Opts ).
-os_exists_true( _Os, _Type, _Mode, Opts ) :-
-    options( error(ErrB), Opts ),
-    os_esists_fail_error( ErrB, Opts ).
-
-os_esists_fail_error( true, Opts ) :-
-	memberchk( os(Os), Opts ),
-	Error = pack_error(os_exists_not(Os),os:os_exists/2),
-    options( error(ErrB), Opts ),
-	caught( false, Error, report(ErrB) ).
-os_esists_fail_error( false, _Opts ) :-
-    fail.
+os_exists_true( Os, _Type, _Mode, Opts ) :-
+    throw( os_exists_not(Os), [os:os_exists/2|Opts] ).
 
 os_exists_dir( any, Os, Mode, Opts ) :-
 	os_exists_dir_mode( Mode, Os, Opts ),
@@ -148,18 +143,8 @@ os_exists_dir( link, Os, Mode, Opts ) :-
 os_exists_dir( Other, Os, _Mode, Opts ) :-
     % options( error(ErrB), Opts ),
 	os_is_dlink( Os, Which ),
-	Error = pack_error(os_type(Os,Other,Which),os:os_exists/2),
-    % caught( false, Error, Opts ).
-    % caught( false, Error, on_exit(ErrB) ).
-    throw( Error, Opts ).
-    % os_err_throw( ErrB, Error ).
-    % caught( false, Error, on_exit(ErrB) ).
-
-/*
-os_err_throw( true, _Error ).
-os_err_throw( ErrB, Error ) :-
-    throw( false, Error, on_exit(ErrB) ).
-    */
+	Error = os_type(Os,Other,Which),
+    throw( Error, [os:os_exists/2|Opts] ).
 
 os_exists_dir_mode( exist, _Os, _Opts ) :- !.
 os_exists_dir_mode( read, Os, Opts) :-
@@ -172,34 +157,24 @@ os_exists_dir_mode( write, Os, Opts ) :-
 	holds( var(Failed), Success ),
 	os_exists_dir_mode_write( Success, Os, Opts, Out, OsTest ).
 os_exists_dir_mode( execute, Os, Opts ) :-
-	catch( working_directory(Old,Os), _, Failed=true ),
-	holds( var(Failed), Success ),
-	os_exists_dir_mode_execute( Success, Os, Opts, Old ).
+    Caupts = [os:os_exists/2,on_true(working_directory(_,Old))|Opts],
+    caught( working_directory(Old,Os), os_mode(Os,execute), Caupts ).
 os_exists_dir_mode( append, Os, Opts ) :-
-	Error = pack_error(os_mode_undefined(Os,dir,append),os:os_exists/2),
-    options( error(ErrB), Opts ),
-	caught( false, Error, report(ErrB) ).
+	Error = os_mode_undefined(Os,dir,append),
+    From = os:os_exists/2,
+    throw( Error, [From|Opts] ).
 
 os_exists_dir_mode_read( true, _Os, _Opts ).
 os_exists_dir_mode_read( false, Os, Opts ) :-
-	Error = pack_error(os_mode(Os,dir,read),os:os_exists/2),
-    options( error(ErrB), Opts ),
-	caught( false, Error, report(ErrB) ).
+	Error = os_mode(Os,dir,read),
+    throw( Error, [os:os_exists/2|Opts] ).
 
 os_exists_dir_mode_write( true, _Os, _Opts, Out, OsTest ) :-
 	close( Out ),
 	os_remove( OsTest ).
 os_exists_dir_mode_write( false, Os, Opts, _Out, _OsTest ) :-
 	% fixme: test OsTest ?
-	Error = pack_error(os_mode(Os,write),os:os_exists/2),
-    options( error(ErrB), Opts ),
-	caught( false, Error, report(ErrB) ).
-
-os_exists_dir_mode_execute( true, _Os, _Opts, Old ) :-
-	working_directory( _, Old ).
-os_exists_dir_mode_execute( false, Os, Opts, _Old ) :-
-	Error = pack_error(os_mode(Os,execute),os:os_exists/2),
-	caught( false, Error, Opts ).
+    throw( os_mode(Os,write), [os:os_exists/2|Opts] ).
 
 os_exists_file( any, Os, Mode, Opts ) :-
 	!,
@@ -218,9 +193,7 @@ os_exists_file( link, Os, Mode, Opts ) :-
 	!.
 os_exists_file( Unmatched, Os, _Mode, Opts ) :-
 	os_is_flink( Os, Which ),
-	Error = pack_error(os_type(Os,Unmatched,Which),os:os_exists/2),
-    options( error(ErrB), Opts ),
-    caught( false, Error, report(ErrB) ).
+    throw( os_type(Os,Unmatched,Which), [os:os_exists/2|Opts] ).
 
 os_exists_file_mode( exist, _Os, _Opts ) :- !.
 os_exists_file_mode( execute, Os, Opts ) :-
@@ -231,21 +204,11 @@ os_exists_file_mode( execute, Os, Opts ) :-
 os_exists_file_mode( execute, Os, Opts ) :-
 	\+ current_prolog_flag( windows, true ),
 	!,
-	Error = pack_error(os_mode(Os,execute),os:os_exists/2),
-    options( error(ErrB), Opts ),
-	caught( access_file(Os,execute), Error, report(ErrB) ).
-os_exists_file_mode( Other, Os, Opts ) :-
-	catch( open(Os,Other,Out), _, Failed=true ),
-	holds( var(Failed), Success ), % Success == true iff writable
-	os_exists_file_mode_stream( Success, Out, write, Os, Opts ).
-	
-os_exists_file_mode_stream( true, Out, _Mode, _Os, _Opts ) :-
-	close( Out ).
-os_exists_file_mode_stream( false, _Out, Mode, Os, Opts ) :-
-	% fixme: check Out is not bound
-	Error = pack_error(os_mode(Os,Mode),os:os_exists/2),
-    options( error(ErrB), Opts ),
-	caught( false, Error, report(ErrB) ).
+	Error = os_mode(Os,execute),
+	caught( access_file(Os,execute), Error, [os:os_exists/2|Opts] ).
+os_exists_file_mode( Mode, Os, Opts ) :-
+    Caupts = [os:os_exists/2,on_true(close(Out))|Opts],
+    caught( open(Os,Mode,Out), os_mode(Os,Mode), Caupts ).
 
 os_exists_file_mode_wins( fail, _Os ) :-  !, fail.
 os_exists_file_mode_wins( error, Os ) :-  !, 
@@ -262,9 +225,7 @@ os_exists_not( Os, _Opts ) :-
 	!.
 os_exists_not( _Os, Opts ) :-
 	memberchk( os(Os), Opts ),
-	Error = pack_error(os_exists(Os),os:os_exists/2),
-    options( error(ErrB), Opts ),
-	caught( false, Error, report(ErrB) ).
+    throw( os_exists(Os), [os:os_exists/2|Opts] ).
 
 os_is_dlink( Os, dir ) :-
 	exists_directory( Os ),

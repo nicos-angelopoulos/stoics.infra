@@ -12,10 +12,16 @@ pack_errors:message( os_postfix_lists(Sc,Fr) ) -->
 	['OS entity: ~w (2nd arg) should not be a list when options (4th arg) is: ~w'-[Sc,Fr]].
 
 pack_errors:message( os_exists(Os) ) -->
-	['OS entity: ~w, already exists'-[Os]].
+    pack_errors:message( os_exists(Os,entity) ).
+
+pack_errors:message( os_exists(Os,EType) ) -->
+	['OS ~w: ~w, already exists'-[EType,Os]].
 
 pack_errors:message( os_exists_not(Os) ) -->
-	['OS entity: ~w, does not exist'-[Os]].
+    pack_errors:message( os_exists_not(Os,entity) ).
+
+pack_errors:message( os_exists_not(Os,Etype) ) -->
+	['OS ~w: ~w, does not exist'-[Etype,Os]].
 
 pack_errors:message( os_mode(Os,Mode) ) -->
 	['OS entity: ~w, exists, but it not of mode: ~w'-[Os,Mode]].
