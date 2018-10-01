@@ -882,7 +882,7 @@ Current version and release date for the library.
 
 ==
 V = 2:0:0,
-D = date(2018, 9, 30).
+D = date(2018, 10, 1).
 ==
 */
 % pack_errors_version( 0:3:0, date(2017,3,6) ).
