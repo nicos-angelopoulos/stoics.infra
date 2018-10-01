@@ -406,7 +406,7 @@ ERROR: os:os_exists/2: Cannot cast: abc(file.csv), to type: atom
 ?- 
     throw(cast(abc('file.csv'),atom), err(test)), writeln(later).
 
-true.
+false.
 
 ?- 
     _Opts = [message(quiet),on_exit(true)],
