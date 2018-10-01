@@ -199,7 +199,7 @@ Pack defined errors selection: (see pack('pack_errors/prolog/pack_errors.pl') fo
 @version 0.1 2016/01/30
 @version 0.2 2016/02/24
 @version 0.3 2017/03/06
-@version 2.0 2018/09/30
+@version 2.0 2018/10/01
 @see     http://stoics.org.uk/~nicos/sware/pack_errors
 
 */
