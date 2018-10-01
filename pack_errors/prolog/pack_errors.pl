@@ -406,7 +406,6 @@ ERROR: os:os_exists/2: Cannot cast: abc(file.csv), to type: atom
 ?- 
     throw(cast(abc('file.csv'),atom), err(test)), writeln(later).
 
-later
 true.
 
 ?- 
@@ -459,7 +458,7 @@ ERROR: Cannot cast: abc(file.csv), to type: atom
 false.
 
 ?-
-    throw cast(abc('file.csv'),atom), on_exit(error)), writeln(later).
+    throw(cast(abc('file.csv'),atom), on_exit(error)), writeln(later).
 
 ERROR: Cannot cast: abc(file.csv), to type: atom
 
