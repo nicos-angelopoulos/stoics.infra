@@ -285,4 +285,4 @@ Current version and release date for the library.
 
 */
 % os_version( 1:2:0, date(2018,8,5) ).
-os_version( 1:2:0, date(2018,10,1) ).
+os_version( 1:3:0, date(2018,10,1) ).
