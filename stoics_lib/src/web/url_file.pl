@@ -19,7 +19,7 @@ url_file_defaults( [overwrite(error),dnt(false)] ).
 % 
 % Opts 
 % * overwrite(Ow=error)
-%   default throws an error if file exists, fail for failure and anything else for business as usual (overwrite local)
+%   default throws an error if file exists, fail or false for failure and anything else for business as usual (overwrite local)
 % * dnt(Dnt=false)
 %   if true, create a File.dnt with the start and end datime/6 stamps.
 %
@@ -73,6 +73,11 @@ url_file( Url, Local, Args ) :-
 	url_file_ow( Ow, Url, Local, Opts ).
 
 url_file_ow( false, Url, Local, _Opts ) :- 
+	exists_file( Local ),
+	!,
+	debug( url_file, 'Local file exists: ~p, not downloading it again from: ~p.', [Local,Url] ),
+    fail.
+url_file_ow( fail, Url, Local, _Opts ) :- 
 	exists_file( Local ),
 	!,
 	debug( url_file, 'Local file exists: ~p, not downloading it again from: ~p.', [Local,Url] ),
