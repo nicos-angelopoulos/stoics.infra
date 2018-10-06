@@ -2,6 +2,7 @@
 --------------------
 
 1.1
+     18.11.06   FIXED:  var(File) input in url_file/3
      18.05.29   FIXED:  option order was in two minds about true/elem value (now uses true)
      18.05.18   FIXED:  arg/4 now returns nths in same order as N, and multi are allowed
      18.04.27   NEW:    first argument of arg/4 can now be a list
