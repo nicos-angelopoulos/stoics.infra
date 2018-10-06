@@ -75,7 +75,8 @@ url_file( Url, Local, Args ) :-
 url_file_ow( false, Url, Local, _Opts ) :- 
 	exists_file( Local ),
 	!,
-	debug( url_file, 'Local file exists: ~p, not downloading it again from: ~p.', [Local,Url] ).
+	debug( url_file, 'Local file exists: ~p, not downloading it again from: ~p.', [Local,Url] ),
+    fail.
 url_file_ow( error, Url, Local, _Opts ) :-
 	exists_file( Local ),
 	!,
