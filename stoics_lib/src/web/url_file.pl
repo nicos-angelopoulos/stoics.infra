@@ -19,7 +19,7 @@ url_file_defaults( [overwrite(error),dnt(false)] ).
 % 
 % Opts 
 % * overwrite(Ow=error)
-%   default throws an error if file exists, fail for failure and anything else for business as usual (overwrite local)
+%   default throws an error if file exists, fail or false for failure and anything else for business as usual (overwrite local)
 % * dnt(Dnt=false)
 %   if true, create a File.dnt with the start and end datime/6 stamps.
 %
@@ -52,20 +52,21 @@ url_file_defaults( [overwrite(error),dnt(false)] ).
 % @version  0.3 2018/03/13, removed url_file/1 but url_file/2 allows -File, moved to pack(stoics_lib)
 %
 url_file( Url, LocP ) :-
+    url_file( Url, LocP, [] ).
+
+url_file( Url, LocP, Opts ) :-
     var(LocP),
 	user:file_search_path( downloads, Downloads ),
 	!,
 	make_directory_path( Downloads ),
 	file_base_name( Url, RemB ),
 	directory_file_path( Downloads, RemB, LocP ),
-	url_file( Url, LocP ).
-url_file( Url, RemB ) :-
+	url_file( Url, LocP, Opts ).
+url_file( Url, RemB, Opts ) :-
     var(RemB),
     !,
 	file_base_name( Url, RemB ),
-	url_file( Url, RemB ).
-url_file( Url, Local ) :-
-	url_file( Url, Local, [] ).
+	url_file( Url, RemB, Opts ).
 url_file( Url, Local, Args ) :-
 	options_append( url_file, Args, Opts ),
 	options( overwrite(Ow), Opts ),
@@ -74,7 +75,13 @@ url_file( Url, Local, Args ) :-
 url_file_ow( false, Url, Local, _Opts ) :- 
 	exists_file( Local ),
 	!,
-	debug( url_file, 'Local file exists: ~p, not downloading it again from: ~p.', [Local,Url] ).
+	debug( url_file, 'Local file exists: ~p, not downloading it again from: ~p.', [Local,Url] ),
+    fail.
+url_file_ow( fail, Url, Local, _Opts ) :- 
+	exists_file( Local ),
+	!,
+	debug( url_file, 'Local file exists: ~p, not downloading it again from: ~p.', [Local,Url] ),
+    fail.
 url_file_ow( error, Url, Local, _Opts ) :-
 	exists_file( Local ),
 	!,
