@@ -75,4 +75,4 @@ os_deco_name( &(_), string ).
 
 os_name_alias( true, _Entity, alias ).
 os_name_alias( false, Entity, _ ) :-
-    throw( missing_alias(Entitty), os:os_name/2 ).
+    throw( missing_alias(Entity), os:os_name/2 ).
