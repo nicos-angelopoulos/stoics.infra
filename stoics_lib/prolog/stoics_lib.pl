@@ -89,7 +89,7 @@
               compound/3,              % +Term, -Name, -Args 
               curtail/3,               % +Term, -Max, -Curtailed
               en_append/3,             % +ListOr1, +ListOr2, List
-              en_list/2,               % +Term, -Listed
+              en_list/2,en_list/3,     % +Term, -Listed[, +Opts]
               has_length/2,            % +List, +Lengthy
               has_length/3,            % +List, +Lengthy, +Op
               has_length/4,            % +List, +Lengthy, +Op, +Err

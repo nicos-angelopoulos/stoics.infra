@@ -1,7 +1,13 @@
 ---   Releases   ---
 --------------------
 
-1.4  18.10.07   FIXED:   throwing of missing alias error
+1.4  
+     18.10.12   DOC:      small typos in os_mill/4
+                OPTS;     on_exists(OnX) is called if file exists
+                OPTS:     os_ext/4: 4th argument can now be Opts
+                ERROR:    os_mill passes self throught to os_ext
+                FIXED:    os_mill for given Milled
+     18.10.07   FIXED:    throwing of missing alias error
 
 1.3         @   18.10.01
      18.10.01   IFACE:    removed os_type_entity/3 (covered by os_cast/3)

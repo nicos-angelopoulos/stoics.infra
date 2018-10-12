@@ -865,6 +865,34 @@ of_same_length_mismatch( warn_lists(Tkn), Lng1, Lng2, L1, L2, _Opts ) :-
     message_report( Format2, [L2], debug(_) ).
 
 pack_message_options_augment( Opts, Apts ) :-
+    nth1( N, Opts, Mod:Pred, Rest ),
+    \+ (nth1(N1,Opts,_Name/_Arity), N1<N),
+    !,
+    pack_message_options_trail( Rest, Trail, Rems ),
+    Apts = [pred(Mod:Pred),trail(Trail)|Rems]. 
+pack_message_options_augment( Opts, Apts ) :-
+    nth1( _N1, Opts, Name/Arity, Rest ),
+    !,
+    pack_message_options_trail( Rest, Trail, Rems ),
+    Apts = [pred(Name/Arity),trail(Trail)|Rems].
+    %  fixme: just stick a mod infront of Name/Arity
+pack_message_options_augment( Apts, Apts ).
+
+pack_message_options_trail( [], [], [] ).
+pack_message_options_trail( [Opt|Opts], Trail, Rems ) :-
+    ( (Opt=_Mod:_Name1/_Arity1; Opt=_Name2/_Arity2) ->
+        Trail = [Opt|TellTail],
+        Rems = Tems
+        ;
+        Trail = TellTail,
+        Rems = [Opt|Tems]
+    ),
+    pack_message_options_trail( Opts, TellTail, Tems ).
+
+/* fixme: delete
+pack_message_options_augment( Opts, Apts ) :-
+    nth1( N, Opts, Name/Arity, Rest ),
+    pack_message_options_trail( Rest, Trail, Rems ),
     ( select(Mod:Pred,Opts,Rem) ->
         Apts = [pred(Mod:Pred)|Rem]
         ;
@@ -874,6 +902,7 @@ pack_message_options_augment( Opts, Apts ) :-
             Apts = Opts
         )
     ).
+*/
 
 /** pack_errors_version( -Version, -Date ).
 
@@ -909,7 +938,16 @@ pack_message( Mess, OptsPrv ) -->
     {( is_list(OptsPrv) -> OptsPrv = Opts; Opts = [OptsPrv] )},
     {pack_message_options_augment(Opts,Apts)},
     message_pack( Apts ),
-    pack_errors:message( Mess ).
+    pack_errors:message( Mess ),
+    pack_message_trail( Apts ).
+
+pack_message_trail( Apts ) -->
+    { memberchk(trail(Trail),Apts),
+      Trail \== [],
+      !
+    },
+    [ '\nERROR: Trail: ~w' - [Trail] ].
+pack_message_trail( _Apts ) --> {true}.
 
 message_pack( Opts )  -->
     { debug( pack_errors, 'message_pack options: ~w', [Opts] ) },

@@ -2,7 +2,13 @@
 --------------------
 
 1.1
-     18.11.06   FIXED:  var(File) input in url_file/3
+     18.10.12   OPTS:   Overrides moved to options
+                OPTS:   options are now passed to error, so real source can be reported 
+                CHANGE: mod_goal's 3rd argument can be non var, not ground
+                IFACE:  en_list/3
+                OPTS;   en_list throws up properly now, including trails
+                OPTS:   mod_goal/4 throws trails
+     18.10.06   FIXED:  var(File) input in url_file/3
                 FIXED:  fail after debug message if overwrite(false) is given
                 OPTS:   added false as alternative to fail for overwrite(Ow)
      18.05.29   FIXED:  option order was in two minds about true/elem value (now uses true)

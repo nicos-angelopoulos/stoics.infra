@@ -2,12 +2,14 @@
 %% os_ext( +Ext, +Stem, -File ).
 %% os_ext( -Ext, -Stem, +File ).
 %% os_ext( ?Ext, +New, +File, -NewFile ).
+%% os_ext( ?Ext, ?Stem, ?File, +Opts ).
 % 
 %  Switch the position of the first two arguments of file_name_extension/3.
 %  Ext is the file extension of File.  Provides an arity 2 version of 
 %  file_name_extension/3. This is appropriate for going through
 %  include/3 to filter files of a kind in a list of filenames.
 %  In os_ext/3, Ext is not added if it is already the extension to Stem (new in 0.2).
+%  In os_ext/4, if the last argument is ground, it is taken to be Opts.
 %
 %  New is a replacement of Ext in File that produces NewFile.
 %  Contrary to file_name_extension/3, os_ext/3 allows dots in Ext.
@@ -80,35 +82,37 @@
 %==
 %
 % @author nicos angelopoulos
-% @version  0.2 2015/5/18   changed behaviour to not adding Ext if it is already in Stem.
-% @version  0.3 2016/2/05   added some os typing, and ground Ext can be multi doted
-% @version  0.4 2016/1/04   various teething problems after public release
+% @version  0.2 2015/05/18   changed behaviour to not adding Ext if it is already in Stem.
+% @version  0.3 2016/02/05   added some os typing, and ground Ext can be multi doted
+% @version  0.4 2016/01/04   various teething problems after public release
+% @version  1.0 2018/10/11   allows 4th arg to be options. Errors updates, and trails.
 %
 os_ext( Ext, File ) :-
-     os_ext( Ext, _Stem, File ).
+     os_ext_opts( Ext, _Stem, File, [] ).
 
-os_ext( Ext, Stem, Os ) :-
-	ground(Os),
+os_ext( Ext, Stem, File ) :-
+    os_ext_opts( Ext, Stem, File, [] ).
+
+os_ext_opts( Ext, Stem, Os, Opts ) :-
+	ground( Os ),
 	!,
 	os_name( Os, Type ),
-	os_ext_file( Type, Stem, Ext, Os ).
-	/*
-	os_ext_stem(Stem,Ext,File),
-     file_name_extension( _, Ext, Stem ),
-	!,
-	File = Stem.
-	*/
-os_ext( Ext, Stem, Os ) :-
+	os_ext_file( Type, Stem, Ext, Os, Opts ).
+	/* os_ext_stem(Stem,Ext,File),
+       file_name_extension( _, Ext, Stem ),
+	   !, File = Stem.  */
+os_ext_opts( Ext, Stem, Os, _Opts ) :-
 	ground( Ext ),
 	ground( Stem ),
 	!,
 	os_name( Stem, Type ),
-	os_ext_stem( Type, Stem, Ext, Os ).
-os_ext( Ext, Stem, Os ) :-
-	throw( pack_error(os,os_ext/3,arg_ground_pattern([[1,2],3],[Ext,Stem,Os])) ).
+	os_ext_stem( Type, Stem, Ext, Os ).   % fixme: add Opts
+os_ext_opts( Ext, Stem, Os, Opts ) :-
+	throw( arg_ground_pattern([[1,2],3],[Ext,Stem,Os]), [os:os_ext/3|Opts] ).
+	% throw( pack_error(os,os_ext/3,arg_ground_pattern([[1,2],3],[Ext,Stem,Os])) ).
 	% throw( instantiation_error ).
 
-os_ext_file( atom, Stem, Ext, Os ) :-
+os_ext_file( atom, Stem, Ext, Os, _Opts ) :-
 	ground(Ext),
 	!,
 	atomic_list_concat( ExtPartsPrv, '.', Ext ),
@@ -116,16 +120,16 @@ os_ext_file( atom, Stem, Ext, Os ) :-
 	atomic_list_concat( OsParts, '.', Os ),
 	once(append(AStemParts,ExtParts,OsParts)), 
 	atomic_list_concat( AStemParts, '.', AStem ),
-	os_cast( atom, AStem, Stem ).
-os_ext_file( atom, Stem, Ext, Os ) :-  % os_ext( X, S, abc.def.ghi ).
+	os_cast( atom, AStem, Stem ). % fixme: can pass Opts with os_ext/3 added to os_cast (for reporting).
+os_ext_file( atom, Stem, Ext, Os, _Opts ) :-  % os_ext( X, S, abc.def.ghi ).
 	file_name_extension( AStem, AExt, Os ),
     maplist( os_cast(atom), [AStem,AExt], [Stem,Ext] ).
 %
-os_ext_file( string, Stem, Ext, Os ) :-
+os_ext_file( string, Stem, Ext, Os, _Opts ) :-
 	atom_string( OsAtom, Os ),
 	os_ext_file( atom, StemAtom, ExtAtom, OsAtom ),
     maplist( os_cast(string), [StemAtom,ExtAtom], [Stem,Ext] ).
-os_ext_file( slash, Stem, Ext, Path ) :-
+os_ext_file( slash, Stem, Ext, Path, _Opts ) :-
 	Path = Dir/File,
 	ground(Ext),
 	!,
@@ -133,12 +137,12 @@ os_ext_file( slash, Stem, Ext, Path ) :-
 	atomic_list_concat( [AStem|ExtParts], '.', File ),
 	% file_name_extension( AStem, Ext, File ),
 	os_cast( slash, Dir/AStem, Stem ).
-os_ext_file( slash, Stemmed, Ext, Path ) :-
+os_ext_file( slash, Stemmed, Ext, Path, _Opts ) :-
 	Path = Dir/File,
 	file_name_extension( Stem, Ext, File ),
 	Stemmed = Dir/Stem.
 %
-os_ext_file( alias, Stem, Ext, Os ) :-
+os_ext_file( alias, Stem, Ext, Os, _Opts ) :-
 	Os =.. [Alias,Rel],
 	os_name( Rel, RelType ),
 	os_ext_file_alias( RelType, Rel, RelStem, Ext ),
@@ -181,14 +185,18 @@ os_ext_file_alias( alias, Os, _Stem, _Ext ) :-
 os_ext_file_alias( Other, Os, Stem, Ext ) :-
 	os_ext_file( Other, Stem, Ext, Os ).
 
+os_ext( Ext, Stem, File, Opts ) :-
+    ground( Opts ),
+    !,
+    os_ext_opts( Ext, Stem, File, Opts ).
 os_ext( _Ext, NewExt, _File, _NewFile ) :-
     \+ ground(NewExt),
     !,
-	throw( pack_error(os,os_ext/4,arg_ground(2,NewExt)) ).
+	throw( arg_ground(2,NewExt), os:os_ext/3 ).
 os_ext( _Ext, _NewExt, File, _NewFile ) :-
     \+ ground(File),
     !,
-	throw( pack_error(os,os_ext/4,arg_ground(3,File)) ).
+	throw( arg_ground(3,File), os:os_ext/4 ).
 os_ext( Ext, NewExt, File, NewFile ) :-
 	os_ext( Ext, Stem, File ),
 	os_ext( NewExt, Stem, NewFile ).
