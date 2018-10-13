@@ -19,11 +19,11 @@ Goal will be called in module user if it is not module-prepended.
 */
 
 map_succ_list( Goal, InList, OutList ) :-
-    mod_goal( user, Goal, false, Moal ),
+    mod_goal( user, Goal, Moal, override(false) ),
     map_succ_list_1( InList, Moal, OutList, _Rej ).
 
 map_succ_list( Goal, InList, OutList, Rej ) :-
-    mod_goal( user, Goal, false, Moal ),
+    mod_goal( user, Goal, Moal, override(false) ),
     map_succ_list_1( InList, Moal, OutList, Rej ).
 
 map_succ_list_1( [], _Goal, [], [] ) :- !.

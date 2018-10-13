@@ -70,14 +70,15 @@ mod_goal( Goal, Moal ) :-
 mod_goal( Mod, Goal, Moal ) :-
     mod_goal( Mod, Goal, Moal, [] ).
 mod_goal( Mod, Goal, Moal, Args ) :-
-    options_append( mod_goal, Args, Opts ),
+    mod_goal_defaults( Defs ),
+    ( is_list(Args) -> append(Args,Defs,Opts); append([Args],Defs,Opts) ),
     mod_goal_opts( Mod, Goal, Moal, Opts ).
 
 mod_goal_opts( Mod, Goal, Moal, Opts ) :-
     ground( Mod ),
     \+ var( Goal ),
     !,
-    options( override(OveR), Opts ),
+    memberchk( override(OveR), Opts ),
     mod_goal_gen( Mod, Goal, OveR, Moal, Opts ).
 mod_goal_opts( Mod, Goal, Moal, _Opts ) :-
     \+ var( Moal ),
@@ -87,7 +88,7 @@ mod_goal_opts( Mod, Goal, Moal, Opts ) :-
     Self = stoics_lib:mod_goal/3,
     throw( pack_error(arg_ground_in_one_of([1+2,3],[Mod+Goal,Moal]),[Self|Opts]) ).
 mod_goal_opts( Mod, Goal, Moal, Opts ) :-
-    options( override(Over), Opts ),
+    memberchk( override(Over), Opts ),
     ground( Mod ),
     ground( Goal ),
     ground( Over ),
@@ -100,7 +101,7 @@ mod_goal_gen( Mod, Goal, Over, Moal, Opts ) :-
     Goal = Mod1:Goal1,
     !,
     mod_goal_over( Over, Mod, Mod1, Goal1, Moal, Opts ).
-mod_goal_gen( Mod, Goal, _Over, Moal ) :-
+mod_goal_gen( Mod, Goal, _Over, Moal, _Opts ) :-
     Moal = Mod:Goal.
 
 mod_goal_over( false, _Mod, Mod1, Goal1, Moal, _Opts ) :-

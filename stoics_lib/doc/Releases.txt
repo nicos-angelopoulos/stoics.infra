@@ -2,6 +2,9 @@
 --------------------
 
 1.1
+     18.10.13   REMOVE: mentions of option_append/3 and options/2 in mod_goal/4
+                UPDATE: call to mod_goal/4 to new argument order
+                FIXED:  mod_goal_gen/4 -> 5
      18.10.12   OPTS:   Overrides moved to options
                 OPTS:   options are now passed to error, so real source can be reported 
                 CHANGE: mod_goal's 3rd argument can be non var, not ground
