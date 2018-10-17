@@ -93,6 +93,22 @@ os_ext( Ext, File ) :-
 os_ext( Ext, Stem, File ) :-
     os_ext_opts( Ext, Stem, File, [] ).
 
+os_ext( Ext, Stem, File, Opts ) :-
+    ground( Opts ),
+    !,
+    os_ext_opts( Ext, Stem, File, Opts ).
+os_ext( _Ext, NewExt, _File, _NewFile ) :-
+    \+ ground(NewExt),
+    !,
+	throw( arg_ground(2,NewExt), os:os_ext/3 ).
+os_ext( _Ext, _NewExt, File, _NewFile ) :-
+    \+ ground(File),
+    !,
+	throw( arg_ground(3,File), os:os_ext/4 ).
+os_ext( Ext, NewExt, File, NewFile ) :-
+	os_ext( Ext, Stem, File ),
+	os_ext( NewExt, Stem, NewFile ).
+
 os_ext_opts( Ext, Stem, Os, Opts ) :-
 	ground( Os ),
 	!,
@@ -134,8 +150,11 @@ os_ext_file( slash, Stem, Ext, Path, _Opts ) :-
 	ground(Ext),
 	!,
 	atomic_list_concat( ExtParts, '.', Ext ),
-	atomic_list_concat( [AStem|ExtParts], '.', File ),
+	atomic_list_concat( FileParts, '.', File ),
+    once( append(StemParts,ExtParts,FileParts) ),
+	% atomic_list_concat( [AStem|ExtParts], '.', File ),
 	% file_name_extension( AStem, Ext, File ),
+    atomic_list_concat( StemParts, '.', AStem ),
 	os_cast( slash, Dir/AStem, Stem ).
 os_ext_file( slash, Stemmed, Ext, Path, _Opts ) :-
 	Path = Dir/File,
@@ -184,19 +203,3 @@ os_ext_file_alias( alias, Os, _Stem, _Ext ) :-
 	throw( pack_error(os,nested_alias(1,os_path/3,Os)) ).
 os_ext_file_alias( Other, Os, Stem, Ext ) :-
 	os_ext_file( Other, Stem, Ext, Os ).
-
-os_ext( Ext, Stem, File, Opts ) :-
-    ground( Opts ),
-    !,
-    os_ext_opts( Ext, Stem, File, Opts ).
-os_ext( _Ext, NewExt, _File, _NewFile ) :-
-    \+ ground(NewExt),
-    !,
-	throw( arg_ground(2,NewExt), os:os_ext/3 ).
-os_ext( _Ext, _NewExt, File, _NewFile ) :-
-    \+ ground(File),
-    !,
-	throw( arg_ground(3,File), os:os_ext/4 ).
-os_ext( Ext, NewExt, File, NewFile ) :-
-	os_ext( Ext, Stem, File ),
-	os_ext( NewExt, Stem, NewFile ).

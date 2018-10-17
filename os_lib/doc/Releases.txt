@@ -2,6 +2,7 @@
 --------------------
 
 1.4  
+     18.10.17   FIXED:    dots in slash stems for new ext: os_ext(x,S,b/a.r.x)
      18.10.12   DOC:      small typos in os_mill/4
                 OPTS;     on_exists(OnX) is called if file exists
                 OPTS:     os_ext/4: 4th argument can now be Opts
