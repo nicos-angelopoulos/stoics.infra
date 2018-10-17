@@ -22,17 +22,17 @@ Outs = [2, 3, 4]
 
 */
 map_list_options( GoalIn, InL, Opts ) :-
-    mod_goal( user, GoalIn, false, Goal ),
+    mod_goal( user, GoalIn, Goal, override(false) ),
     map_list_options_3( InL, Goal, Opts ).
 
 map_list_options( GoalIn, InL, OutL, Opts ) :-
     var( InL ),
     ground( OutL ),
     !,
-    mod_goal( user, GoalIn, false, Goal ),
+    mod_goal( user, GoalIn, Goal, override(false) ),
     maplist_options_2( OutL, Goal, InL, Opts ).
 map_list_options( GoalIn, InL, OutL, Opts ) :-
-    mod_goal( user, GoalIn, false, Goal ),
+    mod_goal( user, GoalIn, Goal, override(false) ),
     maplist_options_1( InL, Goal, OutL, Opts ).
 
 maplist_options_1( [], _Goal, [], _Opts ).

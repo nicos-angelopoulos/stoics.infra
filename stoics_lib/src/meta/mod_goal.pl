@@ -25,6 +25,8 @@ Opts
 When de-constructing, Goal will be a goal with no module prepent. 
 When constructing, Moal will be a module prepented goal
 
+Incompatibility: 0.3 removed the mod_goal/4 version that had OverR as 3rd argument.
+
 ==
 ?- mod_goal( mod1, g1, MG ).
 MG = mod1:g1.

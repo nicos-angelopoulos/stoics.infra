@@ -2,6 +2,8 @@
 --------------------
 
 1.1
+     18.10.17   FIXED:  calls to mod_goal from map_list_options/4 follow the new conventions
+                DOC:    added backward incompatibility note
      18.10.13   REMOVE: mentions of option_append/3 and options/2 in mod_goal/4
                 UPDATE: call to mod_goal/4 to new argument order
                 FIXED:  mod_goal_gen/4 -> 5
