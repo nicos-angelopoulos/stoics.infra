@@ -2,6 +2,7 @@
 --------------------
 
 1.8
+     18.10.29  IFACE:   support for cells within packs
      18.04.13  FIXED:   remove extra comment for lib/2 (version )  
 
 1.7       @   18.04.05

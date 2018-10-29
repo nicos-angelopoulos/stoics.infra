@@ -446,7 +446,15 @@ lib( sys(SysLib), Cxt, _Opts ) :-
     % fixme: need map from SysLib -> Repo
     lib_retract_lazy( SysLib, WasLazy ),
     lib_sys_lazy( WasLazy, SysLib, AbsLib, ', expected,', Cxt ).
-
+% testing: lib( & (bio_db(hs)) ). % which contains hgnc
+%  map_hgnc_hgnc_symb(H,'LMTK3').
+lib( &(CellIn), Cxt, Opts ) :-
+    !,
+    lib_cell( CellIn, Main, Cell, Opts ),
+    Cxt:use_module( library(Main) ),
+    atomic_list_concat( [Main,Cell], '/', Full ),
+    Main:ensure_loaded( pack(Full) ),
+    lib_export_cell( Main, Full, Cxt ).
 lib( Repo, Cxt, Opts ) :-
     lib_tables:lib_lazy( Repo ),
     !,
@@ -501,8 +509,25 @@ lib( Pack, Cxt, Opts ) :-
     lib_missing( Sugg, Pack, Cxt, Opts, true ),
     !.
 lib( Repo, Cxt, Opts ) :-
+    compound( Repo ),
+    lib( &(Repo), Cxt, Opts ),
+    !.
+lib( Repo, Cxt, Opts ) :-
     memberchk( mode(Mode), Opts ),
     lib_not_found( Mode, Repo, Cxt ).
+
+lib_cell( CellIn, Main, Cell, _Opts ) :-
+    compound( CellIn ),
+    !,
+    lib_term_dir( CellIn, true, Main, Cell ).
+lib_cell( CellIn, Pack, Cell, Opts ) :-
+    % options( pack(Pack), Opts ),
+    memberchk( pack(Pack), Opts ),
+    !,
+    lib_term_dir( CellIn, false, Pack, Cell ).
+    % lib_cell_pack( Pack, CellIn, Main, Cell, Opts ).
+lib_cell( CellIn, _Main, _Cell, Opts ) :-
+    throw( cannot_locate_cell_with_options(CellIn,Opts) ).
 
 lib_retract_lazy( SysLib, WasLazy ) :-
     lib_tables:lib_lazy(SysLib),
@@ -701,3 +726,62 @@ lib_source_homonyms( false, _Repo ).
 lib_source_end( Repo, _Opts ) :-
     retractall( lib_tables:lib_context(Repo,_Root1) ),
     retractall( lib_tables:lib_packs_at(Repo,_) ).
+
+lib_term_dir( DirIn, _Top, _Main, Dir ) :-
+    atomic( DirIn ),
+    !,
+    DirIn = Dir.
+lib_term_dir( LeftIn/Leaf, Top, Main, Dir ) :-
+    !,
+    lib_term_dir( LeftIn, Top, Main, Left ),
+    atomic_list_concat( [Left,Leaf], '/', Dir ).
+lib_term_dir( DirIn, Top, Main, Dir ) :-
+    functor( DirIn, TNm, 1 ),
+    !,
+    arg( 1, DirIn, SubIn ),
+    lib_term_dir( SubIn, false, Main, Sub ),
+    ( Top == true -> TNm = Main,
+                     atomic_list_concat( [cell,Sub], '/', Dir )
+                   ; atomic_list_concat( [TNm,Sub], '/', Dir )
+    ).
+lib_term_dir( DirIn, Top, _Main, _Dir ) :-
+    throw( cannot_de_term_dir(DirIn,Top) ).
+
+lib_export_cell( Main, RelCell, Cxt ) :-
+    lib_pack_module( Main, Cxt, Mod ),
+    lib_cell_module( Mod, RelCell, Cod ),
+    findall( Pid, (
+                        ( 
+                        predicate_property(Mod:Pid,imported_from(Cod))
+                        ;
+                        ( predicate_property(Cod:Pid,imported_from(Common)),
+                          predicate_property(Mod:Pid,imported_from(Common))
+                        )
+                        ),
+                        \+ predicate_property(Cxt:Pid,_),
+                        Cxt:import(Mod:Pid)
+                  ), Pids ),
+    debug( lib, 'lib imported in context: ~w, from mod: ~w, having cell, ~w, the predicates: ~w', [Cxt,Main,RelCell,Pids] ).
+
+% finds the module defined by a loaded pack file...
+lib_pack_module( Main, Cxt, Mod ) :-
+    absolute_file_name( pack(Main), PackMain ),
+    directory_file_path( PackMain, prolog, PrologMain ),
+    directory_file_path( PrologMain, Main, MainF ),
+    file_name_extension( MainF, pl, PlF ),
+    exists_file( PlF ),
+    predicate_property( Cxt:Pred, file(PlF) ),
+    predicate_property( Cxt:Pred, imported_from(Mod) ),
+    !,
+    debug( lib, 'Commiting to mod: ~w, for main pack: ~w in context: ~w', [Mod,Main,Cxt] ).
+lib_pack_module( Main, Cxt, Mod ) :-
+    throw( cannot_locate_loaded_module_for(Main,Cxt,Mod) ).
+
+lib_cell_module( Mod, Rel, Cod ) :-
+    absolute_file_name( pack(Rel), PlF, [file_type(prolog),access(read)] ),
+    predicate_property( Mod:Pid, file(PlF) ), 
+    predicate_property( Mod:Pid, imported_from(Cod) ), 
+    !,
+    debug( lib, 'Commiting to cell mod: ~w, for main mod: ~w and relative : ~w', [Cod,Mod,Rel] ).
+lib_cell_module( Mod, Rel, Cod ) :-
+    throw( cannot_locate_loaded_module_cell(Mod,Rel,Cod) ).

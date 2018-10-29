@@ -74,17 +74,23 @@ lib_type( alias(Spc), Type, Repo, Root, Load ) :-
     lib_type_dir( Abs, Type, Repo, Root, Load ),
     debug( lib, 'Alias: ~w explicitly typed as: ~w, with mod: ~w and abs location: ~p', [Spc,Type,Repo,Load] ).
 lib_type( Pack, Type, Repo, Root, Load ) :-
-    AbsOpts = [file_type(directory),file_errors(fail)],
-    absolute_file_name( pack(Pack), Root, AbsOpts ),
-    % move the next few lines to a pred that is clever in locating a load file for a pack ?
-    directory_file_path( Root, prolog, PlD ),
-    directory_file_path( PlD, Pack, AbsStem ),
-    file_name_extension( AbsStem, pl, Load ),
+    AbsDirOpts = [file_type(directory),file_errors(fail)],
+    ( absolute_file_name( pack(Pack), Root, AbsDirOpts ) ->
+        % move the next few lines to a pred that is clever in locating a load file for a pack ?
+        directory_file_path( Root, prolog, PlD ),
+        directory_file_path( PlD, Pack, AbsStem ),
+        file_name_extension( AbsStem, pl, Load ),
+        % absolute_file_name(pack(File),Abs,AbsOpts) ),
+        lib_type_required( Root )  % this can fail, but its fine to do so after cut as the caller deals with non-requires packs
+        ;
+        % this is a cell of a pack...
+        AbsCellOpts = [file_type(prolog),file_errors(fail),access(read)],
+        absolute_file_name( pack(Pack), Load, AbsCellOpts )
+    ),
     exists_file( Load ),
     !,
-    debug( lib, 'Repo typed as pack: ~w, with type: ~w and mod: ~w', [Pack,Type,Repo] ),
-    lib_type_required( Root ),  % this can fail, but its fine to do so after cut as the caller deals with non-requires packs
-    Type = pack, Repo = Pack.
+    Type = pack, Repo = Pack,
+    debug( lib, 'Repo typed as pack: ~w, with type: ~w and mod: ~w', [Pack,Type,Repo] ).
 lib_type( FileSpc, Type, Repo, Root, Load ) :-
     expand_file_name( FileSpc, [File] ),
     AbsOpts = [access(read),file_errors(fail)],
