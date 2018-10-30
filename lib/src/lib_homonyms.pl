@@ -4,6 +4,15 @@
 %
 
 lib_homonyms( Repo ) :-
+    compound( Repo ),
+    !,  % we are within a cell of a pack
+    Repo =.. [Pack,Cell],  % fixme: allow more complex terms
+    prolog_load_context( directory, Root ),
+    directory_file_path( Root, Cell, Coot ),
+    atomic_list_concat( [Pack,Cell], '_', Mod ),
+    lib_homonyms( Mod, Coot ).
+
+lib_homonyms( Repo ) :-
     prolog_load_context( directory, Root ),
     lib_homonyms( Repo, Root ).
 

@@ -697,6 +697,7 @@ lib_repo( Repo, Type, Root, Load, Cxt, Args ) :-
 lib_source( Repo, Opts ) :-
     prolog_load_context( directory, Base ), 
     directory_file_path( Root, prolog, Base ),
+    !,
     % next N lines accommodate for private packs...
     directory_file_path( Root, src, Srot ),
     directory_file_path( Srot, packs, PrivP ),
@@ -707,7 +708,19 @@ lib_source( Repo, Opts ) :-
     lib_source_index( Idx, Root, Repo ),
     ( memberchk(homonyms(Hmns),Opts) -> true; Hmns = false ),
     lib_source_homonyms( Hmns, Repo ).
-
+lib_source( Repo, Opts ) :-
+    compound( Repo ),
+    % we are within a cell of a pack...
+    Repo =.. [Pack,Cell],  % fixme: allow for more complex terms
+    prolog_load_context( directory, Base ), 
+    % directory_file_path( Base, src, Srot ),
+    atomic_list_concat( [Pack,Cell], '_', Mod ),
+    asserta( lib_tables:lib_context(Mod,Base) ),
+    ( memberchk(index(Idx),Opts) -> true; Idx = false ),
+    lib_source_index( Idx, Base, Mod ),
+    ( memberchk(homonyms(Hmns),Opts) -> true; Hmns = false ),
+    lib_source_homonyms( Hmns, Repo ).
+    
 lib_source_index( true, Root, Repo ) :-
     lib_src_sub_dir( Sub ),
     directory_file_path( Root, Sub, AbsSrc ),
@@ -723,6 +736,14 @@ lib_source_homonyms( true, Repo ) :-
     !.
 lib_source_homonyms( false, _Repo ).
 
+lib_source_end( Repo, _Opts ) :-
+    compound( Repo ),
+    % then we are within a cell of a pack
+    !,
+    Repo =.. [Pack,Cell],  % fixme: allow for more complex terms
+    atomic_list_concat( [Pack,Cell], '_', Mod ),
+    retractall( lib_tables:lib_context(Mod,_Root1) ),
+    retractall( lib_tables:lib_packs_at(Mod,_) ).
 lib_source_end( Repo, _Opts ) :-
     retractall( lib_tables:lib_context(Repo,_Root1) ),
     retractall( lib_tables:lib_packs_at(Repo,_) ).
