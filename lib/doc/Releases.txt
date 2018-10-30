@@ -3,6 +3,7 @@
 
 1.8
      18.10.30  IFACE:   first draft complete on pack cells
+               FIXED:   allow user to have multiple sources
      18.10.29  IFACE:   support for cells within packs
      18.04.13  FIXED:   remove extra comment for lib/2 (version )  
 

@@ -17,6 +17,7 @@ lib_homonyms( Repo ) :-
     lib_homonyms( Repo, Root ).
 
 lib_homonyms( Repo, _Root ) :-
+    Repo \== user,
     lib_tables:lib_repo_homonyms( Repo, Root ),
     !,
     % fixme: check for errors ?

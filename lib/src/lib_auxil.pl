@@ -60,6 +60,8 @@ lib_reg_repo( Repo, Type, Root, Load ) :-
     !.
 lib_reg_repo( Repo, _Type, Root, _Load ) :-
     lib_tables:lib_repo( Repo, _XType, XRoot, _XLoad ),
+    Repo \== user,  % allow user to have multiple locations... 
+    % fixme: make sure the rest of the code handles it correctly though
     Root \== XRoot,
     !,
     Mess = 'Repo: ~w, has registered root: ~w, clashing with: ~w',
