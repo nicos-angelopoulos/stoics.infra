@@ -1,5 +1,5 @@
 os_file_defaults( Defs ) :-
-    Defs = [dir('.'), stem(rel), sub(false), dots(false)].
+    Defs = [dir('.'), stem(rel), sub(false), dots(false),solutions(single)].
 
 %% os_file( ?File ).
 %% os_file( ?File, +Opts ).
@@ -13,6 +13,8 @@ os_file_defaults( Defs ) :-
 %   * dots(Dots=false)
 %      set to true if dot starting files are required<br>
 %      note that '.' and '..' are never returned
+%   * solutions(Sol=single)
+%     or findall for returning a list of all solutions
 %   * stem(Stem=rel)
 %      what stem to add to returned files, 
 %      rel: relative (default else), abs: absolute, false: no, stem
@@ -37,11 +39,30 @@ os_file_defaults( Defs ) :-
 % File = '.dotty1' ;
 % File = file1.
 % 
+%:- absolute_file_name( pack(os_lib), OsDir ), working_directory( Old, OsDir ).
+% OsDir = '/usr/local/users/nicos/local/git/lib/swipl-7.7.19/pack/os_lib',
+% Old = '/home/nicos/.unison/canonical/sware/nicos/git/github/stoics.infra/'.
+% 
+% File = pack.pl ;
+% false.
+% 
+% ?- os_file( File, solutions(findall) ).
+% File = [pack.pl].
+% 
+% ?- os_file( File, [solutions(findall),sub(true)] ).
+% File = ['doc/Releases.txt', 'doc/html/h1-bg.png', 'doc/html/h2-bg.png', 'doc/html/multi-bg.png', 'doc/html/os.html', 'doc/html/pldoc.css', 'doc/html/priv-bg.png', 'doc/html/pub-bg.png', 'examples/testo/dir1/file2'|...].
+% 
+% ?- os_file( File, [solutions(single),sub(true)] ).
+% File = 'doc/Releases.txt' ;
+% File = 'doc/html/h1-bg.png' ;
+% File = 'doc/html/h2-bg.png' ;
+% File = 'doc/html/multi-bg.png'...
 %==
 % @author nicos angelopoulos
 % @version  0.1 2016/1/31, this version without ref to lib(os_sub)
 % @version  0.2 2018/7/23, added options, dir(Dir) and sub(true)
 % @version  0.3 2018/10/1, added option dots(Dots)
+% @version  0.4 2018/11/4, added option solutions(Sol)
 % 
 os_file( File ) :-
     os_file( File, [] ).
@@ -53,12 +74,14 @@ os_file( File, _Opts ) :-
 	os_exists( File, type(flink) ).
 os_file( File, Args ) :-
     options_append( os_file, Args, Opts ),
-    options( sub(Sub), Opts ),
-    options( dir(Dir), Opts ),
-    options( stem(Stem), Opts ),
-    options( dots(Dots), Opts ), % fixme: type check
+    options( [dir(Dir),dots(Dots),solutions(Sol),stem(Stem),sub(Sub)], Opts ),
     absolute_file_name( Dir, Abs, [file_type(directory),solutions(first)] ),
+    os_file_sol( Sol, File, Dir, Abs, Stem, Dots, Sub ).
+
+os_file_sol( single, File, Dir, Abs, Stem, Dots, Sub ) :-
     os_file( File, '', Dir, Abs, Stem, Dots, Sub ).
+os_file_sol( findall, Files, Dir, Abs, Stem, Dots, Sub ) :-
+    findall( File, os_file(File,'',Dir,Abs,Stem,Dots,Sub), Files ).
 
 os_file( File, Rel, Dir, Abs, Stem, Dots, Sub ) :-
     os_cast( Dir, +SysDir ),

@@ -2,7 +2,7 @@
 %fixme: should merge with os_file_defaults...
 os_dir_defaults( Defs ) :-
     % ( (memberchk(dir(InDir),Args),\+ InDir == '.') -> Stem = rel ; Stem = false),
-    Defs = [dir('.'), stem(rel), sub(false),dots(false)].
+    Defs = [dir('.'), stem(rel), sub(false),dots(false),solutions(single)].
 
 %% os_dir( ?OsDir ).
 %% os_dir( ?OsDir, +Opts ).
@@ -16,6 +16,8 @@ os_dir_defaults( Defs ) :-
 %   * dots(Dots=false)
 %      set to true if dot starting dirs are required<br>
 %      note that '.' and '..' are never returned
+%   * solutions(Sol=single)
+%     or findall for returning a list for solutions
 %   * stem(Stem=false)
 %      what stem to add to returned files, 
 %      rel: relative (default), abs: absolute, false: none
@@ -70,12 +72,30 @@ os_dir_defaults( Defs ) :-
 % Action? ;
 % Dir = dir1 ;
 % false.
+%
+% ?- absolute_file_name( pack(os_lib), OsDir ), working_directory( _, OsDir ).
+% OsDir = '.../lib/swipl-7.7.19/pack/os_lib',
+% 
+% ?- ls.
+% % doc/        examples/   pack.pl     prolog/     src/        
+% true.
+% 
+% ?- os_dir( Dir ).
+% Dir = doc ;
+% Dir = examples ;
+% Dir = prolog ;
+% Dir = src ;
+% false.
+% 
+% ?- os_dir( Dir, solutions(findall) ).
+% Dir = [doc, examples, prolog, src].
 %==
 %
 % @author nicos angelopoulos
 % @version  0.2 2016/1/31, this version without ref to lib(os_sub)
 % @version  0.3 2018/8/05, added options and harmonized with os_file/2
 % @version  0.3 2018/10/1, added option dots(D)
+% @version  0.4 2018/11/4, added option solutions(D)
 % 
 os_dir( OsDir ) :-
     os_dir( OsDir, [] ).
@@ -86,9 +106,14 @@ os_dir( OsDir, _ ) :-
 	os_exists( OsDir, type(dlink) ).
 os_dir( OsDir, Args ) :-
     options_append( os_dir, Args, Opts ),
-    options( [dir(Dir),sub(Sub),stem(Stem),dots(Dots)], Opts ),
+    options( [solutions(Sol),dir(Dir),sub(Sub),stem(Stem),dots(Dots)], Opts ),
     absolute_file_name( Dir, Abs, [file_type(directory),solutions(first)] ),
+    os_dir_sol( Sol, OsDir, '', Dir, Abs, Stem, Dots, Sub ).
+
+os_dir_sol( single, OsDir, '', Dir, Abs, Stem, Dots, Sub ) :-
     os_dir( OsDir, '', Dir, Abs, Stem, Dots, Sub ).
+os_dir_sol( findall, OsDirs, '', Dir, Abs, Stem, Dots, Sub ) :-
+    findall( OsDir, os_dir(OsDir,'',Dir,Abs,Stem,Dots,Sub), OsDirs ).
 
 os_dir( OsDir, Rel, Dir, Abs, Stem, Dots, Sub ) :-
     os_cast( Dir, +SysDir ),
@@ -108,6 +133,7 @@ os_dir_dot( true, _Entry ).
 os_dir_dot( false, Entry ) :-
     \+ atom_concat( '.', _, Entry ).
 
+
 os_dir_obj( _Os, Rel, Entry, OsDir, _Dir, Abs, Stem, _Dots, _Sub ) :-    % first return the dir
 	% os_exists( Rel, type(flink) ),
     % !,
@@ -125,7 +151,7 @@ os_dir_obj( _Os, Rel, Entry, OsDir, _Dir, Abs, Stem, _Dots, _Sub ) :-    % first
 os_dir_obj( Os, Rel, Entry, OsDir, _Dir, Abs, Stem, Dots, true ) :-  % then recurse into the dir if we have been asked
 	% os_exists( Rel, type(dlink) ),
     os_path( Entry, Abs, Rbs ),
-    os_dir( OsDir, Rel, Os, Rbs, Stem, Dots, true ).
+    os_dir( single, OsDir, Rel, Os, Rbs, Stem, Dots, true ).
 
 %% os_dirs( -Dirs ).
 %% os_dirs( +AtDir, -Dirs ).
