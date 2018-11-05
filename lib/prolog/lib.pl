@@ -448,6 +448,30 @@ lib( sys(SysLib), Cxt, _Opts ) :-
     lib_sys_lazy( WasLazy, SysLib, AbsLib, ', expected,', Cxt ).
 % testing: lib( & (bio_db(hs)) ). % which contains hgnc
 %  map_hgnc_hgnc_symb(H,'LMTK3').
+lib( &(Pack), Cxt, _Opts ) :-
+    atomic( Pack ),
+    absolute_file_name( pack(Pack), PackD, [file_type(directory),access(exist)] ),
+    !,
+    directory_file_path( PackD, cell, CellsD ),
+    ( exists_directory(CellsD) -> 
+        directory_files( CellsD, AllOses ),
+        findall( Os, (member(Os,AllOses),file_name_extension(_,pl,Os)), Oses ),
+        debug( lib, 'Loading of all cells found pl files: ~w', [Oses] ),
+        Cxt:ensure_loaded( library(Pack) ),
+        findall( Os, ( member(Os,Oses), directory_file_path(CellsD,Os,CellF),
+                       %fixme: this: assumes module is same as pack ...
+                       debug( lib, 'Loading of cells is loading: ~w', [CellF] ),
+                       Pack:ensure_loaded(CellF),
+                       directory_file_path(Pack,cell,RelCellP),
+                       directory_file_path(RelCellP,Os,RelOs),
+                       lib_export_cell(Pack,RelOs,Cxt)
+                       ),
+                        _OsesDash )
+        ; 
+        % fixme: print warning ?
+        debug( lib, 'Loading library only as cells cannot be located for: ~w', Pack ),
+        Cxt:ensure_loaded( library(Pack) )
+    ).
 lib( &(CellIn), Cxt, Opts ) :-
     !,
     lib_cell( CellIn, Main, Cell, Opts ),
