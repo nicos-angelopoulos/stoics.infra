@@ -465,8 +465,9 @@ lib( &(Pack), Cxt, _Opts ) :-
                        directory_file_path(Pack,cell,RelCellP),
                        directory_file_path(RelCellP,Os,RelOs),
                        lib_export_cell(Pack,RelOs,Cxt)
-                       ),
-                        _OsesDash )
+                     ),
+                        _OsesDash 
+               )
         ; 
         % fixme: print warning ?
         debug( lib, 'Loading library only as cells cannot be located for: ~w', Pack ),
