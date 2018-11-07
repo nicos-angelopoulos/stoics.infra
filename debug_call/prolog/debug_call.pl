@@ -4,6 +4,7 @@
             debug_call/3,
             debug_call/4,
             debug_chain/2, debug_chain/3,
+            debug_consec/3, debug_consec/4,
             debug_message/3,
             debug_on/1,
             debug_portray/2,
