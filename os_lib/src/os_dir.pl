@@ -110,10 +110,10 @@ os_dir( OsDir, Args ) :-
     absolute_file_name( Dir, Abs, [file_type(directory),solutions(first)] ),
     os_dir_sol( Sol, OsDir, '', Dir, Abs, Stem, Dots, Sub ).
 
-os_dir_sol( single, OsDir, '', Dir, Abs, Stem, Dots, Sub ) :-
-    os_dir( OsDir, '', Dir, Abs, Stem, Dots, Sub ).
-os_dir_sol( findall, OsDirs, '', Dir, Abs, Stem, Dots, Sub ) :-
-    findall( OsDir, os_dir(OsDir,'',Dir,Abs,Stem,Dots,Sub), OsDirs ).
+os_dir_sol( single, OsDir, Path, Dir, Abs, Stem, Dots, Sub ) :-
+    os_dir( OsDir, Path, Dir, Abs, Stem, Dots, Sub ).
+os_dir_sol( findall, OsDirs, Path, Dir, Abs, Stem, Dots, Sub ) :-
+    findall( OsDir, os_dir(OsDir,Path,Dir,Abs,Stem,Dots,Sub), OsDirs ).
 
 os_dir( OsDir, Rel, Dir, Abs, Stem, Dots, Sub ) :-
     os_cast( Dir, +SysDir ),
@@ -133,7 +133,6 @@ os_dir_dot( true, _Entry ).
 os_dir_dot( false, Entry ) :-
     \+ atom_concat( '.', _, Entry ).
 
-
 os_dir_obj( _Os, Rel, Entry, OsDir, _Dir, Abs, Stem, _Dots, _Sub ) :-    % first return the dir
 	% os_exists( Rel, type(flink) ),
     % !,
@@ -151,12 +150,12 @@ os_dir_obj( _Os, Rel, Entry, OsDir, _Dir, Abs, Stem, _Dots, _Sub ) :-    % first
 os_dir_obj( Os, Rel, Entry, OsDir, _Dir, Abs, Stem, Dots, true ) :-  % then recurse into the dir if we have been asked
 	% os_exists( Rel, type(dlink) ),
     os_path( Entry, Abs, Rbs ),
-    os_dir( single, OsDir, Rel, Os, Rbs, Stem, Dots, true ).
+    os_dir_sol( single, OsDir, Rel, Os, Rbs, Stem, Dots, true ).
 
 %% os_dirs( -Dirs ).
 %% os_dirs( +AtDir, -Dirs ).
 %
-% Find-alls, all directories for which os_dir(Dir) succeeds.<br>
+% Find all directories for which os_dir(Dir) succeeds.<br>
 % Opts are passed to os_dirs/2.
 %
 %==

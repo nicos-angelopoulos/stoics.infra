@@ -73,8 +73,8 @@ lib_reg_repo( Repo, Type, Root, Load ) :-
 
 /** lib_loading_context( -Cxt ).
 
-    Establish the loading context either via =lib_context:lib_context(Cxt,Root)=
-or =prolog_load_context(module,Mod)+.
+    Establish the loading context either via =lib_tables:lib_context(Cxt,Root)=
+or =prolog_load_context(module,Mod)=.
 
 */
 lib_loading_context( Cxt ) :-

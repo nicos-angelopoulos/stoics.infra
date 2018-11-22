@@ -232,6 +232,7 @@ Listens to =|debug(lib)|=.
 @version  1.6 2018/3/18,  lib/2 suggests(), lib/2, promise() via hot-swapping, private packs
 @version  1.7 2018/4/5,   auto-install missing was broken
 @see http://stoics.org.uk/~nicos/sware/lib
+@tbd 18.11.22 lib_reg_repo/4 and lib_tables:lib_repo/4 do not operate in specific contexts ?
 
 */
 
@@ -692,6 +693,10 @@ lib_explicit_exports( Repo, Cxt, Opts, Pn/Pa) :-
 % lib_alias( Alias, _Cxt, _Opts ) :-
     % throw( alias_does_not_correspont_to_lib(Alias) ).
 
+% testing: 18.11.22:
+lib( user, _Root, false, _Cxt, _Opts ) :-
+    debug( lib, 'lib/4, not loading anything for user/false', [] ),
+    !.
 lib( Repo, Root, Load, Cxt, Opts ) :-
     ( catch(lib_load_repo_root_index_file(Repo,Root), _, true ) -> true; true ),
     Setup = asserta( lib_tables:lib_context(Repo,Root) ),
