@@ -420,7 +420,7 @@ lib( version(V,D), _, _Args ) :-
     % V = 1:2, D = date(2017,3,11).
     % V = 1:4:0, D = date(2017,8,8).
     % V = 1:7:0, D = date(2018,4,5).
-    V = 2:2:0, D = date(2018,11,22).
+    V = 2:0:0, D = date(2018,11,22).
 lib( suggests(Lib), _, _Args ) :- 
     !,
     lib_suggests( Lib ).
