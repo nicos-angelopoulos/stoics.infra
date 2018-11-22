@@ -1,7 +1,7 @@
 ---   Releases   ---
 --------------------
 
-1.8
+2.0         @  18.11.22
      18.11.22  FIXED:   be more permissive about usr libs within modules/packs
                         that may overall with user defined  ones. if everything
                         resolves to a single Repo-File then be happy about it

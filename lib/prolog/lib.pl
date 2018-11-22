@@ -231,6 +231,7 @@ Listens to =|debug(lib)|=.
 @version  1.5 2017/8/15
 @version  1.6 2018/3/18,  lib/2 suggests(), lib/2, promise() via hot-swapping, private packs
 @version  1.7 2018/4/5,   auto-install missing was broken
+@version  2.0 2018/11/22, cell based module compositionality
 @see http://stoics.org.uk/~nicos/sware/lib
 
 */
@@ -370,12 +371,12 @@ The above two directives can be shortened to:
 ==
 
 ==
-?- lib( version(1:7:0, date(2018.4,5)) ).
+?- lib( version(2:0:0, date(2018.11,22)) ).
 true.
 ==
 
 @author nicos angelopoulos
-@version  1:7 2018/4/5
+@version  2:0 2018/11/22
 @tbd when predicate is missing from stoics_lib while loading from b_real, we get clash between main and lazy, error should be clearer (the pred select_all/3 was actually not defined in file either)
 
 */
@@ -418,7 +419,8 @@ lib( version(V,D), _, _Args ) :-
     !,
     % V = 1:2, D = date(2017,3,11).
     % V = 1:4:0, D = date(2017,8,8).
-    V = 1:7:0, D = date(2018,4,5).
+    % V = 1:7:0, D = date(2018,4,5).
+    V = 2:2:0, D = date(2018,11,22).
 lib( suggests(Lib), _, _Args ) :- 
     !,
     lib_suggests( Lib ).
