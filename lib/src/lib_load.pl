@@ -37,11 +37,12 @@ lib_load_repo( Repo, Cxt, Pn, Pa, _Opts ) :-
                          )
                          % above ensures Repo indices are loaded too
                    ),
-                            RAbsFs 
+                            RAbsFsAll
            ),
+    sort(  RAbsFsAll, RAbsFs ),
     lib_load_files_indexed( RAbsFs, Cxt, Repo, Pn, Pa ).
 
-% if no files where found via indexes the...
+% if no files where found via indexes, then...
 lib_load_files_indexed( [], Cxt, Repo, Pn, Pa ) :- % caution: Repo may be unbound
     % ... try the homonyms
     findall( Handle-AbsF, ( 
@@ -52,7 +53,8 @@ lib_load_files_indexed( [], Cxt, Repo, Pn, Pa ) :- % caution: Repo may be unboun
                         ;
                         ( lib_tables:lib_homonym(Pn,Cxt,AbsF), Handle=Cxt )
                    ),
-                        RAbsFs ), 
+                        RAbsFsAll ), 
+    sort(  RAbsFsAll, RAbsFs ),
     lib_load_files_homonyms( RAbsFs, Cxt, Repo, Pn, Pa ).
 lib_load_files_indexed( [Repo-AbsF], Cxt, _ARepo, Pn, Pa ) :-
     !,

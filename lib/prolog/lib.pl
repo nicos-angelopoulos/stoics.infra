@@ -232,7 +232,6 @@ Listens to =|debug(lib)|=.
 @version  1.6 2018/3/18,  lib/2 suggests(), lib/2, promise() via hot-swapping, private packs
 @version  1.7 2018/4/5,   auto-install missing was broken
 @see http://stoics.org.uk/~nicos/sware/lib
-@tbd 18.11.22 lib_reg_repo/4 and lib_tables:lib_repo/4 do not operate in specific contexts ?
 
 */
 
@@ -312,13 +311,13 @@ The defaults depend on whether Repo is a pack or a lib.
 * Libs get defaults
     [load(false),index(true),homonym(true),type(lib)]
 
-When invvoked with code attaching operands (SysLibrary, Pack or Lib) 
+When invoked with code attaching operands (SysLibrary, Pack or Lib) 
 the predicate will first load anything that needs to be loaded in their native module
 and then import predicates from that module. Attaching a lib or pack means that the 
 predicates pointed to by indices and by file name from the target pack/lib become
 available to the importee. Option =|index(Idx)|= controls whether =LibIndex.pl=
 based indices are attahced whereas =|homonym(Hmns)|= control the attachment of
-the file names from the target.
+the file names from within the filesystem of the target.
 
 For example to only import the interface predicates of pack =ex1= use
 ==
@@ -500,12 +499,12 @@ lib( Repo, Cxt, _Args ) :-
 lib( Repo, Cxt, Args ) :-
     lib_type( Repo, RepoType, RepoMod, RepoRoot, RepoLoad ),
     !,
-    lib_reg_repo( RepoMod, RepoType, RepoRoot, RepoLoad ),
+    lib_reg_repo( RepoMod, RepoType, RepoRoot, RepoLoad, Exists ),
     MsId = 'Identified repo: ~w as: ~w, loading in: ~w, with root: ~w',
     debug( lib, MsId, [Repo,RepoType,RepoMod,RepoRoot] ),
     lib_defaults( RepoType, Defs ),
     append( Args, Defs, Opts ),
-    lib( RepoMod, RepoRoot, RepoLoad, Cxt, Opts ).
+    lib( Exists, RepoMod, RepoRoot, RepoLoad, Cxt, Opts ).
 lib( SysLib, Cxt, _Args ) :-
     AbsOpts = [access(read),file_errors(fail),file_type(prolog)],
     absolute_file_name(library(SysLib), AbsLib, AbsOpts ),
@@ -693,11 +692,17 @@ lib_explicit_exports( Repo, Cxt, Opts, Pn/Pa) :-
 % lib_alias( Alias, _Cxt, _Opts ) :-
     % throw( alias_does_not_correspont_to_lib(Alias) ).
 
-% testing: 18.11.22:
-lib( user, _Root, false, _Cxt, _Opts ) :-
-    debug( lib, 'lib/4, not loading anything for user/false', [] ),
-    !.
 lib( Repo, Root, Load, Cxt, Opts ) :-
+    lib( false, Repo, Root, Load, Cxt, Opts ).
+
+% testing: 18.11.22:
+/*
+lib( true, Repo, Root, _Load, Cxt, _Opts ) :-
+    Mess = 'lib/4, not loading anything for lib that already existed. Cxt: ~w, repo: ~w, root:~w',
+    debug( lib, Mess, [Cxt,Repo,Root] ),
+    !.
+    */
+lib( _, Repo, Root, Load, Cxt, Opts ) :-
     ( catch(lib_load_repo_root_index_file(Repo,Root), _, true ) -> true; true ),
     Setup = asserta( lib_tables:lib_context(Repo,Root) ),
     Goal  = lib_load_file( Load, Repo, Opts ),

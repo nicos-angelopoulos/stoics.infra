@@ -49,16 +49,18 @@ lib_ensure_loaded_file_exists( File, XFile, Repo ) :-
     lib_message_report( Mess, [Repo,XFile,File], error ),
     abort.
     
-/** lib_reg_repo( +Repo, +Type, +Root, +Load ).
+/** lib_reg_repo( +Repo, +Type, +Root, +Load, -Exists ).
     
  Register Repo as having Type, Root and Load-ing file.
  Aborts with error if Repo is already registered under other Root.
+ Exists is _true_ iff the repository already existed.
 
 */
-lib_reg_repo( Repo, Type, Root, Load ) :-
+lib_reg_repo( Repo, Type, Root, Load, Exists ) :-
     lib_tables:lib_repo( Repo, Type, Root, Load ),
-    !.
-lib_reg_repo( Repo, _Type, Root, _Load ) :-
+    !,
+    Exists = true.
+lib_reg_repo( Repo, _Type, Root, _Load, _Exists ) :-
     lib_tables:lib_repo( Repo, _XType, XRoot, _XLoad ),
     Repo \== user,  % allow user to have multiple locations... 
     % fixme: make sure the rest of the code handles it correctly though
@@ -67,9 +69,10 @@ lib_reg_repo( Repo, _Type, Root, _Load ) :-
     Mess = 'Repo: ~w, has registered root: ~w, clashing with: ~w',
     lib_message_report( Mess, [Repo,XRoot,Root], error ),
     abort.
-lib_reg_repo( Repo, Type, Root, Load ) :-
+lib_reg_repo( Repo, Type, Root, Load, Exists ) :-
     debug( lib, 'Reg: ~w', lib_tables:lib_repo(Repo,Type,Root,Load)),
-    assert( lib_tables:lib_repo(Repo,Type,Root,Load) ).
+    assert( lib_tables:lib_repo(Repo,Type,Root,Load) ),
+    Exists = false.
 
 /** lib_loading_context( -Cxt ).
 

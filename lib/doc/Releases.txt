@@ -2,6 +2,9 @@
 --------------------
 
 1.8
+     18.11.22  FIXED:   be more permissive about usr libs within modules/packs
+                        that may overall with user defined  ones. if everything
+                        resolves to a single Repo-File then be happy about it
      18.11.05  IFACE:   &(pack) loads all cell files from cell/
      18.10.30  IFACE:   first draft complete on pack cells
                FIXED:   allow user to have multiple sources
