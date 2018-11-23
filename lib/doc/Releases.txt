@@ -1,6 +1,8 @@
 ---   Releases   ---
 --------------------
 
+2.1         @  18.11.23
+     18.11.22  IFACE:   added & operator to module (was getting it from by_unix)
 2.0         @  18.11.22
      18.11.22  FIXED:   be more permissive about usr libs within modules/packs
                         that may overall with user defined  ones. if everything
