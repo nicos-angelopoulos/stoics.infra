@@ -1,6 +1,6 @@
 name(lib).
 title('Predicate based code development').
-version('2.0').
+version('2.1').
 author( 'Nicos Angelopoulos', 'http://stoics.org.uk/~nicos' ).
 packager( 'Nicos Angelopoulos', 'http://stoics.org.uk/~nicos' ).
 maintainer( 'Nicos Angelopoulos', 'http://stoics.org.uk/~nicos' ).
