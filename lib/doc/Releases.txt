@@ -1,6 +1,11 @@
 ---   Releases   ---
 --------------------
 
+Tbd: document @, & (remove fixme: code that might have been needed due to MAIN instead of PACK variable bug.).
+
+2.2         @  18.11.25
+     18.11.25  LOAD:    harmonize with library(Pack). now celled files load everything in that scenario
+               
 2.1         @  18.11.23
      18.11.22  IFACE:   added & operator to module (was getting it from by_unix)
 2.0         @  18.11.22

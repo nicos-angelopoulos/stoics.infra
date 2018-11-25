@@ -37,6 +37,7 @@
 :- dynamic( lib_tables:lib_lazy/1 ).             % +Repo
 :- dynamic( lib_tables:lib_full/2 ).             % +Repo
 :- dynamic( lib_tables:lib_packs_at/2 ).         % +Repo, +Dir
+:- dynamic( lib_tables:lib_skeleton_only/1 ).    % +Pack
 
 
 % fixme: user defined ones
@@ -232,7 +233,7 @@ Listens to =|debug(lib)|=.
 @version  1.5 2017/8/15
 @version  1.6 2018/3/18,  lib/2 suggests(), lib/2, promise() via hot-swapping, private packs
 @version  1.7 2018/4/5,   auto-install missing was broken
-@version  2.1 2018/11/23, cell based module compositionality, & operator
+@version  2.2 2018/11/23, cell based module compositionality, & operator (by default load everything)
 @see http://stoics.org.uk/~nicos/sware/lib
 
 */
@@ -377,7 +378,7 @@ true.
 ==
 
 @author nicos angelopoulos
-@version  2:1 2018/11/23
+@version  2:2 2018/11/25
 @tbd when predicate is missing from stoics_lib while loading from b_real, we get clash between main and lazy, error should be clearer (the pred select_all/3 was actually not defined in file either)
 
 */
@@ -451,17 +452,19 @@ lib( sys(SysLib), Cxt, _Opts ) :-
     lib_sys_lazy( WasLazy, SysLib, AbsLib, ', expected,', Cxt ).
 % testing: lib( & (bio_db(hs)) ). % which contains hgnc
 %  map_hgnc_hgnc_symb(H,'LMTK3').
-lib( &(Pack), Cxt, _Opts ) :-
+lib( @(Pack), Cxt, _Opts ) :-
     atomic( Pack ),
     absolute_file_name( pack(Pack), PackD, [file_type(directory),access(exist)] ),
     !,
-    directory_file_path( PackD, cell, CellsD ),
-    ( exists_directory(CellsD) -> 
-        directory_files( CellsD, AllOses ),
-        findall( Os, (member(Os,AllOses),file_name_extension(_,pl,Os)), Oses ),
-        debug( lib, 'Loading of all cells found pl files: ~w', [Oses] ),
-        Cxt:ensure_loaded( library(Pack) ),
-        findall( Os, ( member(Os,Oses), directory_file_path(CellsD,Os,CellF),
+    ( lib_tables:lib_skeleton_only(Pack) -> % fixme: shall we check it is the first one ?
+        true
+        ;
+        directory_file_path( PackD, cell, CellsD ),
+        ( exists_directory(CellsD) -> 
+            directory_files( CellsD, AllOses ),
+            findall( Os, (member(Os,AllOses),file_name_extension(_,pl,Os)), Oses ),
+            debug( lib, 'Loading of all cells found pl files: ~w', [Oses] ),
+            findall( Os, ( member(Os,Oses), directory_file_path(CellsD,Os,CellF),
                        %fixme: this: assumes module is same as pack ...
                        debug( lib, 'Loading of cells is loading: ~w', [CellF] ),
                        Pack:ensure_loaded(CellF),
@@ -471,15 +474,27 @@ lib( &(Pack), Cxt, _Opts ) :-
                      ),
                         _OsesDash 
                )
-        ; 
-        % fixme: print warning ?
-        debug( lib, 'Loading library only as cells cannot be located for: ~w', Pack ),
-        Cxt:ensure_loaded( library(Pack) )
+            ; 
+            % fixme: print warning ?
+            debug( lib, 'Loading directory only as cells cannot be located for: ~w', Pack )
+        )
     ).
+lib( &(Pack), Cxt, _Opts ) :-
+    atomic( Pack ),
+    % absolute_file_name( pack(Pack), PackD, [file_type(directory),access(exist)] ),
+    !,
+    asserta( lib_tables:lib_skeleton_only(Pack) ),
+    Cxt:use_module( library(Pack) ),
+    once( retract(lib_tables:lib_skeleton_only(Pack)) ).
+
 lib( &(CellIn), Cxt, Opts ) :-
     !,
     lib_cell( CellIn, Main, Cell, Opts ),
+    % Cxt:use_module( library(Main) ),
+    asserta( lib_tables:lib_skeleton_only(Main) ),
     Cxt:use_module( library(Main) ),
+    once( retract(lib_tables:lib_skeleton_only(Main)) ),
+
     atomic_list_concat( [Main,Cell], '/', Full ),
     Main:ensure_loaded( pack(Full) ),
     lib_export_cell( Main, Full, Cxt ).
@@ -806,6 +821,7 @@ lib_term_dir( DirIn, Top, Main, Dir ) :-
 lib_term_dir( DirIn, Top, _Main, _Dir ) :-
     throw( cannot_de_term_dir(DirIn,Top) ).
 
+% import all predicates that are defined by RelCell into module defined by pack Main.
 lib_export_cell( Main, RelCell, Cxt ) :-
     lib_pack_module( Main, Cxt, Mod ),
     lib_cell_module( Mod, RelCell, Cod ),
@@ -829,12 +845,23 @@ lib_pack_module( Main, Cxt, Mod ) :-
     directory_file_path( PrologMain, Main, MainF ),
     file_name_extension( MainF, pl, PlF ),
     exists_file( PlF ),
+    lib_pack_file_module( PlF, Main, Cxt, Mod ),
+    !.
+lib_pack_module( Main, Cxt, Mod ) :-
+    throw( cannot_locate_loaded_module_for(Main,Cxt,Mod) ).
+
+lib_pack_file_module( PlF, Main, Cxt, Mod ) :-
     predicate_property( Cxt:Pred, file(PlF) ),
     predicate_property( Cxt:Pred, imported_from(Mod) ),
     !,
     debug( lib, 'Commiting to mod: ~w, for main pack: ~w in context: ~w', [Mod,Main,Cxt] ).
-lib_pack_module( Main, Cxt, Mod ) :-
-    throw( cannot_locate_loaded_module_for(Main,Cxt,Mod) ).
+% fixme: we need this for ?- lib(bio_db).  use_module(library(bio_db)) works fine because of initialization delay ?
+lib_pack_file_module( PlF, _Main, _Cxt, Mod ) :-
+    exists_file( PlF ),
+    open( PlF, read, In ),
+    read( In, Term ),
+    close( In ),
+    Term = ( :- module(Mod,_) ).
 
 lib_cell_module( Mod, Rel, Cod ) :-
     absolute_file_name( pack(Rel), PlF, [file_type(prolog),access(read)] ),
