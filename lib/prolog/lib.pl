@@ -1,4 +1,5 @@
 :- module( lib, [
+					op( 200, fy, & ),
                     lib/1, lib/2   % +Repo[, +Opts]
         ] ).
 
@@ -91,7 +92,6 @@ Searching for that on doc server, should make it easy enough to get to it.
 In addition the library allows for loading with initializations turned off.
 
 A good example of how to create a lazy pack is
-pack(stoics_lib), http://stoics.org.uk/~nicos/sware/stoics_lib
 pack(stoics_lib), http://stoics.org.uk/~nicos/sware/stoics_lib
 v0.3. An example of how to lazy load things from stoics_lib
 is the latest pack(debug_call) http://stoics.org.uk/~nicos/sware/debug_call
@@ -801,6 +801,19 @@ lib_term_dir( DirIn, Top, Main, Dir ) :-
     lib_term_dir( SubIn, false, Main, Sub ),
     ( Top == true -> TNm = Main,
                      atomic_list_concat( [cell,Sub], '/', Dir )
+                   ; atomic_list_concat( [TNm,Sub], '/', Dir )
+    ).
+lib_term_dir( DirIn, Top, _Main, _Dir ) :-
+    throw( cannot_de_term_dir(DirIn,Top) ).
+
+lib_export_cell( Main, RelCell, Cxt ) :-
+    lib_pack_module( Main, Cxt, Mod ),
+    lib_cell_module( Mod, RelCell, Cod ),
+    findall( Pid, (
+                        ( 
+                        predicate_property(Mod:Pid,imported_from(Cod))
+                        ;
+                        ( predicate_property(Cod:Pid,imported_from(Common)),
                           predicate_property(Mod:Pid,imported_from(Common))
                         )
                         ),
