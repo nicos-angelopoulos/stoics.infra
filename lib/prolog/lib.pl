@@ -1,5 +1,5 @@
 :- module( lib, [
-					op( 200, fy, & ),
+                    op( 200, fy, & ),
                     lib/1, lib/2   % +Repo[, +Opts]
         ] ).
 
@@ -114,7 +114,7 @@ too specific to be of outside interest.
 ==
 kv_decompose( [], [], [] ).
 kv_decompose( [K-V|T], [K|Tk], [V|Tv] ) :-
-	kv_decompose( T, Tk, Tv ).
+    kv_decompose( T, Tk, Tv ).
 ==
 
 Lib code is considered as coming from the special pack _user_.
@@ -637,7 +637,7 @@ lib_repo_lazy_assert( Repo ) :-
 lib_missing( false, Pack, Cxt, _Args, _Load ) :-
     debug( lib, 'Instructed to skip contacting server for:~w and context:~w', [Pack,Cxt] ).
 lib_missing( true, Pack, Cxt, Args, Load ) :-
-	prolog_pack:confirm( contact_server(Pack), yes, [] ),
+    prolog_pack:confirm( contact_server(Pack), yes, [] ),
     G = query_pack_server(search(Pack), Result, [] ),
     catch( prolog_pack:G, _Ball, fail ),
     Result \== false,
@@ -645,13 +645,13 @@ lib_missing( true, Pack, Cxt, Args, Load ) :-
     append( Args, LibDefs, Opts ),
     memberchk( mode(Mode), Opts ),
     catch( prolog_pack:pack_list(Pack), _, fail ),
-	prolog_pack:confirm( pack_on_server(Mode,Pack), yes, [] ),
-	!,
-	pack_install( Pack ),
+    prolog_pack:confirm( pack_on_server(Mode,Pack), yes, [] ),
+    !,
+    pack_install( Pack ),
     lib_missing_load( Load, Cxt, Pack ).
 
 lib_missing_load( true, Cxt, Pack ) :-
-	Cxt:use_module( library(Pack) ).
+    Cxt:use_module( library(Pack) ).
 lib_missing_load( false, _Cxt, _Pack ).
 
 lib_import_existing( Repo, Pn/Pa, Cxt ) :-
