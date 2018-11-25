@@ -2,6 +2,7 @@
 --------------------
 
 1.1
+     18.11.23   IFACE:  use portray_clauses/3 with defaults [quoted(false)]
      18.10.17   FIXED:  calls to mod_goal from map_list_options/4 follow the new conventions
                 DOC:    added backward incompatibility note
      18.10.13   REMOVE: mentions of option_append/3 and options/2 in mod_goal/4
