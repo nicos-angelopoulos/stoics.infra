@@ -140,8 +140,8 @@ os_dir_obj( _Os, Rel, Entry, OsDir, _Dir, Abs, Stem, _Dots, _Sub ) :-    % first
 	    os_cast( Entry, OsDir )
         ;
         ( Stem == abs ->
-            os_path( Abs, Entry, Path ),
-            os_cast( Path, OsDir )
+            % os_path( Abs, Entry, Path ),
+            os_cast( Abs, OsDir )
             ; % defaulty for all other stem values
             % os_path( Rel, Entry, Path )
             os_cast( Rel, OsDir )
