@@ -48,9 +48,15 @@ lib_src_sub_dir( 'src/auxil' ).
 /** <module> Predicate based code development.
 
  This pack implements methods for loading code into SWI Prolog programs.
+
+---+ Main innovations
+
+---+++ Lazy loading
+
  One of the major innovations the library introduces, is that of progressive, lazy loading of packs.
  That is, if only a specific predicate is (lazily) required
  from a =|pack(lib)-aware|= pack, only that and its dependent code will be loaded.
+
 
 That is, your code can load things like
 ==
@@ -65,7 +71,6 @@ If later on your code decides to do a
 ==
 The remainder of the library loads up quietly and politely. 
 
-
 Please note that this is, at top level at least, orthogonal to any other loading. 
 
 You can still do 
@@ -74,14 +79,90 @@ You can still do
 ==
 and get the whole thing into memory.
 
+A good example of how to create a lazy pack is
+pack(stoics_lib), http://stoics.org.uk/~nicos/sware/stoics_lib
+v0.3. An example of how to lazy load things from stoics_lib
+is the latest pack(debug_call) http://stoics.org.uk/~nicos/sware/debug_call
+v0.4.
+
+---+++ Cells
+As of version 2.0 the pack supports hierarchical module de-composition.
+
+A cell compose pack, is build by a skeleton module that all cells depend on
+and then a number of independent cells that can be loaded independently as well as in combination.
+
+There are at least 2 reasons why one would like decomposable modules: (a) resources, and (b) clarity of interface.
+Only loading parts of a module can result in smaller memory consumption as irrelevant bits are not loaded.
+Also, if modules have long lists of defined predicates, like bio_db v2.0, then loading only conceptually 
+clear sub-set of a module allows programmer to focus on the predicates that are relevant to a specific task.
+
+pack(bio_db) was the driving force for developing cell based packs and it provides natural cell units.
+At the top level there are two cells, _hs_ for human biological data and _mouse_ for mouse data.
+Each cell is further broken to a number of cells each corresponding to the source database where
+data is converted from. For instance _hs_ contains sub-cells: ense,  gont,  hgnc,  ncbi, pros, strg and unip.
+
+See pack(bio_db/cell/hs.pl) and pack(bio_db/cell/mouse.pl).
+
+Cell based pack can still be viewed and loaded as normal module files. For instance,
+
+==
+?- use_module(library(bio_db)).
+==
+Loads the whole interface (all cells), without the user needing to be aware of anything.
+The only difference is that the user will not be able to see all the module predicates
+at the first line of file pack(bio_db/prolog/bio_db.pl)).
+
+==
+?- lib(bio_db).
+==
+Also loads everything (although you will get importing warnings).
+
+==
+?- lib(& bio_db).
+==
+Loads the skeleton of the module (cells usually laod the module dependencies like this).
+
+==
+?- lib(& bio_db(hs)).
+==
+Loads _hs_ cell, which in this case comprises of number of sub-cells.
+
+==
+?- lib(& bio_db(hs)).
+==
+Loads _hs_ cell (and skeleton). _hs_ comprises of a number of sub-cells.
+
+==
+?- lib(& bio_db(hs(hgnc))).
+==
+Loads the hs/hgnc primary cell (and the skeleton).
+
+==
+?- use_module( pack('bio_db/cell/hs/hgnc') ).
+==
+
+==
+?- lib(@ bio_db)
+==
+Loads all sub-cells of a library.
+
+==
+?- load_files( library(bio_db) ).
+
+Will load everything even if cell based loading ahs taken place. (use_module(library(bio_db)) would work.)
+
+---+ Other features
+
+---+++ General points
+
 Pack(lib) plays reasonably well with the documentation server. Bar, the normal
 limitations of the server.  By convention and to help locating the module docs,
 lazy packs should define (Pack)/0 predicate in same file as the mods docs.
 Searching for that on doc server, should make it easy enough to get to it.
 
  Although this library, _pack(lib)_, contains a number of involved features
- it can also be used as a straight forward shorthand, 
- replacement for use_module(library(Lib)).
+it can also be used as a straight forward shorthand, 
+replacement for use_module(library(Lib)).
 
  ==
  ?- lib(Atomic).
@@ -92,15 +173,11 @@ Searching for that on doc server, should make it easy enough to get to it.
 
 In addition the library allows for loading with initializations turned off.
 
-A good example of how to create a lazy pack is
-pack(stoics_lib), http://stoics.org.uk/~nicos/sware/stoics_lib
-v0.3. An example of how to lazy load things from stoics_lib
-is the latest pack(debug_call) http://stoics.org.uk/~nicos/sware/debug_call
-v0.4.
 
----++ Repositories
 
-Code is managed in _repositories_ (also _repo_) that can be either packs or libs. 
+---+++ Repositories
+
+Code is managed in _repositories_ (also _repo_) that can be either packs or libs (ie local directories). 
 
 A _pack_ is a unit of programs as managed by built-in SWI package manager 
 (=|library(prolog_pack)|=). A _lib_ (_library_) is a directory containing a
@@ -120,7 +197,7 @@ kv_decompose( [K-V|T], [K|Tk], [V|Tv] ) :-
 
 Lib code is considered as coming from the special pack _user_.
 
----++ Code-tables
+---+++ Code-tables
 
 Associated with each repository are 2 types of code-tables: (code-)_indices_ and (file-)_locators_.
 
@@ -154,7 +231,7 @@ lib_tables:lib_loaded_homonyms(Repo,Stem,File)
 When loading a repository the user can choose whether to load
 indices and locators independently.
 
----++ Loading source code
+---+++ Loading source code
 
 During the process of loading code into memory, lib/1 and /2 directives are used
 to locate code to which the specific code depends. 
@@ -179,7 +256,7 @@ attaches the indices but not the file locators.
 Since all code from directory-libs load to a single module (_user_), loading 
 code has either access to all such code, or to none.
 
----++ Conventions
+---+++ Conventions
 
 Packs are expected to have matching top directories and main files. The main file
 of a pack should be within top directory _prolog/_. (The directory convention 
@@ -193,7 +270,7 @@ bims/prolog/bims.pl
 For packs the main code directory is _src/_. Additionally _src/lib_ and _src/auxil_
 are treated as code directories.
 
----++ Internals
+---+++ Internals
 
 Variables
   * Repo
@@ -219,7 +296,7 @@ Predicate names
   * index
   * file
 
----++ Pack info
+---+ Pack info
 
 This is a complete re-write of pack(requires) v1.1.
 
@@ -233,7 +310,7 @@ Listens to =|debug(lib)|=.
 @version  1.5 2017/8/15
 @version  1.6 2018/3/18,  lib/2 suggests(), lib/2, promise() via hot-swapping, private packs
 @version  1.7 2018/4/5,   auto-install missing was broken
-@version  2.2 2018/11/23, cell based module compositionality, & operator (by default load everything)
+@version  2.2 2018/11/26, cell based module compositionality, & operator (by default load everything)
 @see http://stoics.org.uk/~nicos/sware/lib
 
 */
@@ -373,12 +450,12 @@ The above two directives can be shortened to:
 ==
 
 ==
-?- lib( version(2:1:0, date(2018.11,23)) ).
+?- lib( version(2:2:0, date(2018.11,26)) ).
 true.
 ==
 
 @author nicos angelopoulos
-@version  2:2 2018/11/25
+@version  2:2 2018/11/26
 @tbd when predicate is missing from stoics_lib while loading from b_real, we get clash between main and lazy, error should be clearer (the pred select_all/3 was actually not defined in file either)
 
 */
@@ -422,7 +499,7 @@ lib( version(V,D), _, _Args ) :-
     % V = 1:2, D = date(2017,3,11).
     % V = 1:4:0, D = date(2017,8,8).
     % V = 1:7:0, D = date(2018,4,5).
-    V = 2:0:0, D = date(2018,11,22).
+    V = 2:2:0, D = date(2018,11,26).
 lib( suggests(Lib), _, _Args ) :- 
     !,
     lib_suggests( Lib ).
