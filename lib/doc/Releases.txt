@@ -3,6 +3,9 @@
 
 Tbd: document @, & (remove fixme: code that might have been needed due to MAIN instead of PACK variable bug.).
 
+2.3
+     18.11.26  DOC:     delete misleading clarification 
+
 2.2         @  18.11.26
      18.11.26  DOC:     of new cells feature
      18.11.25  LOAD:    harmonize with library(Pack). now celled files load everything in that scenario

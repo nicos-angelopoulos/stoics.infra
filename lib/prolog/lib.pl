@@ -115,7 +115,7 @@ at the first line of file pack(bio_db/prolog/bio_db.pl)).
 ==
 ?- lib(bio_db).
 ==
-Also loads everything (although you will get importing warnings).
+Also loads everything.
 
 ==
 ?- lib(& bio_db).

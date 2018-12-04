@@ -82,6 +82,7 @@
             % strings
               letter_strings/3,        % +Start, -N, -Letts 
             % term
+              arg_add/4,               % +N, +Term, +Arg, -New
               arg/4, arg/5,            % ?N, +TermIn, [+NewNth,] ?Nth, -TermOut
               arity/2,arity/3,         % ?Term[, ?Name], ?Arity
               functor_term/2,          % ?Pid, ?Term
@@ -201,6 +202,7 @@
 :- lib(n_breaks/4).
 :- lib(min_max/3).
 :- lib(nth1/5).
+:- lib(add_arg/4).
 :- lib(arg/4).
 :- lib(arg/5).
 :- lib(maparg/2).

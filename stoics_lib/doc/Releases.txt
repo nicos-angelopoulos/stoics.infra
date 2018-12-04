@@ -2,6 +2,7 @@
 --------------------
 
 1.1
+     18.12.04   PRED:   moved arg_add/4 into stoics_lib and allow 1st arg expression
      18.11.23   IFACE:  use portray_clauses/3 with defaults [quoted(false)]
      18.10.17   FIXED:  calls to mod_goal from map_list_options/4 follow the new conventions
                 DOC:    added backward incompatibility note

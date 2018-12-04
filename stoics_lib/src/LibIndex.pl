@@ -1,3 +1,4 @@
+lib_index(arg_add, 4, any, user, 'term/arg_add').
 lib_index(arg, 4, any, user, 'term/arg').
 lib_index(arg, 5, any, user, 'term/arg').
 lib_index(arity, 3, any, user, 'term/arity').
