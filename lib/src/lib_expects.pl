@@ -30,8 +30,8 @@
 % @version  0.1 2014/7/25
 %
 lib_expects( PspecS ) :-
-	( is_list(PspecS) -> Pspecs = PspecS; Pspecs = [PspecS] ),
-	maplist( lib_expects_spec, Pspecs ).
+    ( is_list(PspecS) -> Pspecs = PspecS; Pspecs = [PspecS] ),
+    maplist( lib_expects_spec, Pspecs ).
 
 %% lib_expects( +Expects, +Mess ).
 %% lib_expects( +Expects, +Mess, +Call ).
@@ -58,50 +58,50 @@ lib_expects( PspecS ) :-
 % @version  0.1 2014/1/8
 %
 lib_expects( Term, Mess ) :-
-	lib_expects( Term, Mess, true ).
+    lib_expects( Term, Mess, true ).
 
 lib_expects( lib(Lib), Mess, Call ) :-
-	!,
-	Excp = error(existence_error(source_sink,library(Lib)),_), 
-	Handler = lib_expects_library_exception_handler(Mess,Lib,Call),
-	prolog_load_context( module, Mod ),
-	catch( use_module(Mod:library(Lib)), Excp, Handler ).
+    !,
+    Excp = error(existence_error(source_sink,library(Lib)),_), 
+    Handler = lib_expects_library_exception_handler(Mess,Lib,Call),
+    prolog_load_context( module, Mod ),
+    catch( use_module(Mod:library(Lib)), Excp, Handler ).
 
 lib_expects_library_exception_handler( Mess, Lib, Call ) :-
-	current_prolog_flag( lib_expects_report, true ),
-	Report = '~w, functionality affected by missing library ~w.',
-	lib_message_report( Report, [Mess, Lib], warning ),
-	call( Call ).
+    current_prolog_flag( lib_expects_report, true ),
+    Report = '~w, functionality affected by missing library ~w.',
+    lib_message_report( Report, [Mess, Lib], warning ),
+    call( Call ).
 lib_expects_library_exception_handler( Excp, _Mess, _Lib ) :-
-	write( other(Excp) ), nl,
-	throw( Excp ).
+    write( other(Excp) ), nl,
+    throw( Excp ).
 
 /*
 lib_expects_spec( Pname/Arity ) :-
-	functor( Head, Pname, Arity ),
-	current_predicate( Head ),
-	!.
-	*/
+    functor( Head, Pname, Arity ),
+    current_predicate( Head ),
+    !.
+    */
 lib_expects_spec( Pname/0 ) :-
-	lib_expects_module( Mod ),
-	predicate_property( Mod:Pname, _ ),
-	!.
+    lib_expects_module( Mod ),
+    predicate_property( Mod:Pname, _ ),
+    !.
 
 lib_expects_spec( Pname/Arity ) :-
-	% current_predicate( Indi ), % SWI doesn't show built ins here
-	functor( Head, Pname, Arity ),
-	lib_expects_module( Mod ),
-	predicate_property( Mod:Head, _ ),
-	!.
-	/*
+    % current_predicate( Indi ), % SWI doesn't show built ins here
+    functor( Head, Pname, Arity ),
+    lib_expects_module( Mod ),
+    predicate_property( Mod:Head, _ ),
+    !.
+    /*
 lib_expects_spec( Indi ) :-
-	user:current_predicate( Indi ),
-	!.
-	*/
+    user:current_predicate( Indi ),
+    !.
+    */
 lib_expects_spec( Indi ) :-
-	Mess = 'Expected predicate ~w, not in memory',
-	lib_message_report( Mess, [Indi], warning ).
+    Mess = 'Expected predicate ~w, not in memory',
+    lib_message_report( Mess, [Indi], warning ).
 
 lib_expects_module( Mod ) :-
-	once( requires_module_context(Mod) ).
+    once( requires_module_context(Mod) ).
 lib_expects_module( user ).
