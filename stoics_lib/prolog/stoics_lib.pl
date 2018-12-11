@@ -202,7 +202,7 @@
 :- lib(n_breaks/4).
 :- lib(min_max/3).
 :- lib(nth1/5).
-:- lib(add_arg/4).
+:- lib(arg_add/4).
 :- lib(arg/4).
 :- lib(arg/5).
 :- lib(maparg/2).
