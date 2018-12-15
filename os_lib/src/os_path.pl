@@ -82,6 +82,10 @@ Abc = "what/if/foo.txt".
 @version  0.3.1 2016/1/23
 */
 os_path( Dir, File, Path ) :-
+    File == '.', 
+    !,
+    Path = Dir.
+os_path( Dir, File, Path ) :-
 	ground( Path ),
 	% var( Dir ), 
 	% var( File ),
