@@ -25,7 +25,7 @@ This is a stoics.infrastructure pack that
      through simple options
 
 Version 0.3 introduced type errors via type/3 on top of must_be/2.<br>
-Version 2.0 has been re-written to be Options centric, fully decoupled  and introduced of_same_length/3.
+Version 2.0 has been re-written to be Options centric, fully decoupled and introduced of_same_length/3.
 
 The pack manage mid-level error handling in a uniform way so other packs can use SWI's infracture
 in a simple way. The user only needs to define the print messages (if the pre-canned ones are not suitable)
@@ -776,10 +776,11 @@ Opts are passed to throw/2, the only local one is:
      * warn_lists(Tkn)      
         prints warning that includes lengths (?)
   * token1(Tkn1=1)
-     name of List1 (used in error throwing to id the list)
-  * token1(Tkn1=n)
-     name of List2 (used in errors; 
-     in Lists scenario it will be the first list length-mismatch the first list)
+      name of List1 
+      (used in error throwing to id the list)
+  * token2(Tkn2=n)
+      name of List2 (used in error throwing) 
+      when first argument is Lists, Tkn2 will be the index position of the first list length-mismatch the head list
 
 ==
 ?- of_same_length( [a,b,c], [1,2,3] ).
