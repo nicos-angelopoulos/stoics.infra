@@ -75,13 +75,13 @@
               on_fail/2, on_fail/3,    % +Goal, +Call, +Opts
               on_call/4,               % +OnB+ +Goal, +In, -Out
               which/3,                 % Goal, +Term, -Indices
-            % number
+            % number/
               int_trailer/2,           % +Int, -Trailer
               compare_arithmetic/3,    % -Op, +X, +Y
               n_digits_min/3,          % +N, +Number, -Padded 
-            % strings
+            % strings/
               letter_strings/3,        % +Start, -N, -Letts 
-            % term
+            % term/
               arg_add/4,               % +N, +Term, +Arg, -New
               arg/4, arg/5,            % ?N, +TermIn, [+NewNth,] ?Nth, -TermOut
               arity/2,arity/3,         % ?Term[, ?Name], ?Arity

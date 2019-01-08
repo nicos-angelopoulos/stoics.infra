@@ -2,6 +2,8 @@
 --------------------
 
 1.1
+     19.01.08   DOC:    uniformise section names in interface
+                CHANGE: replace =.. with compound/3
      18.12.11   FIXED:  add_arg/4 -> ard_add/4 in prolog/stoics_lib !
      18.12.04   PRED:   moved arg_add/4 into stoics_lib and allow 1st arg expression
      18.11.23   IFACE:  use portray_clauses/3 with defaults [quoted(false)]
