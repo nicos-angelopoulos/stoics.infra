@@ -16,11 +16,9 @@ os_postfix_defaults( Args, Defs ) :-
 %% os_postfix( +Postfix, ?Fname, ?Posted, +Opts ).
 %% os_postfix( +Postfix, +Opts, ?Fname, ?Posted ).
 %
-% Append a postfix to a filename without touching its file type extension.
+% Append a Postfix atom (or list of postfix atoms) to a filename without touching its file type extension.
 % Also works for removing a postfix.
-% If Postfix is compound of arity/1 is taken to be an aliased path, 
-% in which case the innermost path is extended.
-% Postfix is mapped to an atom before concatenated.
+% If Postfix is compound of arity/1 is taken to be an aliased path, in which case the innermost path is extended.
 %
 % Second argument is allowed to be the options (recognised as such when input is a list)
 % so that it can be used in meta-calls.
@@ -65,8 +63,6 @@ os_postfix_defaults( Args, Defs ) :-
 % T = graph_v1_out.csv
 % ?- maplist( os_postfix(v1,[sep(-)]),[a.csv,b.csv], AB ).
 % AB = ['a-v1.csv', 'b-v1.csv'].
-% ?- os_postfix( _, t(x.txt), T, postfix(abc) ).
-% ERROR: os:os_name/2: OS entity: t(x.txt), looks like aliased but alias does not exist.
 % ?- os_postfix( _, library(x.txt), T, postfix(abc) ).
 % T = library(x_abc.txt).
 % ?- os_postfix( _, "x.txt", T, postfix(abc) ).
@@ -75,6 +71,8 @@ os_postfix_defaults( Args, Defs ) :-
 % Psf = def.
 % ?- os_postfix( bit, by.csv, ByBit, with_ext(txt) ).
 % ByBit = by_bit.txt.
+% ?- os_postfix( [by,bit], bit.csv, ByBit, with_ext(txt) ).
+% ByBit = bit_by_bit.txt.
 %==
 %
 % @author nicos angelopoulos
@@ -101,6 +99,9 @@ os_postfix_1( Psfx, Fname, Posted, Opts ) :-
     !,
     os_name( Fname, Ftype ),
     os_postfix( Ftype, Psfx, Fname, Posted, Opts ).
+    % os_cast( Fname, +(FnAtm) ),
+    % os_postfix_atom( FnAtm, Psfx, PsfFAtm, Opts ),
+    % os_cast( Ftype, PsfFAtm, Posted ).
 os_postfix_1( Psfx, Fname, Posted, Opts ) :-
     ground( Posted ),
     !,
@@ -117,14 +118,14 @@ os_postfix_1( Psfx, Fname, Posted, Opts ) :-
     os_dir_stem_ext( Dir, Fstem, Ext, Fname ).
 
 os_postfix( atom, Psfx, File, Posted, Opts ) :-
-    os_atom_postfix( File, Psfx, Pile, Opts ),
+    os_postfix_atom( File, Psfx, Pile, Opts ),
     os_cast( atom, Pile, Posted ).
 os_postfix( string, Psfx, File, Posted, Opts ) :-
-    os_string_postfix( File, Psfx, Pile, Opts ),
+    os_postfix_string( File, Psfx, Pile, Opts ),
     os_cast( string, Pile, Posted ).
 os_postfix( slash, Psfx, Fname, Posted, Opts ) :-
     Fname = Dir/File,
-    os_atom_postfix( File, Psfx, Pile, Opts ),
+    os_postfix_atom( File, Psfx, Pile, Opts ),
     os_cast( slash, Dir/Pile, Posted ).
 os_postfix( alias, Psfx, Fname, Posted, Opts ) :-
     Fname =.. [Alias,AArg],
@@ -146,36 +147,37 @@ os_postfix_reorder( Psfx, Fname, Posted, Args ) :-
     options_append( os_postfix, Args, Opts ),
     os_postfix_1( Psfx, Fname, Posted, Opts ).
 
-os_atom_postfix( File, Postfix, Pile, Opts ) :-
+os_postfix_atom( File, PostfixPrv, Pile, Opts ) :-
     % fixme: allow all_dots(true) as an option that jumps all extensions ?
     options( ext(Ext), Opts ),
     os_ext( Ext, Stem, File ),
      % file_name_extension( Stem, Ext, File ),
     options( [sep(Sep),replace(Rep)], Opts ),
+    ( is_list(PostfixPrv) -> atomic_list_concat(PostfixPrv,Sep,Postfix) ; PostfixPrv = Postfix ),
     os_postfix_stem( Stem, Sep, Rep, Prefix, Suffix, Opts ),
     os_postfix_ground( Postfix, Opts ),
     at_con( [Prefix,Postfix,Suffix], Sep, PoStem ),
     file_name_extension( PoStem, Ext, Xile ),
     os_postfix_with_ext( Xile, Pile, Opts ).
 
-os_string_postfix( File, Postfix, Pile, Opts ) :-
+os_postfix_string( File, PostfixPrv, Pile, Opts ) :-
     options( ext(Ext), Opts ),
     os_ext( Ext, Stem, File ),
     options( [sep(Sep),replace(Rep)], Opts ),
+    ( is_list(PostfixPrv) -> atomic_list_concat(PostfixPrv,Sep,Postfix) ; PostfixPrv = Postfix ),
     os_postfix_stem( Stem, Sep, Rep, Prefix, Suffix, Opts ),
     os_postfix_ground( Postfix, Opts ),
     at_con( [Prefix,Postfix,Suffix], Sep, PoStem ),
     os_ext( Ext, PoStem, Pile ).
 
-
 os_postfix_with_ext( Xile, Pile, Opts ) :-
     options( with_ext(WithExt), Opts ),
     holds( ground(WithExt), WithExtB ),
-    os_atom_postfix_ext( WithExtB, WithExt, Xile, Pile ).
+    os_postfix_atom_ext( WithExtB, WithExt, Xile, Pile ).
 
-os_atom_postfix_ext( true, WithExt, Xile, Pile ) :-
+os_postfix_atom_ext( true, WithExt, Xile, Pile ) :-
     os_ext( _, WithExt, Xile, Pile ).
-os_atom_postfix_ext( false, _WithExt, Pile, Pile ).
+os_postfix_atom_ext( false, _WithExt, Pile, Pile ).
 
 os_postfix_stem( Stem, Sep, Rep, Prefix, Suffix, Opts ) :-
     atomic_list_concat( StemParts, Sep, Stem ),

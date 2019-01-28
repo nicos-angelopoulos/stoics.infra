@@ -141,9 +141,9 @@ os_ext_file( atom, Stem, Ext, Os, _Opts ) :-  % os_ext( X, S, abc.def.ghi ).
 	file_name_extension( AStem, AExt, Os ),
     maplist( os_cast(atom), [AStem,AExt], [Stem,Ext] ).
 %
-os_ext_file( string, Stem, Ext, Os, _Opts ) :-
+os_ext_file( string, Stem, Ext, Os, Opts ) :-
 	atom_string( OsAtom, Os ),
-	os_ext_file( atom, StemAtom, ExtAtom, OsAtom ),
+	os_ext_file( atom, StemAtom, ExtAtom, OsAtom, Opts ),
     maplist( os_cast(string), [StemAtom,ExtAtom], [Stem,Ext] ).
 os_ext_file( slash, Stem, Ext, Path, _Opts ) :-
 	Path = Dir/File,

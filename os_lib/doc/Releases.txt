@@ -2,6 +2,9 @@
 --------------------
 
 1.4  
+     19.01.28   IFACE:    postfix can now be a list of atoms
+                DOC:      tiny changes to the module declarations layout and comments
+                FIXED:    os_ext/3 with 3rd argument a ground string
      18.12.15   CHANGE:   os_path( Dir, '.', Dir ). is a special case now
      18.11.26   FIXED:    option value stem=abs was adding entry twice
      18.11.22   FIXED:    os_dir( Os, [sub(true),solutions(findall)] ).

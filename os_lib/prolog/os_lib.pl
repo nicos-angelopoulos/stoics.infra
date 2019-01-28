@@ -7,9 +7,9 @@
               os_dir_stem_ext/2,         % -Os, +Opts
               os_dir_stem_ext/4,         % ?Dir, ?Stem, ?Ext, ?Os
               os_stem/3,                 % ?Stem, -Os, +Opts
-              os_postfix/2,              % -Psfx, +Posted
-              os_postfix/3,              % +Psfx, ?Fname, ?Posted
-              os_postfix/4,              % +Psfx, ?Fname, ?Posted, +Opts
+              os_postfix/2,              % -PsfxS, +Posted
+              os_postfix/3,              % +PsfxS, ?Fname, ?Posted
+              os_postfix/4,              % +PsfxS, ?Fname, ?Posted, +Opts
               os_abs/2, os_abs/3,        % +Os, -Abs[, +Opts]
               os_path/3,                 % +-Dir, +-File, -+Path
               os_slashify/2,             % +-Path, -+Slashed
@@ -38,19 +38,22 @@
               os_sel/4,                  % +Oses, +Pattern, -Selected, +Opts
               os_term/2,                 % +-Atom, -+SlashTerm
               os_name/2,                 % +Os, -Type
-              % os_type_entity/3,          % +Os, +Type, -Typed
+
+              % types and casting
+              % os_type_entity/3,         % +Os, +Type, -Typed
               os_cast/2,                 % +Os, -Typed
               os_cast/3,                 % +Type, +Os, -Typed
               os_tmp_dir/1,              % -Os
               os_version/2,              % -Vers, -Date
 
               % logical
-              os_exists/1,os_exists/2,   % +Os[, +Opts]
-              os_file/1,os_file/2,       % ?Os[,+Opts]
-              os_files/1,os_files/2,     % -Os[,+Opts]
-              os_dir/1,os_dir/2,         % ?Os[, +Opts]
-              os_dirs/1,os_dirs/2,       % ?Os[, +Opts]
+              os_exists/1, os_exists/2,  % +Os[, +Opts]
+              os_file/1, os_file/2,      % ?Os[, +Opts]
+              os_files/1, os_files/2,    % -Os[, +Opts]
+              os_dir/1, os_dir/2,        % ?Os[, +Opts]
+              os_dirs/1, os_dirs/2,      % ?Os[, +Opts]
 
+              % operators
               op( 400, fx, / )
             ] ).
 
