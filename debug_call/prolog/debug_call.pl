@@ -16,6 +16,12 @@
             debugging_topic/1
        ] ).
 
+:- multifile(user:message_property/2).
+:- dynamic(debug_call_message_property/2).
+
+user:message_property( Dbg, Property ) :-
+    debug_call_message_property( Dbg, Property ).
+
 /** <module> Debugging with calls.
 
 Avoids running goals to produce output that is only
@@ -479,15 +485,15 @@ debug_consec_topic( Topic, Clrs, Mess, Args ) :-
 debug_consec_color( Topic, Clr, Mess, Args ) :-
     user:message_property( debug(_), color(Attrs) ),
     !,
-    retractall( user:message_property(debug(_),color(_)) ),
-    assert( user:message_property(debug(_),color(fg(Clr))) ),
+    retractall( debug_call_message_property(debug(_),color(_)) ),
+    assert( debug_call_message_property(debug(_),color(fg(Clr))) ),
     debug_message( Topic, Mess, Args ),
-    retractall( user:message_property(debug(_),color(_)) ),
-    assert( user:message_property(debug(_),color(Attrs)) ).
+    retractall( debug_call_message_property(debug(_),color(_)) ),
+    assert( debug_call_message_property(debug(_),color(Attrs)) ).
 debug_consec_color( Topic, Clr, Mess, Args ) :-
-    assert( user:message_property(debug(_),color(fg(Clr))) ),
+    assert( debug_call_message_property(debug(_),color(fg(Clr))) ),
     debug_message( Topic, Mess, Args ),
-    retractall( user:message_property(debug(_),color(_)) ).
+    retractall( debug_call_message_property(debug(_),color(_)) ).
 
 debug_call_topic( length, Pfx, NamesPrv/ListsPrv, Topic ) :-
                             % add version without names

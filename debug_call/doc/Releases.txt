@@ -6,6 +6,7 @@ TBD
 ---
 
 1.2
+     19.02.08   UPDATE:   introduced new dynamic hook to shield user:message_property/2 from asserts/retracts
      18.11.07   IFACE:    debug_consec/3,4 was not in module interface...
      18.09.11   IFACE:    call length now allows compound list names
 
