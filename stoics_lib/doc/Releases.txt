@@ -2,6 +2,7 @@
 --------------------
 
 1.1
+     19.02.19   FIXED:  updated new pack_errors format
      19.01.08   DOC:    uniformise section names in interface
                 CHANGE: replace =.. with compound/3
      18.12.11   FIXED:  add_arg/4 -> ard_add/4 in prolog/stoics_lib !
