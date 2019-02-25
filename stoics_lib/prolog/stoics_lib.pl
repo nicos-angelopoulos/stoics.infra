@@ -58,6 +58,7 @@
               select_first/3,          % +List, +Elem, -Rem
               skim/3,                  % +Nested, -Scum, -Remains
             % meta/
+              call_morph/4,            % +Term, +Input, -Morphed, +Opts
               current_call/1,          % +Goal
               current_call/2,          % +Goal, +Else
               goal/4,                  % +Partial, +ArgS, +Mod, -Goal
@@ -68,6 +69,8 @@
               known/3,                 % +Goal[, +Tkn], +Cat]
               maparg/2,maparg/3,       % +Pname, ?Term1[, ?Term2]
               maparg/4,                % +PName, +Npos ?Term1, ?Term2
+              map_list_options/3,      % +Goal, +InList, +Opts
+              map_list_options/4,      % +Goal, +/-InList, -/+OutList, +Opts
               map_succ_list/3,         %  
               map_succ_list/4,         % +Goal, ?InList, ?OutList[, -Rejects]
               mod_goal/2,              % +Goal, -Moal
@@ -169,6 +172,7 @@
 :- lib(known/1).
 :- lib(known/2).
 :- lib(known/3).
+:- lib(map_list_opts/4).
 :- lib(map_succ_list/4).
 :- lib(mod_goal/2).
 :- lib(mod_goal/3).
@@ -218,5 +222,6 @@
 :- lib(term_type/2).
 :- lib(en_append/3).
 :- lib(url_file/2).
+:- lib(call_morph/4).
 
 :- lib( end(stoics_lib) ).

@@ -16,7 +16,7 @@ Opts
   * override(OverR=false)
     what to do when constructing over a Goal that already has a module prepention
     * false
-      ignores the new Mod,
+      ignores the new Mod
     * true
       replaces Goal's prepention with Mod 
     * error

@@ -9,6 +9,7 @@ lib_index(atom_replace, 4, any, user, 'atom/atom_replace').
 lib_index(atom_sub, 2, any, user, 'atom/atom_sub').
 lib_index(break_on_list, 4, any, user, 'list/break_on_list').
 lib_index(break_nth, 4, any, user, 'list/break_nth').
+lib_index(call_morph, 4, any, user, 'meta/call_morph').
 lib_index(codes_n_digits, 3, any, user, 'codes/codes_n_digits').
 lib_index(compound, 3, any, user, 'term/compound').
 lib_index(compare, 4, any, user, 'term/compare').

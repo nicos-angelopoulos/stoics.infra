@@ -2,6 +2,8 @@
 --------------------
 
 1.1
+     19.02.25   FIXED:  added map_list_options/3,4 to interface
+     19.02.22   IFACE:  call_morph/4, for option transformations
      19.02.19   FIXED:  updated new pack_errors format
      19.01.08   DOC:    uniformise section names in interface
                 CHANGE: replace =.. with compound/3
