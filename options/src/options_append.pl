@@ -6,7 +6,7 @@ options_append_known_process_option( debug ).
 /** options_append( +PredName, +OptS, -All ).
     options_append( +PredName, +OptS, -All, +OAopts ).
 
-Look for PredName_defaults/1 and if that exists append its argumetn to the end of OptS to get All.<br>
+Look for PredName_defaults/1 and if that exists append its argument to the end of OptS to get All.<br>
 OptS is casted to a list before the append, so single terms are allowed as options.<br>
 In addition, if file user_profile('.pl'/Pname) exists, its terms are appended between OptS and
 the argument of PredName_defaults/1.<br> 
