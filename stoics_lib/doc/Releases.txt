@@ -3,6 +3,7 @@
 
 1.1
      19.02.25   FIXED:  added map_list_options/3,4 to interface
+                OPTIONS: added error on failure, add_options(AddOpts), on_fail(OnFail), and moved call options to option call_options(Copts)
      19.02.22   IFACE:  call_morph/4, for option transformations
      19.02.19   FIXED:  updated new pack_errors format
      19.01.08   DOC:    uniformise section names in interface

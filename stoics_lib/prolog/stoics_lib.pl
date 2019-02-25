@@ -172,7 +172,7 @@
 :- lib(known/1).
 :- lib(known/2).
 :- lib(known/3).
-:- lib(map_list_opts/4).
+:- lib(map_list_options/4).
 :- lib(map_succ_list/4).
 :- lib(mod_goal/2).
 :- lib(mod_goal/3).
