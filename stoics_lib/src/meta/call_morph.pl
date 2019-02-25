@@ -3,13 +3,11 @@
 
 /**  call_morph( +Term, +Input, -Morphed, +Opts ).
 
-If Term/+2 is callable, then it is called on Input and Morphed;
-else Morphed is unified to Term. The latter is also the case, if
-the call fails.
+If Term/+2 is a defined predicate, then it is called on Input and Morphed;
+else Morphed is unified to Term. The latter is also the case, if the call fails.
+Opts are passed to mod_call/4.
 
-Opts are passed to mod_call/4
-
-The main perceived use case is for the ability to use options that
+The main perceived use case is for enabling options that
 either transform another option or pass a static value. 
 For instance to create output file stems from input filenames.
 
@@ -19,6 +17,8 @@ For instance to create output file stems from input filenames.
 ?- assert( (to_stem(File,Stem) :- os_ext(Ext,Stem,File)) ).
 ?- call_morph( to_stem, input.txt, Stem, true ).
 Stem = input.
+?- call_morph( static_stem, input.txt, Stem, true ).
+Stem = static_stem.
 ==
 
 @author nicos angelopoulos
