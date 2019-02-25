@@ -88,7 +88,7 @@ Rej = [6].
 
 */
 map_list_options( GoalIn, InL, Args ) :-
-    options_append( map_list_options, Args, Opts ),
+    options_append( map_list_options, Args, Opts, arity(3) ),
     mod_goal( user, GoalIn, Goal, override(false) ),
     options( add_options(AddOpts), Opts ),
     options( call_options(COptsPrv), Opts ),
@@ -98,7 +98,7 @@ map_list_options( GoalIn, InL, Args ) :-
     options( failed(Failed), Opts ).
 
 map_list_options( GoalIn, InL, OutL, Args ) :-
-    options_append( map_list_options, Args, Opts ),
+    options_append( map_list_options, Args, Opts, [arity(4)] ),
     mod_goal( user, GoalIn, Goal, override(false) ),
     options( add_options(AddOpts), Opts ),
     options( call_options(COpts), Opts ),

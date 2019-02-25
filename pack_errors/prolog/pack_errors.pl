@@ -149,6 +149,12 @@ ERROR: _Unk:bar/1: Lists for a and b have mismatching lengths: 1 and 2 respectiv
 ERROR: os:os_term/2: Cannot cast: abc(file.csv), to type: atom
 ==
 
+Examples from other packs:
+==
+?- map_list_options( plus_one, In, [2,3,4,5], [add_options(maybe),on_fail(skip)] ).
+ERROR: false:map_list_options/4 @ option(add_options): Object of type: boolean, expected but found term: maybe
+==
+
 ---+++ Defining new pack errors
 
 Example file (available at pack('pack_errors/examples/fold_data_errors.pl')):
@@ -377,6 +383,9 @@ Opts
  
   * pred(Pid)
      originator predicate
+
+  * option(Opt)
+     name of originator option
 
   * message(Level=error)
      passed to print_message/2 (first argument), but also accepts quiet (as silent still prints things...)
@@ -608,7 +617,8 @@ type( Type, Term ) :-
 type( Type, _Term, _Args ) :-
     \+ ground( Type ),
     !,
-    throw( pack_error(pack_error,type/3,arg_ground(1,Type)) ).
+    % throw( pack_error(pack_error,type/3,arg_ground(1,Type)) ).
+    throw( arg_ground(1,Type), pack_error:type/3 ).
 type( Type, Term, Args ) :-
     pack_errors_options_append( type, Args, Opts ),
     type_optioned( Type, Term, Opts ).
@@ -631,16 +641,17 @@ type_optioned( Type, Term, Opts ) :-
 
 type_error( false, _Type, _Term, _Opts ) :- !, fail.
 type_error( true, Type, Term, Opts ) :-
-    memberchk( pack(Pack), Opts ),
-    memberchk( pred(Pred), Opts ),
+    % memberchk( pack(Pack), Opts ),
+    % memberchk( pred(Pred), Opts ),
     memberchk( arg(Pos), Opts ),
-    type_error_position( Pos, Pack, Pred, Type, Term ).
+    type_error_position( Pos, Type, Term, Opts ).
 
-type_error_position( false, Pack, Pred, Type, Term ) :-
+% type_error_position( false, Pack, Pred, Type, Term ) :-
+type_error_position( false, Type, Term, Opts ) :-
     !,
-    throw( pack_error(Pack,Pred,type_error(Type,Term)) ). 
-type_error_position( Pos, Pack, Pred, Type, Term ) :-
-    throw( pack_error(Pack,Pred,type_error(Pos,Type,Term)) ). 
+    throw( pack_error(type_error(Type,Term)), Opts ). 
+type_error_position( Pos, Type, Term, Opts ) :-
+    throw( pack_error(type_error(Pos,Type,Term)), Opts ). 
 
 pack_errors_options_append( Pname, ArgS, Opts ) :-
     ( is_list(ArgS) -> Args = ArgS ; Args = [ArgS] ),
@@ -975,7 +986,8 @@ message_pack( Opts )  -->
       \+ (Pack=='_Unk', Pred=='_Unk'),
       !
     },
-    ['~w:~w: '-[Pack,Pred] ].
+    {( memberchk(option(OptNm),Opts) -> atomic_list_concat([' @ option(',OptNm,')'],OptTkn); OptTkn = '' )},
+    ['~w:~w~w: '-[Pack,Pred,OptTkn] ].
 message_pack( _ )  --> [].
 
 :- multifile( pack_errors:message/3 ).

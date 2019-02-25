@@ -179,7 +179,7 @@ options_append_types( _Defaulty, Pid, Pack, Opts ) :-
     memberchk( options_types(OTS), Opts ),
     !,
     options_en_list( OTS, OTs ),
-    ( Pack == [] -> TypeOpts = [pred(Pid)]; TypeOpts = [pred(Pid),pack(Pack)] ),
+    ( Pack == [] -> TypeOpts = [pred(Pid),option(OName)]; TypeOpts = [pred(Pid),pack(Pack),option(OName)] ),
     findall( _, (  member(OName-Type,OTs),
                 Opt=..[OName,OArg],
                 options(Opt,Opts),
