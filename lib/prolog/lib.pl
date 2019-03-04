@@ -360,10 +360,11 @@ Operands
        declare initilization call (library can be loaded without this firing, if so needed, as is the
        case for lib_mkindex/1)
     * suggests(Lib)
-       it is likely you need Lib for full functionalilty, if Lib is a known library it is loaded other wise nothing is loaded 
-       This is useful for fringe functionalities that depend on external libraries
+       it is likely you need Lib for full functionalilty. If Lib is a known library it is loaded other wise nothing is loaded.<br>
+       This is useful for fringe functionalities that depend on external libraries, where we do not want the average user to do anything
+       if library (Lib) is not there.
     * promise(Pred,Load)
-       Pred is needed for functionality and it can be found by loading Load, but it will only happen at Pred's first call
+       Pred is needed for functionality and it can be found by loading Load, but it will only happen at Pred's first call.
     * expects(Pid,Mess)
     * expects(Pid,Mess,Call)
        complains if Pid is not defined at loading time. Mess should be a debug style message
