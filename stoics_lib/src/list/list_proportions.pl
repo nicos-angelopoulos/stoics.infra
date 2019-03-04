@@ -1,5 +1,5 @@
 
-:- lib(options).
+:- lib(suggests(options)).
 
 list_proportions_defaults( [min_max(false),to_range(false)] ).
 

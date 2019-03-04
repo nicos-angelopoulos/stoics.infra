@@ -1,4 +1,6 @@
 
+:- lib(suggests(options)).
+
 :- lib(en_list/2). 
 :- lib(mod_goal/4).
 

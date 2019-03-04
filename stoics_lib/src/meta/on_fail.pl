@@ -1,5 +1,5 @@
 
-:- lib(options).
+:- lib(suggests(options)).
 
 :- lib(mod_goal/2).
 :- lib(mod_goal/3).
