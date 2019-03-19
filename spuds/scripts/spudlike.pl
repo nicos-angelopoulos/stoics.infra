@@ -14,14 +14,20 @@ See doc for spudlike/0.
     Only tested on linux.
 
 ==
-% pupsh spudlike
-% was: /home/na11/bin/swipl_man_doc
+% upsh spudlike
 ==
+
+You can add something like the following to a launcher in your linux windows manager:
+==
+/usr/local/users/nicos/local/git/bin/swipl -f none -l /usr/local/users/nicos/local/git/lib/swipl/pack/spuds/scripts/spudlike.pl -g spudlike
+==
+which will also give you doc for any start-up loading packs. The "-f" is critical in avoiding to load stuff from ~/.swiplrc that will not
+be documented as they are loaded before the server started.
+
 @author nicos angelopoulos
 @version  0.2 2018/01/26
 @version  0.3 2018/02/07,  removed dependency to by_unix
-@version  0.4 2019/03/18,  generalise for home network use. added options.
-
+@version  0.4 2019/03/18,  generalise for home network use. added options and CLI example
 
 */
 
