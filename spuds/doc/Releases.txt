@@ -1,3 +1,6 @@
+1:1  
+     19.03.18   SCRIPT:   spudlike extensions, added options
+
 1:0         @   18.03.18    
      18.03.18   FIX:      only run kill script in spudlike.pl if we are unix
      18.02.07   CHANGE:   spudlike has now no external dependencies
