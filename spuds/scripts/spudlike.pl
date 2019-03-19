@@ -31,7 +31,7 @@ spudlike( Args ) :-
     getenv( 'HOST', Host ),
     atomic_list_concat( ['.pl/spudlike_', Host, '.pl'], HostPrefs ),
     absolute_file_name( home(HostPrefs), AbsHostF ),
-    debug( spudlike, 'AbsHostF: ~w', [AbsHostF] ),
+    debug( spudlike, 'Preferences from: ~w', [AbsHostF] ),
     ( exists_file(AbsHostF) ->
         spudlike_read_file( AbsHostF, UserOpts )
         ;
@@ -55,7 +55,8 @@ spudlike( Args ) :-
         ;
         AllowsPrv = Allows
     ),
-    spudlike( Port, Server, Allows, Kill ),
+    debug( spudslike, 'Server: ~w, Port: ~w', [Server,Port] ),
+    spudlike( Server, Port, Allows, Kill ),
     ( memberchk(browser(Browser),Opts) -> true; Browser = true ),
     ( Browser == false ->
         true
@@ -71,8 +72,8 @@ spudlike_busy :-
     !,
     spudlike_busy.
 
-spudlike( Port, Server, Allows, Kill ) :-
-    spudlike_kill( Kill, Server ),
+spudlike( localhost, Port, Allows, Kill ) :-
+    spudlike_kill( Kill, localhost ),
     doc_server( Port, Allows ),
     debug( spudlike, 'doc_server(~w,~w)', [Port,Allows] ),
     use_module( library(lib) ),
@@ -86,7 +87,13 @@ spudlike( Port, Server, Allows, Kill ) :-
     once( select('..',NodSubs,NtdSubs) ),
     % os_dir_dirs( Packed, Packs ),
     maplist( spudlike_load(Packed), NtdSubs ),
-    write( 'http://localhost:8080/pldoc' ), nl.
+    atomic_list_concat( ['http://localhost:',Port,'/pldoc'], '', Url ),
+    debug( spudlike, '~w', [Url] ).
+spudlike( Remote, _Port, _Allows, _Kill ) :-
+    % fixme: pass Opts ?
+    getenv( 'USER', User ),
+    atomic_list_concat( [User,Remote], '@', From ),
+    process_create( path(ssh), ['-Y',From,pupsh,spudlike], [] ).
 
 spudlike_load( _, 'Downloads' ) :-
     !.
