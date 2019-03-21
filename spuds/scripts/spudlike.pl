@@ -27,7 +27,7 @@ be documented as they are loaded before the server started.
 @author nicos angelopoulos
 @version  0.2 2018/01/26
 @version  0.3 2018/02/07,  removed dependency to by_unix
-@version  0.4 2019/03/18,  generalise for home network use. added options and CLI example
+@version  0.4 2019/03/21,  generalise for home network use. added options and CLI example
 
 */
 
@@ -36,11 +36,14 @@ spudlike :-
 spudlike( Args ) :-
     getenv( 'HOST', Host ),
     atomic_list_concat( ['.pl/spudlike_', Host, '.pl'], HostPrefs ),
-    absolute_file_name( home(HostPrefs), AbsHostF ),
-    debug( spudlike, 'Preferences from: ~w', [AbsHostF] ),
-    ( exists_file(AbsHostF) ->
+    ( ( 
+    	absolute_file_name(home(HostPrefs),AbsHostF),
+	exists_file(AbsHostF)
+      ) 	->
+    	debug( spudlike, 'Preferences from: ~w', [AbsHostF] ),
         spudlike_read_file( AbsHostF, UserOpts )
         ;
+    	debug( spudlike, 'No preferences file found (~w).', [HostPrefs] ),
         % fixme, also for .pl/spudlike.pl here
         UserOpts = []
     ),
