@@ -34,8 +34,12 @@ be documented as they are loaded before the server started.
 spudlike :-
     spudlike( [] ).
 spudlike( Args ) :-
-    getenv( 'HOST', Host ),
-    atomic_list_concat( ['.pl/spudlike_', Host, '.pl'], HostPrefs ),
+    ( getenv('HOST',Host) -> 
+    	atomic_list_concat( ['.pl/spudlike_', Host, '.pl'], HostPrefs )
+	;
+	Host = localhost,
+	HostPrefs = '.pl/spudlike.pl'
+    ),
     ( ( 
     	absolute_file_name(home(HostPrefs),AbsHostF),
 	exists_file(AbsHostF)
