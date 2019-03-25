@@ -10,7 +10,7 @@ See doc for spudlike/0.
 
 /** spudlike.
 
-    (Re-)Start a server at 3003 serving all currently installed packs.<br>
+    (Re-)Start a server at Port serving all currently installed packs.<br>
     Only tested on linux.
 
 ==
@@ -35,19 +35,15 @@ spudlike :-
     spudlike( [] ).
 spudlike( Args ) :-
     ( getenv('HOST',Host) -> 
-        % atomic_list_concat( ['.pl/spudlike_', Host, '.pl'], HostPrefs )
         atomic_list_concat( ['spudlike_', Host, '.pl'], HostPrefsB )
         ;
         Host = localhost,
         HostPrefsB = 'spudlike.pl'
-        % HostPrefs = '.pl/spudlike.pl'
     ),
     ( ( 
-        % absolute_file_name(home(HostPrefs),AbsHostF),
         getenv('HOME',Home),
         directory_file_path(Home,'.pl', HostPrefsD),
         directory_file_path(HostPrefsD,HostPrefsB,AbsHostPrefsF),
-        % absolute_file_name(home(HostPrefs),AbsHostF),
         exists_file(AbsHostPrefsF)
       )     ->
         debug( spudlike, 'Preferences from: ~w', [AbsHostPrefsF] ),
@@ -55,7 +51,7 @@ spudlike( Args ) :-
         ;
         atom_concat( '~/', HostPrefsB, RepPrefsF ),
         debug( spudlike, 'No preferences file found (~w).', [RepPrefsF] ),
-        % fixme, also for .pl/spudlike.pl here
+            % fixme, also for .pl/spudlike.pl here
         UserOpts = []
     ),
     append( Args, UserOpts, Opts ),
@@ -82,7 +78,6 @@ spudlike( Args ) :-
         true
         ;
         atomic_list_concat( ['http://',Host,':',Port,'/pldoc'], '', Url ),
-        % www_open_url('http://localhost:8080/pldoc')
         www_open_url(Url)
     ),
     spudlike_busy.
@@ -133,7 +128,6 @@ spudlike_kill( true, localhost ) :-   % only attempt when running locally
     current_prolog_flag( unix, true ),
     current_prolog_flag( pid, ThisPid ),
     debug( spudlike, 'This process id: ~d', ThisPid ), nl,
-    % LnsPrv @@ psa('spudlike'),
     psa_lines( spudlike, LnsPrv ),
     exclude( atom_sub('grep cline'), LnsPrv, LnsCline ),
     ( (include( atom_sub('swipl -x'),LnsCline,LnsSwi),LnsSwi\==[]) -> true; LnsSwi = LnsCline ),
@@ -145,7 +139,6 @@ spudlike_kill( true, localhost ) :-   % only attempt when running locally
     debug( spudlike, 'Killing process id: ~d', PidNum ), nl,
     !,
     debug( spudlike, 'Killing old spudlike process: ~w', Pid ), nl,
-    % @ kill( -9, Pid ).
     process_create( path(kill), ['-9',Pid], [] ),
     sleep(3).
 spudlike_kill( true, _Server ) :-
