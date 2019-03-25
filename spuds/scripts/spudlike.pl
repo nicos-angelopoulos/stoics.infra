@@ -35,19 +35,26 @@ spudlike :-
     spudlike( [] ).
 spudlike( Args ) :-
     ( getenv('HOST',Host) -> 
-    	atomic_list_concat( ['.pl/spudlike_', Host, '.pl'], HostPrefs )
-	;
-	Host = localhost,
-	HostPrefs = '.pl/spudlike.pl'
+        % atomic_list_concat( ['.pl/spudlike_', Host, '.pl'], HostPrefs )
+        atomic_list_concat( ['spudlike_', Host, '.pl'], HostPrefsB )
+        ;
+        Host = localhost,
+        HostPrefsB = 'spudlike.pl'
+        % HostPrefs = '.pl/spudlike.pl'
     ),
     ( ( 
-    	absolute_file_name(home(HostPrefs),AbsHostF),
-	exists_file(AbsHostF)
-      ) 	->
-    	debug( spudlike, 'Preferences from: ~w', [AbsHostF] ),
-        spudlike_read_file( AbsHostF, UserOpts )
+        % absolute_file_name(home(HostPrefs),AbsHostF),
+        getenv('HOME',Home),
+        directory_file_path(Home,'.pl', HostPrefsD),
+        directory_file_path(HostPrefsD,HostPrefsB,AbsHostPrefsF),
+        % absolute_file_name(home(HostPrefs),AbsHostF),
+        exists_file(AbsHostPrefsF)
+      )     ->
+        debug( spudlike, 'Preferences from: ~w', [AbsHostPrefsF] ),
+        spudlike_read_file( AbsHostPrefsF, UserOpts )
         ;
-    	debug( spudlike, 'No preferences file found (~w).', [HostPrefs] ),
+        atom_concat( '~/', HostPrefsB, RepPrefsF ),
+        debug( spudlike, 'No preferences file found (~w).', [RepPrefsF] ),
         % fixme, also for .pl/spudlike.pl here
         UserOpts = []
     ),

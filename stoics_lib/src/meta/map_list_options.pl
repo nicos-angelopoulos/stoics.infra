@@ -26,15 +26,15 @@ The direction might become more explicit with a new option (_auto_, _left_ and _
 Currently direction is _right_ (generating InList from OutList) if Outlist is ground and InList is not,
 and _left_ otherwise.
 
-Opts 
- * add_options(AddOpts=true)
- false if do not wish to add Copts to call to Goal (AddOpts is passed through en_list/2)
- * call_options(Copts)
- Options to pass to Goal (as last argument)
- * failed(Failed)
- returns the list of failed elements (direction dependent)
- * on_fail(OnFail=skip)
- If OnFail is _fail_, the whole predicate fails if Goal fails, _error_ throws a ball
+Opts
+  * add_options(AddOpts=true)
+  false if do not wish to add Copts to call to Goal (AddOpts is passed through en_list/2)
+  * call_options(Copts)
+  Options to pass to Goal (as last argument)
+  * failed(Failed)
+  returns the list of failed elements (direction dependent)
+  * on_fail(OnFail=skip)
+  If OnFail is _fail_, the whole predicate fails if Goal fails, _error_ throws a ball
 
 ==
 ?- assert( (ex_mlo(No,Out,Opts) :- Out is No + 1, write( opts(Opts) ), nl) ).
