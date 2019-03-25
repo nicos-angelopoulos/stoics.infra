@@ -29,7 +29,7 @@ and _left_ otherwise.
 Opts
   * add_options(AddOpts=true)
   false if do not wish to add Copts to call to Goal (AddOpts is passed through en_list/2)
-  * call_options(Copts)
+  * call_options(Copts=[])
   Options to pass to Goal (as last argument)
   * failed(Failed)
   returns the list of failed elements (direction dependent)
