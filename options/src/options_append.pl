@@ -2,11 +2,12 @@
 :- lib(debugging_status/2).
 
 options_append_known_process_option( debug ).
+options_append_known_process_option( version ).
 
 /** options_append( +PredName, +OptS, -All ).
     options_append( +PredName, +OptS, -All, +OAopts ).
 
-Look for PredName_defaults/1 and if that exists append its argument to the end of OptS to get All.<br>
+Look for PredName_defaults/1 (Defs) and if that exists append its argument to the end of OptS to get All.<br>
 OptS is casted to a list before the append, so single terms are allowed as options.<br>
 In addition, if file user_profile('.pl'/Pname) exists, its terms are appended between OptS and
 the argument of PredName_defaults/1.<br> 
@@ -56,7 +57,7 @@ OAopts term or list of
  
   * funnel(Proccess)    
      as process() below, 
-     but leaves processed options in All.
+     but leaves processed options in All. (By default both debug and version are passed as funnel.)
 
   * pack(Pack)
      caller pack. For now it is 
@@ -67,6 +68,9 @@ OAopts term or list of
      * debug     
         will turn on debugging according 
         to debug/0,1,2 options, see below
+     * version
+        partially instantiation version(Vers) in Defs with the term <Pred>(PredVersion) where version(PredVersion) is
+        in OptS
 
   * remove_types(Rtypes=true)
      to pass options_types(OTypes) 
@@ -139,7 +143,7 @@ The default OAopts list is [funnel(debug)].
 */
 
 options_append( Pname, Args, Opts ) :-
-    options_append( Pname, Args, Opts, [funnel(debug)] ).
+    options_append( Pname, Args, Opts, [funnel(debug),funnel(version)] ).
 options_append( Pname, ArgS, Opts, OAoptS ) :-
     options_en_list( OAoptS, OAoptsWA ),
     atom_concat( Pname, '_defaults', Dname ),
@@ -225,13 +229,14 @@ options_append_process( [extra_arg(_)|T], All, Defs, Pname, Opts ) :-
 options_append_process( [process(Opt)|T], All, Defs, Pname, Opts ) :-
     !,
     findall( Other, (member(Other,T),\+ functor(Other,process,1)), Rem ),
-    options_append_process_option( Opt, All, Pname, Nxt, _Enh, Opts ),
+    options_append_process_option( Opt, All, Pname, Defs, Nxt, _Enh, Opts ),
     options_append_process( Rem, Nxt, Defs, Pname, Opts ).
 options_append_process( [funnel(Opt)|T], All, Defs, Pname, Opts ) :-
     !,
-    findall( Other, (member(Other,T),\+ functor(Other,funnel,1)), Rem ),
+    % findall( Other, (member(Other,T),\+ functor(Other,funnel,1)), Rem ),
+    findall( Other, (member(Other,T),(Other = funnel(Etc) -> Etc \==Opt ; true)), Rem ),
     % select_all( T, process(Opt), _, Rem ),
-    options_append_process_option( Opt, All, Pname, _Nxt, Enh, Rem ),
+    options_append_process_option( Opt, All, Pname, Defs, _Nxt, Enh, Rem ),
     options_append_process( Rem, Enh, Defs, Pname, Opts ).
 options_append_process( [foreign(Fgn)|T], All, Defs, Pname, Opts ) :-
     !,
@@ -246,11 +251,11 @@ template_in_defaults( Defs, Term ) :-
     functor( Template, Tname, Tarity ),
     memberchk( Template, Defs ).
 
-options_append_process_option( Opt, All, Pname, Nxt, Enh, Opts ) :- 
+options_append_process_option( Opt, All, Pname, Defs, Nxt, Enh, Opts ) :- 
     options_append_known_process_option( Opt ),
     !,
-    options_append_option_process( Opt, All, Pname, Nxt, Enh, Opts ).
-options_append_process_option( Opt, _All, _Pname, _Nxt, _Enh, _Opts ) :- 
+    options_append_option_process( Opt, All, Pname, Defs, Nxt, Enh, Opts ).
+options_append_process_option( Opt, _All, _Pname, _Defs, _Nxt, _Enh, _Opts ) :- 
     throw( options_append( unknown_process_option(Opt)) ).
 
 % user + program can use debug/0,1,2 the first one 
@@ -259,7 +264,7 @@ options_append_process_option( Opt, _All, _Pname, _Nxt, _Enh, _Opts ) :-
 % 
 % fixme: this doesn't work properly from multi_debugs
 %  
-options_append_option_process( debug, All, Pname, NxtEnh, Enh, _Opts ) :-
+options_append_option_process( debug, All, Pname, _Defs, NxtEnh, Enh, _Opts ) :-
     partition( option_name(debug), All, Dbgs, Nxt ),
     Dbgs = [Dbg|_],
     !,
@@ -271,11 +276,43 @@ options_append_option_process( debug, All, Pname, NxtEnh, Enh, _Opts ) :-
     NxtEnh = [Rst|Nxt],
     options_append_option_process_debug( Dbg, Pname ).
 % next clause states that we shouldn't complain if there is no debug/1,2,3
-options_append_option_process( debug, All, _Pname, Nxt, Enh, _Opts ) :-
+options_append_option_process( debug, All, _Pname, _Defs, Nxt, Enh, _Opts ) :-
     % fixme: add option_append option for strictness here ?
     Nxt = All,
     Enh = All.
-    
+options_append_option_process( version, All, Pname, Defs, NxtEnh, Enh, Opts ) :-
+    write( here(All,Pname,Defs,NxtEnh,Enh,Opts) ), nl,
+    ( memberchk(version(V),Defs) -> true; V=null ),
+    ( memberchk(version(RetV),All) -> 
+        ThisV =.. [Pname,V],
+        options_append_option_process_version_return( RetV, ThisV )
+        ;
+        true 
+    ),
+    NxtEnh = All, Enh = All.
+
+options_append_option_process_version_return( RetV, _ThisV ) :-
+    ground(RetV),
+    !,
+    throw( options_ground_return_version(RetV) ).
+options_append_option_process_version_return( RetV, ThisV ) :-
+    var( RetV ),
+    !,
+    RetV = [ThisV|_].
+options_append_option_process_version_return( List, ThisV ) :-
+    is_list( List, ThisV ),
+    options_append_option_process_version_return_list( List, ThisV ),
+    !.
+options_append_option_process_version_return( Etc, _ThisV ) :-
+    throw( options_ground_return_unrecognised_term(Etc) ).
+
+options_append_option_process_version_return_list( Var, ThisV ) :-
+    var( Var ),
+    !,
+    Var = [ThisV|_].
+options_append_option_process_version_return_list( [_H|T], ThisV ) :-
+    options_append_option_process_version_return_list( T, ThisV ).
+
 options_append_option_process_debug( debug, Pname ) :-
     options_append_option_process_debug_arg( Pname, true ).
 options_append_option_process_debug( debug(DbgS), Pname ) :-
