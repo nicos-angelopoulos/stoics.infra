@@ -2,7 +2,9 @@
 %fixme: should merge with os_file_defaults...
 os_dir_defaults( Defs ) :-
     % ( (memberchk(dir(InDir),Args),\+ InDir == '.') -> Stem = rel ; Stem = false),
-    Defs = [dir('.'), stem(rel), sub(false),dots(false),solutions(single)].
+    Defs = [ dir('.'), stem(rel), sub(false),dots(false),solutions(single),
+             version(0:0:4)
+    ].
 
 %% os_dir( ?OsDir ).
 %% os_dir( ?OsDir, +Opts ).
@@ -171,4 +173,6 @@ os_dir_obj( Os, Rel, Entry, OsDir, _Dir, Abs, Stem, Dots, true ) :-  % then recu
 os_dirs( Dirs ) :-
 	findall( Dir, os_dir(Dir), Dirs ).
 os_dirs( Dirs, Opts ) :-
+    % just so we get the version() option updated:
+    options_append( os_file, Opts, _All ),
 	findall( Dir, os_dir(Dir,Opts), Dirs ).

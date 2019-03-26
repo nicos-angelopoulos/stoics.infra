@@ -1,5 +1,8 @@
 os_file_defaults( Defs ) :-
-    Defs = [dir('.'), stem(rel), sub(false), dots(false),solutions(single)].
+    Defs = [ dir('.'), stem(rel), sub(false), 
+             dots(false), solutions(single),
+             version(0:0:4)
+             ].
 
 %% os_file( ?File ).
 %% os_file( ?File, +Opts ).
@@ -140,4 +143,6 @@ os_files_defaults( [dir('.'),sub(false)] ).
 os_files( Files ) :-
 	findall( File, os_file(File), Files ).
 os_files( Files, Opts ) :-
+    % just so we get the version() option updated:
+    options_append( os_file, Opts, _All ),
 	findall( File, os_file(File,Opts), Files ).

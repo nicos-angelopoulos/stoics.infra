@@ -2,7 +2,7 @@
 :- lib(options).
 :- lib( stoics_lib:atom_sub/2 ).
 
-os_sel_defaults( [dir('.'),sub(false)] ).
+os_sel_defaults( [dir('.'),sub(false),version(0:1:3)] ).
 
 /** os_sel( +Oses, +PatternS, -Sel ).
     os_sel( +Oses, +PatternS, -Sel, +Opts ).
@@ -65,7 +65,8 @@ os_sel( OsesIn, PatS, Sel, Args ) :-
 	options_append( os_sel, Args, Opts ),
 	options( dir(Dir), Opts ),
 	options( sub(Sub), Opts ),
-	os_sel_oses( OsesIn, Dir, Sub, Oses ),
+	options( version(Vers), Opts ),
+	os_sel_oses( OsesIn, Dir, Sub, Vers, Oses ),
     en_list( PatS, Pats ),
     os_sel_patterns( Pats, Oses, Sel ).
 
@@ -88,15 +89,15 @@ os_sel_pattern( postfix(Psf), Os ) :-
 	os_ext( _Ext, Stem, Os ),
 	once( sub_atom(Stem,_,_,0,Psf) ).
 
-os_sel_oses( os_files, Dir, Sub, Oses ) :-
+os_sel_oses( os_files, Dir, Sub, Vers, Oses ) :-
 	!,
-    os_files( Oses, [dir(Dir),stem(rel),sub(Sub)] ).
-os_sel_oses( os_dirs, Dir, Sub, Oses ) :-
+    os_files( Oses, [dir(Dir),stem(rel),sub(Sub),version(Vers)] ).
+os_sel_oses( os_dirs, Dir, Sub, Vers, Oses ) :-
 	!,
-	os_dirs( Oses, [dir(Dir),stem(rel),sub(Sub)] ).
-os_sel_oses( os_all, Dir, Sub,  Oses ) :-
-    os_files( Files, [dir(Dir),stem(rel),sub(Sub)] ),
-    os_dirs( Dirs, [dir(Dir),stem(rel),sub(Sub)] ),
+	os_dirs( Oses, [dir(Dir),stem(rel),sub(Sub),version(Vers)] ).
+os_sel_oses( os_all, Dir, Sub, Vers, Oses ) :-
+    os_files( Files, [dir(Dir),stem(rel),sub(Sub),version(Vers)] ),
+    os_dirs( Dirs, [dir(Dir),stem(rel),sub(Sub),version(Vers)] ),
     append( Dirs, Files, Oses ).
-os_sel_oses( Other, _Dir, Oses ) :-
+os_sel_oses( Other, _Dir, _Sub, _Vers, Oses ) :-
 	en_list( Other, Oses ).
