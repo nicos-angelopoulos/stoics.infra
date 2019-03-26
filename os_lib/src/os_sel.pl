@@ -2,7 +2,7 @@
 :- lib(options).
 :- lib( stoics_lib:atom_sub/2 ).
 
-os_sel_defaults( dir('.') ).
+os_sel_defaults( [dir('.'),sub(false)] ).
 
 /** os_sel( +Oses, +PatternS, -Sel ).
     os_sel( +Oses, +PatternS, -Sel, +Opts ).
@@ -24,13 +24,16 @@ PatternS, a list of, or one of:
   * prefix(Pfx)
    is a prefix of the stem fo Os
 
-  * sub(Sub)
+  * sub(SubAtom)
    sub_atom/5 succeeds on the stem of the Os
 
 Opts 
 
   * dir(Dir='.')
     directory at which the Oses will be sought
+
+  * sub(Sub=false)
+    should sub dirs be recursed (passed to os_files/2 and os_dirs/2)
 
 ==
 % mkdir /tmp/os_sel; cd /tmp/os_sel; touch a.pl b.txt c.pl abc.txt; mkdir abc_sub
@@ -52,6 +55,7 @@ Sel = [os_sel].
 @version  0.1 2016/ 8/24
 @version  0.2 2016/10/18  changed naked atoms to sub(Sub), added prefix and postfix
 @version  0.3 2017/2/8    allow list of patterns 
+@version  0.4 2019/3/26   option sub
 
 */
 os_sel( OsesIn, Pat, Sel ) :-
@@ -60,7 +64,8 @@ os_sel( OsesIn, Pat, Sel ) :-
 os_sel( OsesIn, PatS, Sel, Args ) :-
 	options_append( os_sel, Args, Opts ),
 	options( dir(Dir), Opts ),
-	os_sel_oses( OsesIn, Dir, Oses ),
+	options( sub(Sub), Opts ),
+	os_sel_oses( OsesIn, Dir, Sub, Oses ),
     en_list( PatS, Pats ),
     os_sel_patterns( Pats, Oses, Sel ).
 
@@ -83,15 +88,15 @@ os_sel_pattern( postfix(Psf), Os ) :-
 	os_ext( _Ext, Stem, Os ),
 	once( sub_atom(Stem,_,_,0,Psf) ).
 
-os_sel_oses( os_files, Dir, Oses ) :-
+os_sel_oses( os_files, Dir, Sub, Oses ) :-
 	!,
-    os_files( Oses, [dir(Dir),stem(rel)] ).
-os_sel_oses( os_dirs, Dir, Oses ) :-
+    os_files( Oses, [dir(Dir),stem(rel),sub(Sub)] ).
+os_sel_oses( os_dirs, Dir, Sub, Oses ) :-
 	!,
-	os_dirs( Oses, [dir(Dir),stem(rel)] ).
-os_sel_oses( os_all, Dir, Oses ) :-
-	!,
-    os_cast( Dir, +DirAtm ),
-	directory_files( DirAtm, Oses ).
+	os_dirs( Oses, [dir(Dir),stem(rel),sub(Sub)] ).
+os_sel_oses( os_all, Dir, Sub,  Oses ) :-
+    os_files( Files, [dir(Dir),stem(rel),sub(Sub)] ),
+    os_dirs( Dirs, [dir(Dir),stem(rel),sub(Sub)] ),
+    append( Dirs, Files, Oses ).
 os_sel_oses( Other, _Dir, Oses ) :-
 	en_list( Other, Oses ).
