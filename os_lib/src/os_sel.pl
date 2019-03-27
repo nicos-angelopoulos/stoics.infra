@@ -63,10 +63,7 @@ os_sel( OsesIn, Pat, Sel ) :-
 
 os_sel( OsesIn, PatS, Sel, Args ) :-
 	options_append( os_sel, Args, Opts ),
-	options( dir(Dir), Opts ),
-	options( sub(Sub), Opts ),
-	options( version(Vers), Opts ),
-	os_sel_oses( OsesIn, Dir, Sub, Vers, Oses ),
+	os_sel_oses( OsesIn, Oses, Opts ),
     en_list( PatS, Pats ),
     os_sel_patterns( Pats, Oses, Sel ).
 
@@ -89,15 +86,15 @@ os_sel_pattern( postfix(Psf), Os ) :-
 	os_ext( _Ext, Stem, Os ),
 	once( sub_atom(Stem,_,_,0,Psf) ).
 
-os_sel_oses( os_files, Dir, Sub, Vers, Oses ) :-
+os_sel_oses( os_files, Oses, Opts ) :-
 	!,
-    os_files( Oses, [dir(Dir),stem(rel),sub(Sub),version(Vers)] ).
-os_sel_oses( os_dirs, Dir, Sub, Vers, Oses ) :-
+    os_files( Oses, [stem(rel)|Opts] ).
+os_sel_oses( os_dirs, Oses, Opts ) :-
 	!,
-	os_dirs( Oses, [dir(Dir),stem(rel),sub(Sub),version(Vers)] ).
-os_sel_oses( os_all, Dir, Sub, Vers, Oses ) :-
-    os_files( Files, [dir(Dir),stem(rel),sub(Sub),version(Vers)] ),
-    os_dirs( Dirs, [dir(Dir),stem(rel),sub(Sub),version(Vers)] ),
+	os_dirs( Oses, [stem(rel)|Opts] ).
+os_sel_oses( os_all, Oses, Opts ) :-
+    os_files( Files, [stem(rel)|Opts] ),
+    os_dirs( Dirs, [stem(rel)|Opts] ),
     append( Dirs, Files, Oses ).
-os_sel_oses( Other, _Dir, _Sub, _Vers, Oses ) :-
+os_sel_oses( Other, Oses, _Opts ) :-
 	en_list( Other, Oses ).

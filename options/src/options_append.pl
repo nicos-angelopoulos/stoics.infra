@@ -292,11 +292,15 @@ options_append_option_process( version, All, Pname, Args, Defs, NxtEnh, Enh, _Op
     ( memberchk(version(V),Defs) -> true; V=null ),
     ( memberchk(version(RetV),Args) -> 
         ThisV =.. [Pname,V],
-        options_append_option_process_version_return( RetV, ThisV )
+        options_append_option_process_version_return( RetV, ThisV ),
+        NxtEnh = All, Enh = All
         ;
-        true 
-    ),
-    NxtEnh = All, Enh = All.
+        % avoid constricting version to an atom, as per defaults option,
+        % as this will create problems further on if Opts are passed.
+        % we can remove, as user is not going to be able to access these,...
+        findall( Other, (member(Other,All),Other\=version(_)), Rem ),
+        NxtEnh = Rem, Enh = Rem
+    ).
 
 options_append_option_process_version_return( RetV, _ThisV ) :-
     ground(RetV),
