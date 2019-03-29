@@ -25,11 +25,16 @@ options_en_list( In, Opts ) :-
 options_en_list( Else, _Opts ) :-
 	throw( options_en_list(2,encountered_variable_in_1st_arg(Else)) ).
 
-options_remainder( [], _OptNm, _OptAr, [] ).
-options_remainder( [O|Os], OptNm, OptAr, Remain ) :-
-    ( functor(O,OptNm,OptAr) ->
-        Remain = Temain
+options_remainder( [], _OptNm, _OptAr, _Val, [] ).
+options_remainder( [O|Os], OptNm, OptAr, Val, Remain ) :-
+    functor( O, OptNm, OptAr ),
+    ( ground(Val) -> 
+        arg( 1, O, Val )
         ;
-        Remain = [O|Temain]
+        true
     ),
-    options_remainder( Os, OptNm, OptAr, Temain ).
+    !,
+    options_remainder( Os, OptNm, OptAr, Val, Remain ).
+options_remainder( [O|Os], OptNm, OptAr, Val, Remain ) :-
+    Remain = [O|Temain],
+    options_remainder( Os, OptNm, OptAr, Val, Temain ).

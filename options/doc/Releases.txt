@@ -3,7 +3,8 @@
 
 1.2  
 
-
+     19.03.29  IFACE:   added argument to options_remainder/4 (insist value of option to be remove matches)
+               FIXED:   findalls to find remainders where losing uninstantianted variables
      19.02.26  OPTS:    version() in options_append/4
      19.02.25  ERROR:   option type errors now identify the source option
                FIXED:   option type error uses the new pack_errors syntax

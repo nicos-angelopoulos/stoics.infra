@@ -175,8 +175,6 @@ options_append( Pname, ArgS, Opts, OAoptS ) :-
     ( select(append_profile(AppProf),OAoptsPack,OAoptsApF) -> true; AppProf=true, OAoptsApF=OAoptsPack ),
     OAopts = OAoptsApF,
     options_append_profile_options( AppProf, Pname, Args, ProfArgs ),
-    % options_append_args( OAopts, Args, Arity ),
-    % options_def_append( Dname, Pname, Opts, Args, Arity, Defs, All ),
     findall( Xarg, member(extra_arg(Xarg),OAopts), Xargs ),
     append( ProfArgs, Xargs, ExtArgs ),
     options_def_append( Dname, Pname, ProfArgs, ExtArgs, Defs, OptsUnpro ),
@@ -202,8 +200,7 @@ options_append_types( _Defaulty, _Pid, _Pack, _Opts ).
 
 options_append_types_remove( false, Opts, Opts ) :- !.
 options_append_types_remove( _Defaulty, OptsWT, Opts ) :-
-    % findall( Other, (member(Other,OptsWT),\+ functor(Other,options_types,1)), Opts ).
-    options_remainder( OptsWT, remove_types, 1, Opts ).
+    options_remainder( OptsWT, remove_types, 1, _, Opts ).
 
 % options_append_profile_options( +AddB, +Pname, +Args, -ProfArgs ),
 % 
@@ -236,19 +233,17 @@ options_append_process( [extra_arg(_)|T], All, Args, Defs, Pname, Opts ) :-
     options_append_process( T, All, Args, Defs, Pname, Opts ).
 options_append_process( [process(Opt)|T], All, Args, Defs, Pname, Opts ) :-
     !,
-    findall( Other, (member(Other,T),\+ functor(Other,process,1)), Rem ),
+    options_remainder( T, process, 1, Opt, Rem ),
     options_append_process_option( Opt, All, Pname, Args, Defs, Nxt, _Enh, Opts ),
     options_append_process( Rem, Nxt, Args, Defs, Pname, Opts ).
 options_append_process( [funnel(Opt)|T], All, Args, Defs, Pname, Opts ) :-
     !,
-    % findall( Other, (member(Other,T),\+ functor(Other,funnel,1)), Rem ),
-    findall( Other, (member(Other,T),(Other = funnel(Etc) -> Etc \==Opt ; true)), Rem ),
-    % select_all( T, process(Opt), _, Rem ),
+    options_remainder( T, process, 1, Opt, Rem ),
     options_append_process_option( Opt, All, Pname, Args, Defs, _Nxt, Enh, Rem ),
     options_append_process( Rem, Enh, Args, Defs, Pname, Opts ).
 options_append_process( [foreign(Fgn)|T], All, Args, Defs, Pname, Opts ) :-
     !,
-    findall( Other, (member(Other,T),\+ functor(Other,foreign,1)), Rem ),
+    options_remainder( T, process, 1, Fgn, Rem ),
     exclude( template_in_defaults(Defs), All, Fgn ),
     options_append_process( Rem, All, Args, Defs, Pname, Opts ).
 options_append_process( [Opt|_T], _All, _Args, _Defs, Pname, _Opts ) :-
@@ -298,7 +293,7 @@ options_append_option_process( version, All, Pname, Args, Defs, NxtEnh, Enh, _Op
         % avoid constricting version to an atom, as per defaults option,
         % as this will create problems further on if Opts are passed.
         % we can remove, as user is not going to be able to access these,...
-        findall( Other, (member(Other,All),Other\=version(_)), Rem ),
+        options_remainder(  All, version, 1, _, Rem ),
         NxtEnh = Rem, Enh = Rem
     ).
 
