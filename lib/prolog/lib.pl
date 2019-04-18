@@ -2,48 +2,104 @@
                     op( 200, fy, & ),
                     lib/1, lib/2   % +Repo[, +Opts]
         ] ).
-
                      % lib_suggests/1,  % fixme: feature()
                      % lib_promise/2,
                      % lib_expects/1+2,
                      % lib_init/1
 
-:- ensure_loaded( library(prolog_pack) ).
+:- ensure_loaded(library(prolog_pack)).
     % query_pack_server/3
 
-:- ensure_loaded( '../src/lib_init'  ).
-:- ensure_loaded( '../src/lib_load'  ).
-:- ensure_loaded( '../src/lib_type'  ).
-:- ensure_loaded( '../src/lib_auxil' ).
-:- ensure_loaded( '../src/lib_attach').
-:- ensure_loaded( '../src/lib_homonyms'  ).
-:- ensure_loaded( '../src/lib_suggests'  ).
-:- ensure_loaded( '../src/lib_expects'  ).
-:- ensure_loaded( '../src/lib_promise'  ).
-:- ensure_loaded( '../src/lib_message'  ).
+:- ensure_loaded('../src/lib_init').
+:- ensure_loaded('../src/lib_load').
+:- ensure_loaded('../src/lib_type').
+:- ensure_loaded('../src/lib_auxil').
+:- ensure_loaded('../src/lib_attach').
+:- ensure_loaded('../src/lib_homonyms').
+:- ensure_loaded('../src/lib_suggests').
+:- ensure_loaded('../src/lib_expects').
+:- ensure_loaded('../src/lib_promise').
+:- ensure_loaded('../src/lib_message').
 
+:- dynamic(lib_tables:lib_repo/4).             % +Repo, +Type, +Root, +Load 
+:- dynamic(lib_tables:lib_repo_index/2).       % +Repo, +IdxFile
+:- dynamic(lib_tables:lib_repo_homonyms/2).    % +Repo, +SrcDir
+:- dynamic(lib_tables:lib_context/2).          % +Ctx, +Root
+:- dynamic(lib_tables:lib_index/4).            % +Pa, +Pn, +Repo, +File. records loaded indices
+:- dynamic(lib_tables:lib_promise/2).          % +Load, +Pid.  hot swap Pid with loading Load
+:- dynamic(lib_tables:lib_homonym/3).          % +Stem, +Repo, +File. record loaded homonym
+:- dynamic(lib_tables:lib_loaded_index/2).     % +Repo, +File. tracks loaded index files
+:- dynamic(lib_tables:lib_loaded_homonyms/2).  % 
+:- dynamic(lib_tables:lib_attached_indices/2). % +Ctx, Repo
+:- dynamic(lib_tables:lib_attached_homonyms/2).% +Ctx, Repo
+:- dynamic(lib_tables:lib_lazy/1).             % +Repo
+:- dynamic(lib_tables:lib_full/2).             % +Repo
+:- dynamic(lib_tables:lib_packs_at/2).         % +Repo, +Dir
+:- dynamic(lib_tables:lib_skeleton_only/1).    % +Pack
 
-:- dynamic( lib_tables:lib_repo/4 ).             % +Repo, +Type, +Root, +Load 
-:- dynamic( lib_tables:lib_repo_index/2 ).       % +Repo, +IdxFile
-:- dynamic( lib_tables:lib_repo_homonyms/2 ).    % +Repo, +SrcDir
-:- dynamic( lib_tables:lib_context/2 ).          % +Ctx, +Root
-:- dynamic( lib_tables:lib_index/4 ).            % +Pa, +Pn, +Repo, +File. records loaded indices
-:- dynamic( lib_tables:lib_promise/2 ).          % +Load, +Pid.  hot swap Pid with loading Load
-:- dynamic( lib_tables:lib_homonym/3 ).          % +Stem, +Repo, +File. record loaded homonym
-:- dynamic( lib_tables:lib_loaded_index/2 ).     % +Repo, +File. tracks loaded index files
-:- dynamic( lib_tables:lib_loaded_homonyms/2 ).  % 
-:- dynamic( lib_tables:lib_attached_indices/2 ). % +Ctx, Repo
-:- dynamic( lib_tables:lib_attached_homonyms/2 ).% +Ctx, Repo
-:- dynamic( lib_tables:lib_lazy/1 ).             % +Repo
-:- dynamic( lib_tables:lib_full/2 ).             % +Repo
-:- dynamic( lib_tables:lib_packs_at/2 ).         % +Repo, +Dir
-:- dynamic( lib_tables:lib_skeleton_only/1 ).    % +Pack
+:- multifile(user:lib_code_loader/3 ).
 
+user:lib_code_loader(r, lib, r_lib).
+
+r_lib( Rlib, Opts ) :-
+     string( Rlib ),
+     atom_string( RlibAtm, Rlib ),
+     r_lib( RlibAtm, Opts ).
+r_lib( Rlib, _Opts ) :-
+     getenv( 'R_LIB_REAL', RlibRealPath ),
+     atomic_list_concat( RlibDirs, ':', RlibRealPath ),
+     member( Rdir, RlibDirs ),
+     member( Ext, ['','r','R'] ),
+     file_name_extension( Rlib, Ext, Rbase ),
+     directory_file_path( Rdir, Rbase, Rfile ),
+     exists_file( Rfile ),
+     !,
+     r_call( source(+Rfile), [] ).
+r_lib( Rlib, Opts ) :-
+    memberchk( suggests(Sugg), Opts ),
+    current_prolog_flag( lib_suggests_warns, SuggFlag ),
+    (Sugg == true ; SuggFlag == debug),
+    !,
+    real:r_call( rownames('installed.packages'()), [rvar(Rlibs)] ),
+    ( memberchk(Rlib,Rlibs) ->
+        ( (debugging(lib);SuggFlag==debug) ->
+            Mess = 'Loading installed R library: ~w',
+            lib_message_report( Mess, [Rlib], informational )
+            ;
+            true
+        ),
+        r_lib_sys( Rlib )
+        ;
+        fail
+    ).
+r_lib( Rlib, _Opts ) :-
+    r_lib_sys( Rlib ).
+
+r_lib_sys( Rlib ) :-
+     current_prolog_flag( real_suppress_lib_messages, false ),
+     !,
+     r_library_codes( Rlib, '', '', Rcodes ), % fixme to atom
+     atom_codes( R, Rcodes ),
+     real:r_send(R).
+r_lib_sys( Rlib ) :-
+     Pre = 'suppressPackageStartupMessages(',
+     r_lib_codes( Rlib, Pre, ')', Rcodes ),
+     atom_codes( R, Rcodes ),
+     real:r_send( R ).
+r_lib_codes( Rlib, Pre, Post, Rcodes ) :-
+     ( is_list(Rlib) -> Rlib=Rlibs; Rlibs = [Rlib] ),
+     atomic_list_concat( Rlibs, ',', RlibsAtm ),
+     atomic_list_concat( [Pre,'library(',RlibsAtm,')',Post], RlibCallAtm ),
+     atom_codes( RlibCallAtm, Rcodes ).
+
+% values: auto, allow option to override if set to true; false: never warn; true: always warn
+:- Opts = [access(read_write),type(atom),keep(true)],
+   create_prolog_flag(lib_suggests_warns, auto, Opts).
 
 % fixme: user defined ones
-lib_src_sub_dir( src ).
-lib_src_sub_dir( 'src/lib' ).
-lib_src_sub_dir( 'src/auxil' ).
+lib_src_sub_dir(src).
+lib_src_sub_dir('src/lib').
+lib_src_sub_dir('src/auxil' ).
 
 /** <module> Predicate based code development.
 
@@ -150,6 +206,26 @@ Loads all sub-cells of a library.
 ?- load_files( library(bio_db) ).
 
 Will load everything even if cell based loading ahs taken place. (use_module(library(bio_db)) would work.)
+
+---+++ Suggested code
+
+The library supports _suggested_ loading and code execution. These operations are meant for fringe features that 
+are not, by default reported if missing. Reporting in form of warnings can be turned on by either setting flag
+_lib_suggests_warns_ to true (globally controlled), or passing option (local, controlled by developer).
+
+Prolog lag _lib_suggests_warns_ can take values:
+  * auto
+    (default flag value), silent by default unless loading code presents option suggests_warns(true)
+  * true
+    always warn when features are missing. 
+  * false
+    never warn when suggested features are missing
+
+==
+:- lib(suggests(wgraph),[]).
+:- lib(real).
+:- lib(suggests(call(r_lib("GGally"),[]).
+==
 
 ---+ Other features
 
@@ -311,13 +387,14 @@ Listens to =|debug(lib)|=.
 @version  1.6 2018/3/18,  lib/2 suggests(), lib/2, promise() via hot-swapping, private packs
 @version  1.7 2018/4/5,   auto-install missing was broken
 @version  2.2 2018/11/26, cell based module compositionality, & operator (by default load everything)
+@version  2.3 2019/4/18,  user:lib_code_loader/3 hook & r_lib/2, suggests failure messages via lib_suggests_warns flag & options
 @see http://stoics.org.uk/~nicos/sware/lib
 
 */
 
 lib_defaults( pack, [load(true),index(true),homonym(true),type(pack),mode(self)] ).
 lib_defaults( lib, [load(false),index(true),homonym(true),type(lib),mode(self)] ).
-lib_defaults( [suggest(true)] ).
+lib_defaults( [suggests(true)] ).
 
 /**  lib( +Operand ).
      lib( +Operand, +Opts )
@@ -360,9 +437,10 @@ Operands
        declare initilization call (library can be loaded without this firing, if so needed, as is the
        case for lib_mkindex/1)
     * suggests(Lib)
+    * suggests(Lib,SugOpts)
        it is likely you need Lib for full functionalilty. If Lib is a known library it is loaded other wise nothing is loaded.<br>
        This is useful for fringe functionalities that depend on external libraries, where we do not want the average user to do anything
-       if library (Lib) is not there.
+       if library (Lib) is not there. See lib_suggests/2 for details of how to enable warning messages.
     * promise(Pred,Load)
        Pred is needed for functionality and it can be found by loading Load, but it will only happen at Pred's first call.
     * expects(Pid,Mess)
@@ -381,7 +459,7 @@ Opts
   * load(Load)
      whether to load the main entry point of Repo
   * mode(Mode=self)
-     makes miising message more acurate (other value: _suggests_)
+     makes missing message more acurate (other value: _suggests_)
   * suggest(Dn=true)
      suggest the library is downloaded if it is not locally installed ?
   * type(Type)
@@ -452,12 +530,12 @@ The above two directives can be shortened to:
 ==
 
 ==
-?- lib( version(2:2:0, date(2018.11,26)) ).
+?- lib( version(2:3:0, date(2019.4,18)) ).
 true.
 ==
 
 @author nicos angelopoulos
-@version  2:2 2018/11/26
+@version  2:3 2019/4/18
 @tbd when predicate is missing from stoics_lib while loading from b_real, we get clash between main and lazy, error should be clearer (the pred select_all/3 was actually not defined in file either)
 
 */
@@ -481,6 +559,19 @@ lib( Pn/Pa, Cxt, Args ) :-
 lib( Repo:Pn/Pa, Cxt, Args ) :-
     !,
     lib_explicit( Repo, Pn, Pa, Cxt, Args ).
+lib( External,  Cxt, Opts ) :-
+    compound( External ),
+    External =.. [Alias,Lib],
+    user:lib_code_loader( Alias, Mod, Pname ), 
+    !,
+    Goal =.. [Pname,Lib,Opts],
+    ( catch(Mod:Goal,_,fail) ->
+        true
+        ;
+        memberchk( suggest(Sugg), Opts ),
+        lib_missing( Sugg, Lib, Cxt, Opts, true )
+    ).
+
 lib( homonyms(Repo), _, _Args )  :-   
                   % load local homonyms as coming from Repo. can be added to
                   % pack to indicate that LibIndex is incomplete or missing 
@@ -501,7 +592,8 @@ lib( version(V,D), _, _Args ) :-
     % V = 1:2, D = date(2017,3,11).
     % V = 1:4:0, D = date(2017,8,8).
     % V = 1:7:0, D = date(2018,4,5).
-    V = 2:2:0, D = date(2018,11,26).
+    % V = 2:2:0, D = date(2018,11,26).
+    V = 2:3:0, D = date(2019,4,18).
 lib( suggests(Lib), _, _Args ) :- 
     !,
     lib_suggests( Lib ).
@@ -672,10 +764,10 @@ lib_sys( SysLib, AbsLib, ExplicitTkn, Cxt  ) :-
     debug( lib, 'System~w library: ~w, loaded in: ~w', [ExplicitTkn,SysLib,Cxt] ).
 
 lib_not_found( self, Repo, _Cxt ) :-
-    Mess = 'Failed to locate repository:~w, (no local lib, local pack or remote pack)',
+    Mess = 'Failed to locate library:~w, (no local lib, local pack or remote pack)',
     lib_message_report( Mess, [Repo], informational ).
 lib_not_found( suggests, Repo, _Cxt ) :-
-    Mess = 'Failed to locate suggested repository:~w, (no local lib, local pack or remote pack)',
+    Mess = 'Failed to locate suggested library:~w, (no local lib, local pack or remote pack)',
     lib_message_report( Mess, [Repo], informational ).
 
 lib_explicit( Repo, Pn, Pa, Cxt, _Opts ) :-
@@ -728,6 +820,12 @@ lib_repo_lazy_assert( Repo ) :-
 lib_repo_lazy_assert( Repo ) :-
     asserta( lib_tables:lib_lazy(Repo) ).
 
+lib_missing( false, Pack, Cxt, Opts, _Load ) :-
+    memberchk( mode(Mode), Opts ),
+    Mode == suggests,
+    !,
+    current_prolog_flag( lib_suggests_warns, WarnFlag ),
+    lib_missing_suggested( WarnFlag, Pack, Cxt, Opts ).
 lib_missing( false, Pack, Cxt, _Args, _Load ) :-
     debug( lib, 'Instructed to skip contacting server for:~w and context:~w', [Pack,Cxt] ).
 lib_missing( true, Pack, Cxt, Args, Load ) :-
@@ -743,6 +841,25 @@ lib_missing( true, Pack, Cxt, Args, Load ) :-
     !,
     pack_install( Pack ),
     lib_missing_load( Load, Cxt, Pack ).
+
+lib_missing_suggested( WarnFlag, Pack, Cxt, Opts ) :-
+    memberchk( WarnFlag, [auto,debug,false,true] ),
+    !,
+    lib_missing_suggested_known( WarnFlag, Pack, Cxt, Opts ).
+lib_missing_suggested( WarnFlag, _Pack, _Cxt, _Opts ) :-
+    throw( incorrect_value_for_flag(lib_suggests_warns(WarnFlag)) ).
+
+lib_missing_suggested_known( auto, Pack, Cxt, Opts ) :-
+    memberchk( suggests_warns(WarnsOpt), Opts ),
+    ( memberchk(WarnsOpt,[true,false]) -> true; throw(incorrent_option_value_for_option(suggest_warns(WarnsOpt))) ),
+    lib_missing_suggested_known( WarnsOpt, Pack, Cxt, Opts ).
+lib_missing_suggested_known( debug, Pack, Cxt, Opts ) :-
+    lib_missing_suggested_known( true, Pack, Cxt, Opts ).
+lib_missing_suggested_known( false, Pack, Cxt, _Opts ) :-
+    debug( lib, 'Silently ignoring suggested, and missing library: ~w, in context: ~w', [Pack,Cxt] ).
+lib_missing_suggested_known( true, Pack, Cxt, _Opts ) :-
+    Mess = 'Failed to load suggested library:~w, in context: ~w',
+    lib_message_report( Mess, [Pack,Cxt], informational ).
 
 lib_missing_load( true, Cxt, Pack ) :-
     Cxt:use_module( library(Pack) ).
