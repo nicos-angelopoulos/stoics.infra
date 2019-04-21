@@ -41,6 +41,10 @@
 
 user:lib_code_loader(r, lib, r_lib).
 
+% values: auto, allow option to override if set to true; false: never warn; true: always warn; install: install if missing
+:- Opts = [access(read_write),type(atom),keep(true)],
+   create_prolog_flag(lib_suggests_warns, auto, Opts).
+
 r_lib( Rlib, Opts ) :-
      string( Rlib ),
      atom_string( RlibAtm, Rlib ),
@@ -99,10 +103,6 @@ r_lib_codes( Rlib, Pre, Post, Rcodes ) :-
      atomic_list_concat( Rlibs, ',', RlibsAtm ),
      atomic_list_concat( [Pre,'library(',RlibsAtm,')',Post], RlibCallAtm ),
      atom_codes( RlibCallAtm, Rcodes ).
-
-% values: auto, allow option to override if set to true; false: never warn; true: always warn
-:- Opts = [access(read_write),type(atom),keep(true)],
-   create_prolog_flag(lib_suggests_warns, auto, Opts).
 
 % fixme: user defined ones
 lib_src_sub_dir(src).
@@ -851,7 +851,7 @@ lib_missing( true, Pack, Cxt, Args, Load ) :-
     lib_missing_load( Load, Cxt, Pack ).
 
 lib_missing_suggested( WarnFlag, Pack, Cxt, Opts ) :-
-    memberchk( WarnFlag, [auto,debug,false,true] ),
+    memberchk( WarnFlag, [auto,debug,false,install,true] ),
     !,
     lib_missing_suggested_known( WarnFlag, Pack, Cxt, Opts ).
 lib_missing_suggested( WarnFlag, _Pack, _Cxt, _Opts ) :-
