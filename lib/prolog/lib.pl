@@ -76,7 +76,8 @@ r_lib( Rlib, Opts ) :-
         ;
         ( SuggFlag==install -> 
             ( prolog_pack:confirm( contact_r_server(Rlib), yes, [] ) ->
-                real:r_call( 'install.packages'(+ Rlib),  [] )
+                real:r_call( 'install.packages'(+ Rlib),  [] ),
+                real:r_call( library(Rlib), [] )
                 ;
                 true
             )
