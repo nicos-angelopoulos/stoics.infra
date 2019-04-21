@@ -58,7 +58,7 @@ r_lib( Rlib, _Opts ) :-
 r_lib( Rlib, Opts ) :-
     memberchk( suggests(Sugg), Opts ),
     current_prolog_flag( lib_suggests_warns, SuggFlag ),
-    (Sugg == true ; SuggFlag == debug),
+    (Sugg == true ; SuggFlag == debug; SuggFlag == install),
     !,
     real:r_call( rownames('installed.packages'()), [rvar(Rlibs)] ),
     ( memberchk(Rlib,Rlibs) ->
@@ -70,7 +70,15 @@ r_lib( Rlib, Opts ) :-
         ),
         r_lib_sys( Rlib )
         ;
-        fail
+        ( SuggFlag==install -> 
+            ( prolog_pack:confirm( contact_r_server(Rlib), yes, [] ) ->
+                real:r_call( 'install.packages'(+ Rlib),  [] )
+                ;
+                true
+            )
+            ;
+            fail
+        )
     ).
 r_lib( Rlib, _Opts ) :-
     r_lib_sys( Rlib ).
@@ -216,10 +224,10 @@ _lib_suggests_warns_ to true (globally controlled), or passing option (local, co
 Prolog lag _lib_suggests_warns_ can take values:
   * auto
     (default flag value), silent by default unless loading code presents option suggests_warns(true)
-  * true
-    always warn when features are missing. 
   * false
     never warn when suggested features are missing
+  * true
+    always warn when features are missing. 
 
 ==
 :- lib(suggests(wgraph),[]).
