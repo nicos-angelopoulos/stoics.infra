@@ -13,7 +13,7 @@ message(confirm(Question,Default)) -->
 	[ flush ].
 
 message(contact_r_server(Lib)) -->
-    ['Library: ~w, not locally installed. Do you want me to load it from the R server?'-[Lib] ].
+    ['R library: ~w, not locally installed. Do you want me to load it from the R server?'-[Lib] ].
 message(contact_server(Pack)) -->
     ['Library: ~w, not locally installed. Do you want me to search on the SWI server for matching packs ?'-[Pack] ].
 message(pack_on_server(suggests,Pack)) -->
