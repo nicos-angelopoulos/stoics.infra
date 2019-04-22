@@ -1,7 +1,7 @@
 ---   Releases   ---
 --------------------
 
-1.1
+1.1         @   19.04.22 
      19.03.04   LIBS:   lib(suggest(options)) in all preds that call options_append/4
      19.02.25   FIXED:  added map_list_options/3,4 to interface
                 OPTS:   added error on failure, add_options(AddOpts), on_fail(OnFail), and moved call options to option call_options(Copts)

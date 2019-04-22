@@ -1,6 +1,6 @@
 name( stoics_lib ).
 title( 'A medley of library predicates for stoics packs' ).
-version( '1.0' ).
+version( '1.1' ).
 author( 'Nicos Angelopoulos', 'http://stoics.org.uk/~nicos' ).
 packager( 'Nicos Angelopoulos', 'http://stoics.org.uk/~nicos' ).
 maintainer( 'Nicos Angelopoulos', 'http://stoics.org.uk/~nicos' ).
