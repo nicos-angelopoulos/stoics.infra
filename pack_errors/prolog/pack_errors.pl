@@ -322,6 +322,7 @@ Ghi = false.
 ?- ground_binary( abc, Abc ), ground_binary( de(F), Def ), ground_binary( GHI, Ghi ).
 Abc = true,
 Def = Ghi, Ghi = false.
+==
 */
 ground( Term, Type ) :-
     var( Term ),
