@@ -397,13 +397,14 @@ Listens to =|debug(lib)|=.
 @version  1.7 2018/4/5,   auto-install missing was broken
 @version  2.2 2018/11/26, cell based module compositionality, & operator (by default load everything)
 @version  2.3 2019/4/18,  user:lib_code_loader/3 hook & r_lib/2, suggests failure messages via lib_suggests_warns flag & options
+@version  2.4 2019/4/22,  small fix release
 @see http://stoics.org.uk/~nicos/sware/lib
 
 */
 
 lib_defaults( pack, [load(true),index(true),homonym(true),type(pack),mode(self)] ).
 lib_defaults( lib, [load(false),index(true),homonym(true),type(lib),mode(self)] ).
-lib_defaults( [suggests(true)] ).
+lib_defaults( [suggest(true)] ).
 
 /**  lib( +Operand ).
      lib( +Operand, +Opts )
@@ -539,12 +540,12 @@ The above two directives can be shortened to:
 ==
 
 ==
-?- lib( version(2:3:0, date(2019.4,18)) ).
+?- lib( version(2:4:0, date(2019.4,22)) ).
 true.
 ==
 
 @author nicos angelopoulos
-@version  2:3 2019/4/18
+@version  2:4 2019/4/22
 @tbd when predicate is missing from stoics_lib while loading from b_real, we get clash between main and lazy, error should be clearer (the pred select_all/3 was actually not defined in file either)
 
 */
@@ -598,11 +599,7 @@ lib( end(Src), _Cxt, Opts ) :-
     % lib_alias( Alias, Cxt, Opts ).
 lib( version(V,D), _, _Args ) :-
     !,
-    % V = 1:2, D = date(2017,3,11).
-    % V = 1:4:0, D = date(2017,8,8).
-    % V = 1:7:0, D = date(2018,4,5).
-    % V = 2:2:0, D = date(2018,11,26).
-    V = 2:3:0, D = date(2019,4,18).
+    V = 2:4:0, D = date(2019,4,22).
 lib( suggests(Lib), _, _Args ) :- 
     !,
     lib_suggests( Lib ).
