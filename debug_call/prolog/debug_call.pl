@@ -74,6 +74,7 @@ debug_calls uses dynamic -..
 @version 0.2 2016/11/01
 @version 0.3 2017/3/9
 @version 1.1 2018/3/20
+@version 1.2 2019/4/22
 
 */
 
@@ -82,10 +83,12 @@ debug_calls uses dynamic -..
 Current version and release date for the library.
 
 ==
-?- debug_call_version( 1:1:0, date(2018,3,20) ).
+?- debug_call_version( V, D ).
+V = 1:2:0,
+D = date(2019,4,22).
 ==
 */
-debug_call_version( 1:1:1, date(2018,9,11) ).
+debug_call_version( 1:2:0, date(2019,4,22) ).
 
 :- use_module(library(lib)).
 
