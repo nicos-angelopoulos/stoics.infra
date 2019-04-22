@@ -26,7 +26,7 @@
 :- dynamic(lib_tables:lib_repo_homonyms/2).    % +Repo, +SrcDir
 :- dynamic(lib_tables:lib_context/2).          % +Ctx, +Root
 :- dynamic(lib_tables:lib_index/4).            % +Pa, +Pn, +Repo, +File. records loaded indices
-:- dynamic(lib_tables:lib_promise/2).          % +Load, +Pid.  hot swap Pid with loading Load
+:- dynamic(lib_tables:lib_promise/2).          % +Pids, +Cxt, +Load. hot swap Pid with loading Load
 :- dynamic(lib_tables:lib_homonym/3).          % +Stem, +Repo, +File. record loaded homonym
 :- dynamic(lib_tables:lib_loaded_index/2).     % +Repo, +File. tracks loaded index files
 :- dynamic(lib_tables:lib_loaded_homonyms/2).  % 
@@ -60,7 +60,7 @@ r_lib( Rlib, _Opts ) :-
      !,
      r_call( source(+Rfile), [] ).
 r_lib( Rlib, Opts ) :-
-    memberchk( suggests(Sugg), Opts ),
+    memberchk( suggest(Sugg), Opts ),
     current_prolog_flag( lib_suggests_warns, SuggFlag ),
     (Sugg == true ; SuggFlag == debug; SuggFlag == install),
     !,
@@ -607,9 +607,9 @@ lib( suggests(Lib,SgOptS), _, _Args ) :-
     !,
     lib_en_list( SgOptS, SgOpts ),
     lib_suggests( Lib, SgOpts ).
-lib( promise(PidS,Load), _, _Args ) :-
+lib( promise(PidS,Load), Cxt, _Args ) :-
     !,
-    lib_promise( PidS, Load ).
+    lib_promise( PidS, Cxt, Load ).
 lib( expects(Lib,Mess), _, _Opts ) :-
     !,
     lib_expects( Lib, Mess ).
