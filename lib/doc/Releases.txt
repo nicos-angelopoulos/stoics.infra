@@ -3,6 +3,8 @@
 
 Tbd: document @, & (remove fixme: code that might have been needed due to MAIN instead of PACK variable bug.).
 
+2.5
+     19.05.05  IFACE:   added lib(bioc(Lib)) implemented as a optionised special case of lib(r(Lib))
 2.4         @  19.04.21
      19.04.21  FIXED:   default of missing to suggest from suggests
 2.3         @  19.04.18

@@ -39,17 +39,22 @@
 
 :- multifile(user:lib_code_loader/3 ).
 
-user:lib_code_loader(r, lib, r_lib).
+user:lib_code_loader(bioc, lib, lib_bioc).
+user:lib_code_loader(r, lib, lib_r).
 
 % values: auto, allow option to override if set to true; false: never warn; true: always warn; install: install if missing
 :- Opts = [access(read_write),type(atom),keep(true)],
    create_prolog_flag(lib_suggests_warns, auto, Opts).
 
-r_lib( Rlib, Opts ) :-
+lib_bioc( Rlib, Opts ) :-
+    lib_r( Rlib, [bioc(true)|Opts] ).
+
+lib_r( Rlib, Opts ) :-
      string( Rlib ),
+     !,
      atom_string( RlibAtm, Rlib ),
-     r_lib( RlibAtm, Opts ).
-r_lib( Rlib, _Opts ) :-
+     lib_r( RlibAtm, Opts ).
+lib_r( Rlib, _Opts ) :-
      getenv( 'R_LIB_REAL', RlibRealPath ),
      atomic_list_concat( RlibDirs, ':', RlibRealPath ),
      member( Rdir, RlibDirs ),
@@ -59,33 +64,50 @@ r_lib( Rlib, _Opts ) :-
      exists_file( Rfile ),
      !,
      r_call( source(+Rfile), [] ).
-r_lib( Rlib, Opts ) :-
+lib_r( Rlib, Opts ) :-
     memberchk( suggest(Sugg), Opts ),
     current_prolog_flag( lib_suggests_warns, SuggFlag ),
     (Sugg == true ; SuggFlag == debug; SuggFlag == install),
     !,
-    real:r_call( rownames('installed.packages'()), [rvar(Rlibs)] ),
-    ( memberchk(Rlib,Rlibs) ->
-        ( (debugging(lib);SuggFlag==debug) ->
-            Mess = 'Loading installed R library: ~w',
-            lib_message_report( Mess, [Rlib], informational )
-            ;
-            true
-        ),
-        r_lib_sys( Rlib )
+    ( current_predicate(real:r_call/2) ->
+        true
         ;
-        ( SuggFlag==install -> 
-            ( prolog_pack:confirm( contact_r_server(Rlib), yes, [] ) ->
-                real:r_call( 'install.packages'(+ Rlib),  [] ),
-                real:r_call( library(Rlib), [] )
+        catch(use_module(library(real)),_,true)
+    ),
+    ( current_predicate(real:r_call/2) ->           
+        real:r_call(rownames('installed.packages'()), [rvar(Rlibs)]),
+        ( memberchk(Rlib,Rlibs) ->
+            ( (debugging(lib);SuggFlag==debug) ->
+                Mess = 'Loading installed R library: ~w',
+                lib_message_report( Mess, [Rlib], informational )
                 ;
                 true
-            )
+            ),
+            r_lib_sys( Rlib )
             ;
-            fail
+            ( (SuggFlag==install;SuggFlag==debug) -> 
+                ( prolog_pack:confirm( contact_r_server(Rlib), yes, [] ) ->
+                    ( memberchk(bioc(true),Opts) ->
+                        real:r_call( requireNamespace("BiocManager",quietly='TRUE'), [rvar(BiocX)] ),
+                        (BiocX == true -> true; real:r_call('install.packages'("BiocManager"),[])),
+                            real:r_call('BiocManager::install'(+ Rlib),  []),
+                            real:r_call(library(Rlib), [])
+                            ;
+                            real:r_call('install.packages'(+ Rlib),  []),
+                            real:r_call(library(Rlib), [])
+                    )
+                    ;
+                    true
+                )
+                ;
+                fail
+            )
         )
+        ;      % if it is still not installed 
+        Mess1 = 'You need to install SWI-Prolog lib Real before you can lib/1-load R library: ~w',
+        lib_message_report( Mess1, [Rlib], informational )
     ).
-r_lib( Rlib, _Opts ) :-
+lib_r( Rlib, _Opts ) :-
     r_lib_sys( Rlib ).
 
 r_lib_sys( Rlib ) :-
@@ -233,7 +255,7 @@ Prolog lag _lib_suggests_warns_ can take values:
 ==
 :- lib(suggests(wgraph),[]).
 :- lib(real).
-:- lib(suggests(call(r_lib("GGally"),[]).
+:- lib(suggests(call(lib_r("GGally"),[]).
 ==
 
 ---+ Other features
@@ -396,7 +418,7 @@ Listens to =|debug(lib)|=.
 @version  1.6 2018/3/18,  lib/2 suggests(), lib/2, promise() via hot-swapping, private packs
 @version  1.7 2018/4/5,   auto-install missing was broken
 @version  2.2 2018/11/26, cell based module compositionality, & operator (by default load everything)
-@version  2.3 2019/4/18,  user:lib_code_loader/3 hook & r_lib/2, suggests failure messages via lib_suggests_warns flag & options
+@version  2.3 2019/4/18,  user:lib_code_loader/3 hook & lib_r/2, suggests failure messages via lib_suggests_warns flag & options
 @version  2.4 2019/4/22,  small fix release
 @see http://stoics.org.uk/~nicos/sware/lib
 
@@ -540,7 +562,7 @@ The above two directives can be shortened to:
 ==
 
 ==
-?- lib( version(2:4:0, date(2019.4,22)) ).
+?- lib( version(2:4:0, date(2019,4,22)) ).
 true.
 ==
 
