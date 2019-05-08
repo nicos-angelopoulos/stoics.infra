@@ -420,6 +420,7 @@ Listens to =|debug(lib)|=.
 @version  2.2 2018/11/26, cell based module compositionality, & operator (by default load everything)
 @version  2.3 2019/4/18,  user:lib_code_loader/3 hook & lib_r/2, suggests failure messages via lib_suggests_warns flag & options
 @version  2.4 2019/4/22,  small fix release
+@version  2.5 2019/5/8,   bioc (for bioconductor) load term 
 @see http://stoics.org.uk/~nicos/sware/lib
 
 */
@@ -562,12 +563,12 @@ The above two directives can be shortened to:
 ==
 
 ==
-?- lib( version(2:4:0, date(2019,4,22)) ).
+?- lib( version(2:5:0, date(2019,5,8)) ).
 true.
 ==
 
 @author nicos angelopoulos
-@version  2:4 2019/4/22
+@version  2:5 2019/5/8
 @tbd when predicate is missing from stoics_lib while loading from b_real, we get clash between main and lazy, error should be clearer (the pred select_all/3 was actually not defined in file either)
 
 */
@@ -621,7 +622,7 @@ lib( end(Src), _Cxt, Opts ) :-
     % lib_alias( Alias, Cxt, Opts ).
 lib( version(V,D), _, _Args ) :-
     !,
-    V = 2:4:0, D = date(2019,4,22).
+    V = 2:5:0, D = date(2019,5,8).
 lib( suggests(Lib), _, _Args ) :- 
     !,
     lib_suggests( Lib ).
