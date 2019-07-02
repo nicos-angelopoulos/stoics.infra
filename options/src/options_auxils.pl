@@ -1,8 +1,7 @@
 options_auxils.
 
 options_message_report( Format, Args, Kind ) :-
-	phrase('$messages':translate_message(debug(Format,Args)), Lines),
-	print_message_lines(current_output, kind(Kind), Lines).
+    print_message( Kind, format(Format,Args) ).
 
 options_compound( Term, Name, Args ) :-
 	% current_predicate( compound_name_arguments/3 ),
@@ -27,7 +26,7 @@ options_en_list( Else, _Opts ) :-
 options_remainder( [], _OptNm, _OptAr, _Val, [] ).
 options_remainder( [O|Os], OptNm, OptAr, Val, Remain ) :-
     functor( O, OptNm, OptAr ),
-    ( ground(Val) -> 
+    ( ground(Val) ->
         arg( 1, O, Val )
         ;
         true
