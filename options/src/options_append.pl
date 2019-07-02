@@ -10,14 +10,14 @@ options_append_known_process_option( version ).
 Look for PredName_defaults/1 (Defs) and if that exists append its argument to the end of OptS to get All.<br>
 OptS is casted to a list before the append, so single terms are allowed as options.<br>
 In addition, if file user_profile('.pl'/Pname) exists, its terms are appended between OptS and
-the argument of PredName_defaults/1.<br> 
+the argument of PredName_defaults/1.<br>
 Appending of the profile terms, can be by passed with options append_profile(false).<br>
 Listens to debug(options_append).
  
 The predicate can process debug(Dbg) a commonly used option (in All). When Dbg is set to true =|debug( PredName )|= is called.  <br>
 The default value of Dbg is provided by PredName_defaults/1.
 
-OptS and All are options of PredName, whereas OAopts are options of options_append/4 and control 
+OptS and All are options of PredName, whereas OAopts are options of options_append/4 and control
 how OptS are transformed into All.
 
 
@@ -32,83 +32,72 @@ OAopts term or list of
      the arity of the caller, only used for reporting type errors for now
 
   * atoms(-Atoms)
-     removes atoms from input arguments, and instantiates them into Atoms. OptS == true, 
+     removes atoms from input arguments, and instantiates them into Atoms. OptS == true,
      is an exception: Atoms is instantiated to []
 
   * check_types(ChkTypes=true)
-     if the defaults predicate returns a default of options_types(OTypes), 
-     this is removed and used to check the types of the supplied options. 
+     if the defaults predicate returns a default of options_types(OTypes),
+     this is removed and used to check the types of the supplied options.
      OTypes should be OptName-Type pairs list with Type being one of those
      recognised by type/2 in pack(pack_errors).
 
-  * extra_arg(Arg)          
-     multiple allowed. All Arg(s) so passed are added to the Args passed to the defaults predicate, 
-     but not to the generated options. Allows for instance to pass arguments of the call itself 
+  * extra_arg(Arg)
+     multiple allowed. All Arg(s) so passed are added to the Args passed to the defaults predicate,
+     but not to the generated options. Allows for instance to pass arguments of the call itself
      to the defaults predicate without those arguments being added to the Options list
 
   * foreign(-Foreign)
      instantiates to all input options that do not have matching default
      term structure
 
-  * debug(Dbg=none)   
-     if _true_ debug this call, and call prolog_debug:debug_topic(Pname). 
+  * debug(Dbg=none)
+     if _true_ debug this call, and call prolog_debug:debug_topic(Pname).
      if _false_ trun debugging off for this call.
      Else Dbg can be a debug term (other than none,false,true) or list of debug terms.
  
-  * funnel(Proccess)    
-     as process() below, 
+  * funnel(Proccess)
+     as process() below,
      but leaves processed options in All. (By default both debug and version are passed as funnel.)
 
   * pack(Pack)
-     caller pack. For now it is 
-     only used to report type errors
+     caller pack. For now it is only used to report type errors
 
   * process(Proccess)
-     with Proccess in 
-     * debug     
-        will turn on debugging according 
-        to debug/0,1,2 options, see below
+     with Proccess in
+     * debug
+        will turn on debugging according to debug/0,1,2 options, see below
      * version
         partially instantiation version(Vers) in Defs with the term <Pred>(PredVersion) where version(PredVersion) is
         in OptS
 
   * remove_types(Rtypes=true)
-     to pass options_types(OTypes) 
-     to the result Options use Rtypes == false
+     to pass options_types(OTypes) to the result Options use Rtypes == false
 
- When processing debugging options in All, the first matching term of the following is used: 
+ When processing debugging options in All, the first matching term of the following is used:
     * debug
-        short 
-        for debug(true)
+        short for debug(true)
    
     * debug(Dbgs)
-        short 
-        for debug(Dbgs,_Prior)
+        short for debug(Dbgs,_Prior)
 
     * debug(Dbgs,Prior)
-        Prior is the prior status 
-        of debug(PredName). For each element of Dbgs call RHS:
+        Prior is the prior status of debug(PredName). For each element of Dbgs call RHS:
 
-    * true   
-        debug(PredName)
-        same as
+    * true
+        debug(PredName) same as
 
-    * false  
-        nodebug(PredName)
-        same as
+    * false
+        nodebug(PredName) same as
 
-    * none   
-        true
-        same as
+    * none
+        true same as
 
-    * all    
-        debug(_)
-        same as
-    * Other  
-        debug(Other)
-        other
+    * all
+        debug(_) same as
+    * Other
+        debug(Other) other
 
-== 
+==
 ?- assert( demo_defaults(ls(true)) ).
 ?- options_append( demo, ls(false), All ).
 All = [ls(false), ls(true)].
@@ -136,7 +125,6 @@ true.
 ?- os_sel( os_files, ext(svg), Oses, version(V) ).
 Oses = [],
 V = [os_sel(0:1:3), os_file(0:0:4)|_9214].
-
 
 ==
   
@@ -203,7 +191,7 @@ options_append_types_remove( _Defaulty, OptsWT, Opts ) :-
     options_remainder( OptsWT, remove_types, 1, _, Opts ).
 
 % options_append_profile_options( +AddB, +Pname, +Args, -ProfArgs ),
-% 
+%
 % If AddB is true and file $HOME/.pl/Pname.pl exists, append its terms to Args.
 %
 options_append_profile_options( true, Pname, Args, Semi ) :-
@@ -225,7 +213,7 @@ options_append_args( Opts, ArgsList, Arity ) :-
 options_append_args( _Opts, Args, Arity ) :-
     Args = [],
     Arity is 1.
-    */
+*/
 
 options_append_process( [], Opts, _Args, _Defs, _Pname, Opts ).
 options_append_process( [extra_arg(_)|T], All, Args, Defs, Pname, Opts ) :-
@@ -254,19 +242,19 @@ template_in_defaults( Defs, Term ) :-
     functor( Template, Tname, Tarity ),
     memberchk( Template, Defs ).
 
-options_append_process_option( Opt, All, Pname, Args, Defs, Nxt, Enh, Opts ) :- 
+options_append_process_option( Opt, All, Pname, Args, Defs, Nxt, Enh, Opts ) :-
     options_append_known_process_option( Opt ),
     !,
     options_append_option_process( Opt, All, Pname, Args, Defs, Nxt, Enh, Opts ).
-options_append_process_option( Opt, _All, _Pname, _Args, _Defs, _Nxt, _Enh, _Opts ) :- 
+options_append_process_option( Opt, _All, _Pname, _Args, _Defs, _Nxt, _Enh, _Opts ) :-
     throw( options_append( unknown_process_option(Opt)) ).
 
-% user + program can use debug/0,1,2 the first one 
-% is only used, the Dbg terms argument can be a list if 
+% user + program can use debug/0,1,2 the first one
+% is only used, the Dbg terms argument can be a list if
 % more subjects need debugging
-% 
+%
 % fixme: this doesn't work properly from multi_debugs
-%  
+%
 options_append_option_process( debug, All, Pname, _Args, _Defs, NxtEnh, Enh, _Opts ) :-
     partition( option_name(debug), All, Dbgs, Nxt ),
     Dbgs = [Dbg|_],
@@ -285,7 +273,7 @@ options_append_option_process( debug, All, _Pname, _Args, _Defs, Nxt, Enh, _Opts
     Enh = All.
 options_append_option_process( version, All, Pname, Args, Defs, NxtEnh, Enh, _Opts ) :-
     ( memberchk(version(V),Defs) -> true; V=null ),
-    ( memberchk(version(RetV),Args) -> 
+    ( memberchk(version(RetV),Args) ->
         ThisV =.. [Pname,V],
         options_append_option_process_version_return( RetV, ThisV ),
         NxtEnh = All, Enh = All
