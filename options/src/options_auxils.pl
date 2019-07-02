@@ -5,14 +5,13 @@ options_message_report( Format, Args, Kind ) :-
 	print_message_lines(current_output, kind(Kind), Lines).
 
 options_compound( Term, Name, Args ) :-
-	current_predicate( compound_name_arguments/3 ),
-	!,
-	once( (compound(Term) ; (ground(Name),is_list(Args))) ),
+	% current_predicate( compound_name_arguments/3 ),
 	% !,
+	once( (compound(Term) ; (ground(Name),is_list(Args))) ),
 	compound_name_arguments( Term, Name, Args ).
-options_compound( Term, Name, Args ) :-
-	once( (compound(Term) ; (ground(Name),ground(Args))) ),
-	Term =.. [Name,Args].
+% options_compound( Term, Name, Args ) :- % fixme: delete 19.07.02
+	% once( (compound(Term) ; (ground(Name),ground(Args))) ),
+	% Term =.. [Name,Args].
 
 options_en_list( In, Opts ) :-
 	is_list( In ),
