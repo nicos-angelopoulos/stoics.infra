@@ -138,7 +138,7 @@ os_files_defaults( [dir('.'),sub(false)] ).
 % @author nicos angelopoulos
 % @version  0.1 2016/1/31, this version without ref to lib(os_sub)
 % @version  0.2 2018/8/05, added options, dir(Dir) and sub(true), removed os_dir_files/2
-% see os_file/2
+% @see os_file/2
 %
 os_files( Files ) :-
 	findall( File, os_file(File), Files ).
