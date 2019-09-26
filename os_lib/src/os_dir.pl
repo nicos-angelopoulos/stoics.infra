@@ -155,7 +155,7 @@ os_dir_obj( Os, Rel, Entry, OsDir, _Dir, Abs, Stem, Dots, true ) :-  % then recu
     os_dir_sol( single, OsDir, Rel, Os, Rbs, Stem, Dots, true ).
 
 %% os_dirs( -Dirs ).
-%% os_dirs( +AtDir, -Dirs ).
+%% os_dirs( -Dirs, +Opts ).
 %
 % Find all directories for which os_dir(Dir) succeeds.<br>
 % Opts are passed to os_dir/2.
