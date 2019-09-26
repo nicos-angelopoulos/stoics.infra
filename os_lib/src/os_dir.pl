@@ -158,7 +158,7 @@ os_dir_obj( Os, Rel, Entry, OsDir, _Dir, Abs, Stem, Dots, true ) :-  % then recu
 %% os_dirs( +AtDir, -Dirs ).
 %
 % Find all directories for which os_dir(Dir) succeeds.<br>
-% Opts are passed to os_dirs/2.
+% Opts are passed to os_dir/2.
 %
 %==
 % ?- cd( pack(os_lib) ).
