@@ -430,7 +430,7 @@ lib_defaults( lib, [load(false),index(true),homonym(true),type(lib),mode(self)] 
 lib_defaults( [suggest(true)] ).
 
 /**  lib( +Operand ).
-     lib( +Operand, +Opts )
+     lib( +Operand, +Opts ).
 
 Loads code or/and indices of Repo into the current context.
 
