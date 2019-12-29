@@ -1,6 +1,9 @@
 ---   Releases   ---
 --------------------
 
+1.2
+     19.12.29   IFACE:  allow ground term structures in second argument atom_sub/2
+
 1.1         @   19.04.22 
      19.03.04   LIBS:   lib(suggest(options)) in all preds that call options_append/4
      19.02.25   FIXED:  added map_list_options/3,4 to interface

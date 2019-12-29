@@ -2,9 +2,10 @@
 %
 %  Short for sub_atom( Full, _, _, _, Sub ).
 % 
-%  Succeds multiple times. for +Full, +Part.
+%  As per sub_atom/5, it can succeed multiple times, so leaves backtrack points.
 %
-%  See also atom_sub/2.
+%  As of v0.2 +,+ modality calls atom_sub/2 which allows Part to be non atomic.
+%
 %==
 % ?- sub_atom( abcde, bc ).
 % true ;
@@ -13,8 +14,24 @@
 % ?- findall( Sub, sub_atom(abc,Sub), Subs ), length( Subs, Len ).
 % Subs = ['', a, ab, abc, '', b, bc, '', c|...],
 % Len = 10.
+%
+% ?- sub_atom( full, psf(ul) ).
+% false.
+% 
+% ?- sub_atom( full, psf(ll) ).
+% true.
+% 
 %==
 %
+% @author  nicos angelopoulos
+% @version 0:2
+% @see sub_atom/5, atom_sub/2
+%
+sub_atom( Full, Part ) :-
+    compound( Part ),
+    ground( Part ),
+    !,
+    atom_sub( Part, Full ).
 sub_atom( Full, Part ) :-
 	sub_atom( Full, _, _, _, Part ).
 
