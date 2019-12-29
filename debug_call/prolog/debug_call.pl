@@ -451,35 +451,50 @@ debugging_call( Topic, Goal, Mess, Args ) :-
 %% debug_consec( +Topic, +Clrs, +Mess, +Args ).
 % 
 % Alternate the colours of printing messages on Topic,
-% from those in Clrs. When missing these are [blue,magenta].
+% from those in Clrs. When missing these are [blue,magenta]. 
+% As of v0.2 Clrs can be a single colour.
 % 
 %==
 % ?- debug( dbg ).
-% ?- debug_consec( dbg, 'what:~w', when' ).
-% % what: where   %  % in blue
-% ?- debug_consec( dbg, 'what:~w', when' ).
-% % what: where   %  % in magenta
-% ?- debug_consec( dbg, 'what:~w', when' ).
-% % what: where   %  % in blue
+% ?- debug_consec( dbg, 'what:~w', when ).
+% % what: when            <- in blue
+%
+% ?- debug_consec( dbg, 'what:~w', when ).
+% % what: when            <- in magenta
+%
+% ?- debug_consec( dbg, [blue,green], 'what:~w', when ).
+% % what: when            <- in blue
+%
+% ?- debug_consec( dbg, [blue,green], 'what:~w', when ).
+% % what: when            <- in green
+% 
+% ==
+
+% Version 0.2
+%==
+% ?- debug_consec( dbg, magenta, 'what:~w', when ).
+% % what: when            <- in magenta
 %==
 %
 % @author nicos angelopoulos
+% @version  0.2 2019/12/29
 % @version  0.1 2014/7/24
 %
 debug_consec( Topic, Mess, Args ) :-
     Clrs = [blue,magenta],
     debug_consec( Topic, Clrs, Mess, Args ).
 
-debug_consec( Topic, Clrs, Mess, Args ) :-
+debug_consec( Topic, ClrS, Mess, Args ) :-
     debugging_topic( Topic ),
     !,
+    ( is_list(ClrS) -> Clrs = ClrS; Clrs = [ClrS] ),
     debug_consec_topic( Topic, Clrs, Mess, Args ).
 debug_consec( _Topic, _Clrs, _Mess, _Args ).
 
 debug_consec_topic( Topic, Clrs, Mess, Args ) :-
     with_output_to( atom(Topicat), write_term(Topic,[]) ),
     ( nb_current(Topicat,Value) -> true; Value = 1 ),
-    nth1( Value, Clrs, Clr ),
+    ( nth1(Value, Clrs, Clr) -> true; Clrs = [Clr|_] ),
     debug_consec_color( Topic, Clr, Mess, Args ),
     length( Clrs, Len ),
     ( Value < Len -> Next is Value + 1; Next is 1 ),
