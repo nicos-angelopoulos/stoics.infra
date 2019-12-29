@@ -468,8 +468,8 @@ debugging_call( Topic, Goal, Mess, Args ) :-
 % ?- debug_consec( dbg, [blue,green], 'what:~w', when ).
 % % what: when            <- in green
 % 
-% ==
-
+%==
+% 
 % Version 0.2
 %==
 % ?- debug_consec( dbg, magenta, 'what:~w', when ).
