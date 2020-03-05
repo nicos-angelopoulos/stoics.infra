@@ -1,4 +1,5 @@
 1:1  
+     20.02.22   SCRIPT:   extra how-to load comment, spudlike
      19.03.19   DOC:      CLI example for doc-everything
      19.03.18   SCRIPT:   spudlike extensions, added options
 

@@ -9,6 +9,7 @@ See doc for spudlike/0.
 */
 
 /** spudlike.
+    spudlike(Opts).
 
     (Re-)Start a server at Port serving all currently installed packs.<br>
     Only tested on linux.
@@ -17,9 +18,31 @@ See doc for spudlike/0.
 % upsh spudlike
 ==
 
+Opts
+ * allow(Allow=[])
+   Ips allowed to connect to server
+
+ * browser(Browser=true)
+   whether to start a browser window authomatically
+   
+ * kill(Kill=true)
+   whether to kill existing server
+
+ * port(Port=3003)
+   port for server
+
+ * scripts(Scripts=false)
+   experimental: untested, whether to load to server, upsh locatable scripts
+
+ * server(ServerAt=localhost)
+   host of the server
+
+
 You can add something like the following to a launcher in your linux windows manager:
 ==
 /usr/local/users/nicos/local/git/bin/swipl -f none -l /usr/local/users/nicos/local/git/lib/swipl/pack/spuds/scripts/spudlike.pl -g spudlike
+% -t below can be replaced with -g, the -t makes the process restart continuously, only use on stable set-ups
+/usr/local/users/nicos/local/git/bin/swipl -f none -g "[pack(spuds/scripts/spudlike)]" -t spudlike
 ==
 which will also give you doc for any start-up loading packs. The "-f" is critical in avoiding to load stuff from ~/.swiplrc that will not
 be documented as they are loaded before the server started.
@@ -56,9 +79,12 @@ spudlike( Args ) :-
     ),
     append( Args, UserOpts, Opts ),
     debug( spudlike, 'Opts: ~w', [Opts] ),
-    ( memberchk(port(Port),Opts) -> true; Port = 3003 ),
-    ( memberchk(server(Server),Opts) -> true; Server = localhost ),
-    ( memberchk(kill(Kill),Opts) -> true; Kill = true ),
+    options_val( port(Port), Opts, 3003 ),
+    options_val( server(Server), Opts, localhost ),
+    options_val( kill(Kill), Opts, true ),
+    % ( memberchk(port(Port),Opts) -> true; Port = 3003 ),
+    % ( memberchk(server(Server),Opts) -> true; Server = localhost ),
+    % ( memberchk(kill(Kill),Opts) -> true; Kill = true ),
     findall( allow(Allow), member(allow(Allow),Opts), AllowsPrv ),
     ( AllowsPrv = [] -> 
         ( Server == localhost ->
@@ -72,7 +98,8 @@ spudlike( Args ) :-
         AllowsPrv = Allows
     ),
     debug( spudslike, 'Server: ~w, Port: ~w', [Server,Port] ),
-    spudlike( Server, Port, Allows, Kill ),
+    options_val( scripts(Scripts), Opts, true ),
+    spudlike( Server, Port, Allows, Kill, Scripts ),
     ( memberchk(browser(Browser),Opts) -> true; Browser = true ),
     ( Browser == false ->
         true
@@ -87,7 +114,7 @@ spudlike_busy :-
     !,
     spudlike_busy.
 
-spudlike( localhost, Port, Allows, Kill ) :-
+spudlike( localhost, Port, Allows, Kill, Scripts ) :-
     spudlike_kill( Kill, localhost ),
     doc_server( Port, Allows ),
     debug( spudlike, 'doc_server(~w,~w)', [Port,Allows] ),
@@ -97,18 +124,41 @@ spudlike( localhost, Port, Allows, Kill ) :-
     absolute_file_name( Pack, Packed, AbsOpts ),
     !,
     debug( spudlike, 'Packs directory: ~p', Packed ),
-    directory_files( Packed, AllSubs ),
-    once( select('.',AllSubs,NodSubs) ),
-    once( select('..',NodSubs,NtdSubs) ),
+    directory_files( Packed, WithDotsSubs ),
+    once( select('.',WithDotsSubs,NodSubs) ),
+    once( select('..',NodSubs,Subs) ),
     % os_dir_dirs( Packed, Packs ),
-    maplist( spudlike_load(Packed), NtdSubs ),
+    maplist( spudlike_load(Packed), Subs ),
+    spudlike_scripts( Scripts, Packed, Subs ),
     atomic_list_concat( ['http://localhost:',Port,'/pldoc'], '', Url ),
     debug( spudlike, '~w', [Url] ).
-spudlike( Remote, _Port, _Allows, _Kill ) :-
+spudlike( Remote, _Port, _Allows, _Kill, _Scripts ) :-
     % fixme: pass Opts ?
     getenv( 'USER', User ),
     atomic_list_concat( [User,Remote], '@', From ),
     process_create( path(ssh), ['-Y',From,pupsh,spudlike], [] ).
+
+spudlike_scripts( true, _Packed, _PackSubs ) :- 
+    !,
+    % fixme(here).
+    % do the bin first
+    % use tmp module ?
+    % user:file_search_path( home, Home ),
+    % ( expand_file_name( '$HOME', [Home|_] ) -> true; Home = '/home/nicos' ),
+    expand_file_name( '$HOME', [Home|_] ),
+    directory_file_path( Home, bin, Bin ),
+    directory_file_path( Bin, cline_upsh, Cline ),
+    directory_files( Cline, ClineSubs ),
+    findall( _, ( member(PlF,ClineSubs), atom_concat(_,pl,PlF), write(doing(PlF)),nl,
+                  directory_file_path( Cline, PlF, PlP ),
+                  consult(tmp:PlP)
+                  % consider abolishing all tmp:_ ?
+                ),
+                    _ ), 
+    % then do the Subs (again tmp:module)
+    % fixme(Subs).
+    true.
+spudlike_scripts(_,_,_).
 
 spudlike_load( _, 'Downloads' ) :-
     !.
@@ -130,9 +180,23 @@ spudlike_kill( true, localhost ) :-   % only attempt when running locally
     debug( spudlike, 'This process id: ~d', ThisPid ), nl,
     psa_lines( spudlike, LnsPrv ),
     exclude( atom_sub('grep cline'), LnsPrv, LnsCline ),
-    ( (include( atom_sub('swipl -x'),LnsCline,LnsSwi),LnsSwi\==[]) -> true; LnsSwi = LnsCline ),
-    ( (include(atom_sub('upsh'),LnsSwi,LnsUpsh),LnsUpsh \==[]) -> true; LnsUpsh = LnsSwi ),
-    include( atom_sub('swipl'), LnsUpsh, Lns ),
+    include( atom_sub('-g spudlike'), LnsCline, LnsG ),
+    ( LnsG = [] -> 
+        include( atom_sub('-t spudlike'), LnsCline, Lns )
+        ;
+        Lns = LnsG
+    ),
+
+    % ( (include( atom_sub('swipl'),LnsCline,LnsSwi),write(here(LnsSwi)), nl,LnsSwi\==[]) -> true; LnsSwi = LnsCline ),
+    % debug( spudlike, 'Swi lines: ~w', [LnsSwi] ),
+    % upsh: (but currently SWI throws error anyway
+    % ( (include( atom_sub('swipl -f'),LnsCline,LnsSwi),LnsSwi\==[]) -> true; LnsSwi = LnsCline ),
+    % ( (include(atom_sub('upsh'),LnsSwi,LnsUpsh),LnsUpsh \==[]) -> true; LnsUpsh = LnsSwi ),
+    % include( atom_sub('swipl'), LnsUpsh, Lns ),
+    % % findall( Aln, (member(Aln,LnsSwi),atom_concat(_,spudlike,Aln)), Lns ),
+    % include( atom_sub('spudlike'),LnsCline,LnsSwi),write(here(LnsSwi)), nl,LnsSwi\==[]) -> true; LnsSwi = LnsCline ),
+
+    debug( spudlike, 'Identified lines: ~w', [Lns] ),
     member( Ln, Lns ),
     once( (atomic_list_concat([_|T],' ',Ln),member(Pid,T),Pid \== '',atom_number(Pid,PidNum) ) ),
     PidNum =\= ThisPid,
@@ -189,3 +253,7 @@ process_output( Exe, Args, Atom ) :-
    Create = process_create(path(Exe),Args,Opts),
    setup_call_cleanup( Create, read_string(Out,_,Output), close(Out) ),
    atom_string( Atom, Output ).
+
+options_val( Compound, Opts, Def ) :-
+    ( memberchk(Compound,Opts) -> true; arg(1,Compound,Def) ),
+    !.
