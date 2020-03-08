@@ -167,12 +167,18 @@ spudlike_load( Root, Pack ) :-
     exists_directory( Path ),
     !,
     debug( spudlike, '...loading: ~w', Pack ),
-    ( catch(lib(Pack),_,fail) -> 
+    spudlike_loads( Pack, LoadThis ),
+    ( catch(lib(LoadThis),_,fail) -> 
         true
         ;
-        debug( spudlike, '...FAILED to load it', true )
+        debug( spudlike, '...FAILED to load it', [] )
     ).
 spudlike_load( _Root, _Pack ).  % skipping litter files
+
+spudlike_loads( Pack, LoadThis ) :-
+    spudlike_loads_specific( Pack, LoadThis ),
+    !.
+spudlike_loads( Pack, Pack ).
 
 spudlike_kill( true, localhost ) :-   % only attempt when running locally
     current_prolog_flag( unix, true ),
@@ -208,7 +214,7 @@ spudlike_kill( true, localhost ) :-   % only attempt when running locally
 spudlike_kill( true, _Server ) :-
     current_prolog_flag( unix, true ),
     !,
-    debug( spudlike, 'No running spudlike found.', true ).
+    debug( spudlike, 'No running spudlike found.', [] ).
 spudlike_kill( _, _Server ). 
     % SWI will throw an error if an old instance is running... so let it succeed here
 
@@ -257,3 +263,5 @@ process_output( Exe, Args, Atom ) :-
 options_val( Compound, Opts, Def ) :-
     ( memberchk(Compound,Opts) -> true; arg(1,Compound,Def) ),
     !.
+
+spudlike_loads_specific( terminus_store_prolog, terminus_store ).
