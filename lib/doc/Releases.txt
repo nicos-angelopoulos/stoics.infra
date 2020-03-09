@@ -3,8 +3,11 @@
 
 Tbd: document @, & (remove fixme: code that might have been needed due to MAIN instead of PACK variable bug.).
 
+2.7
+      20.03.08 DOC:     skeleton clarification + tiny typo
+
 2.6         @  20.09.08  
-      20.09.08 FIX:     the warning spewed by loading old (bio_db) module.
+      20.03.08 FIX:     the warning spewed by loading old (bio_db) module.
 
 2.5         @  19.05.08
      19.05.05  IFACE:   added lib(bioc(Lib)) implemented as a optionised special case of lib(r(Lib))
