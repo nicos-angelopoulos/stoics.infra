@@ -438,31 +438,8 @@ Loads code or/and indices of Repo into the current context.
 When Repo =|homonym(Repository)|= then only the homonims of local dir
 (adjusted for pack dir structure) are added to as coming from Repository.
 
-Operands
-  * SysLibrary
-    An installed library (atomic). Is loaded with use_module( library(SysLibrary) ).
-  * Pack
-    A pack known to SWI. If pack is not installed then the server is contacted to look
-    for name-matching packs that can be installed. If there is at least
-    one matching pack, it can be installed interactively.
-  * LibDir
-    Declares a library directory should be 
-      * atomic,       
-           an absolute path
-      * rel(Rel)     
-           Rel will be absolute_file_name/3 to be made into an absolute location
-      * alias(Dir)    
-           as above, but ensures that nothing in Dir is interpreted as a command
-      * compound 
-           compound terms are tried to be expanded to an existing directory
 
-    The default options for libs are
-      * load(Load=false)
-      * index(Idx=true)
-      * homonyms(Hmns=true)
-      * type(Type=lib)
-
-  * Command
+  * Operand
     One of 
     * homonyms(From)
        attach homonyms From pack
@@ -498,12 +475,13 @@ Opts
      suggest the library is downloaded if it is not locally installed ?
   * type(Type)
      enforce a particular type of repository (pack or lib)
+
   
 The defaults depend on whether Repo is a pack or a lib. 
-* Packs get defaults
-    [load(true),index(true),homonym(false),type(pack)]
-* Libs get defaults
-    [load(false),index(true),homonym(true),type(lib)]
+  * opts(Opts=PackDefs)
+     PackDefs= =|[load(true),index(true),homonym(false),type(pack)]|=
+  * opts(Opts=LibDefs)
+     LibDefs = =|[load(false),index(true),homonym(true),type(lib)]|=
 
 When invoked with code attaching operands (SysLibrary, Pack or Lib) 
 the predicate will first load anything that needs to be loaded in their native module
@@ -563,9 +541,12 @@ The above two directives can be shortened to:
 ?- lib(stoics_lib:kv_decompose/3).
 ==
 
+Current version can be found by:
 ==
-?- lib( version(2:6:0, date(2020,3,8)) ).
-true.
+?- 
+    lib( version(Vers,Date) ).
+Vers = 2:6:0,
+Date = date(2020, 3, 8).
 ==
 
 @author nicos angelopoulos
