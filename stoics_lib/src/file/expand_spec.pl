@@ -5,8 +5,8 @@
 
    Expand the file specification FileSpec to a simple 
 
-   Similar to  exapnd_file_name/2 for Atomic FileSpec but it also 
-   works on termed and aliaed args (abc/def.pl and abc(def.pl) respectively).
+   Similar to expand_file_name/2 for Atomic FileSpec but it also 
+   works on termed and aliased args (abc/def.pl and abc(def.pl) respectively).
 
 == 
 ?- expand_spec( '$HOME', Home ).
