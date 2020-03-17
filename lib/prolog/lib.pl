@@ -207,7 +207,8 @@ Also loads everything.
 ==
 ?- lib(& bio_db).
 ==
-Loads the skeleton of the module (cells usually laod the module dependencies like this).
+Loads the skeleton of the module (cells usually load the module dependencies like this).
+That is, file pack(prolog/bio_db.pl), but not the cell files in pack(cell/ * ). 
 
 ==
 ?- lib(& bio_db(hs)).
