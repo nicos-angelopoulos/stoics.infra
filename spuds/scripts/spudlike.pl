@@ -1,4 +1,4 @@
-:-  module( spudlike, [spudlike/0] ).
+:-  module( spudlike, [spudlike/0,spudlike/1] ).
 
 :- debug(spudlike).
 
@@ -19,48 +19,61 @@ See doc for spudlike/0.
 ==
 
 Opts
- * allow(Allow=[])
-   Ips allowed to connect to server
 
- * browser(Browser=true)
-   whether to start a browser window authomatically
-   
- * kill(Kill=true)
-   whether to kill existing server
+  * allow(Allow=[])
+  Ips allowed to connect to server
 
- * port(Port=3003)
-   port for server
+  * browser(Browser=true)
+  whether to start a browser window authomatically. if not a boolean is taken to be the page to start
 
- * scripts(Scripts=false)
-   experimental: untested, whether to load to server, upsh locatable scripts
+  * kill(Kill=true)
+  whether to kill existing server
 
- * server(ServerAt=localhost)
-   host of the server
+  * port(Port=3003)
+  port for server
 
+  * scripts(Scripts=false)
+  experimental: untested, whether to load to server, upsh locatable scripts
+
+  * server(Server=localhost)
+  domain name of the server to access
 
 You can add something like the following to a launcher in your linux windows manager:
 ==
-/usr/local/users/nicos/local/git/bin/swipl -f none -l /usr/local/users/nicos/local/git/lib/swipl/pack/spuds/scripts/spudlike.pl -g spudlike
-% -t below can be replaced with -g, the -t makes the process restart continuously, only use on stable set-ups
-/usr/local/users/nicos/local/git/bin/swipl -f none -g "[pack(spuds/scripts/spudlike)]" -t spudlike
+/usr/local/users/nicos/local/git/bin/swipl -f none 
+    -g "doc_collect(true),[pack(spuds/scripts/spudlike)]" -t spudlike
+
+/usr/local/users/nicos/local/git/bin/swipl -f none 
+    -g "[pack(spuds/scripts/spudlike)]" -g spudlike
+
+/usr/local/users/nicos/local/git/bin/swipl -f none 
+    -g "doc_collect(true),[pack(spuds/scripts/spudlike)]" 
+        -g "spudlike(browser('search?for=stoics_lib&in=all&match=summary'))"
+
 ==
-which will also give you doc for any start-up loading packs. The "-f" is critical in avoiding to load stuff from ~/.swiplrc that will not
-be documented as they are loaded before the server started.
+which will also give you doc for any start-up loading packs (and spudlike/0,1). The "-f" is critical in that normal user profile is not loaded before
+the server has been started (in which case it will not be in the doc server).
 
 @author nicos angelopoulos
 @version  0.2 2018/01/26
 @version  0.3 2018/02/07,  removed dependency to by_unix
 @version  0.4 2019/03/21,  generalise for home network use. added options and CLI example
+@version  0.5 2020/03/19,  steadfast kill code; doc enhancements; work in tmp dir courtesy tmp_file/2; browser to page
 
 */
 
 spudlike :-
     spudlike( [] ).
-spudlike( Args ) :-
+spudlike( ArgS ) :-
+    ( is_list(ArgS) -> Args=ArgS; Args=[ArgS] ),
+    tmp_file( spudlike, Tmp ),
+    make_directory( Tmp ),
+    working_directory( _, Tmp ),
+    debug( spudlike, 'Working dir: ~w', [Tmp] ),
     ( getenv('HOST',Host) -> 
         atomic_list_concat( ['spudlike_', Host, '.pl'], HostPrefsB )
         ;
-        Host = localhost,
+        % Host = localhost,
         HostPrefsB = 'spudlike.pl'
     ),
     ( ( 
@@ -90,7 +103,8 @@ spudlike( Args ) :-
         ( Server == localhost ->
             Allows = [] % doc_server/2 defaults are fine
             ;
-            process_output( hostname, '-I', Atom ),
+            % process_output( hostname, ['-I'], Atom ),
+            process_output( hostname, [], Atom ),
             atom_concat( IP, ' \n', Atom ),
             Allows = [allow(IP)]
         )
@@ -101,10 +115,16 @@ spudlike( Args ) :-
     options_val( scripts(Scripts), Opts, true ),
     spudlike( Server, Port, Allows, Kill, Scripts ),
     ( memberchk(browser(Browser),Opts) -> true; Browser = true ),
+    debug( spudslike, 'Browser: ~w', [Browser] ),
     ( Browser == false ->
         true
         ;
-        atomic_list_concat( ['http://',Host,':',Port,'/pldoc'], '', Url ),
+        ( Browser == true ->
+            atomic_list_concat( ['http://',Server,':',Port,'/pldoc'], '', Url )
+            ;
+            atomic_list_concat( ['http://',Server,':',Port,'/pldoc/',Browser], '', Url )
+        ),
+        debug( spudslike, 'URL: ~w', [Url] ),
         www_open_url(Url)
     ),
     spudlike_busy.

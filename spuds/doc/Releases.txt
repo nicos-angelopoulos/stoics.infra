@@ -1,4 +1,7 @@
-1:1  
+1:1         @   20.03.19
+     20.03.19   SCRIPT:   work in /tmp/ via tmp_file/2
+                SCRIPT:   doc example now allows for server that documents spudlike/0
+                SCRIPT:   browser can now point to page
      20.03.07   SCRIPT:   fix debug(,,true) broken compatibility
                 SCRIPT:   allow packs to loads something else by nameshake
                           this currently managed by a curated fact predicate
