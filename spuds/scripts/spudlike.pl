@@ -26,8 +26,8 @@ be documented as they are loaded before the server started.
 
 @author nicos angelopoulos
 @version  0.2 2018/01/26
-@version  0.3 2018/02/07,  removed dependency to by_unix
-@version  0.4 2019/03/21,  generalise for home network use. added options and CLI example
+@version  0.3 2018/02/07   removed dependency to by_unix
+@version  0.4 2019/03/21   generalise for home network use. added options and CLI example
 
 */
 
