@@ -75,6 +75,7 @@ debug_calls uses dynamic -..
 @version 0.3 2017/3/9
 @version 1.1 2018/3/20
 @version 1.2 2019/4/22
+@version 1.3 2020/3/7, not published yet
 
 */
 
@@ -84,11 +85,11 @@ Current version and release date for the library.
 
 ==
 ?- debug_call_version( V, D ).
-V = 1:2:0,
-D = date(2019,4,22).
+V = 1:3:0,
+D = date(2020,3,7).
 ==
 */
-debug_call_version( 1:2:0, date(2019,4,22) ).
+debug_call_version( 1:3:0, date(2019,4,22) ).
 
 :- use_module(library(lib)).
 
@@ -414,6 +415,23 @@ debug_portray( _Topic, _Term ).
 %    debug_call( suv, ns_sel, c(Etc,Etcs,'suv file',true) )
 % Continuing with: suv file, as: suv-17.09.26.txg, from non singleton list: [suv-17.09.26.txg,suv-17.09.21.txg]
 %==
+% 
+% At some point around SWI-Prolog 8, behaviour of debug/3 changed in being more strict about messages with no arguments.
+% As of version 1.2 debug_call/3 can act as a replacement of debug/3 but with the ord behaviour.
+%==
+% ?- debug( ex, 'Messagging...', true ).
+% % Messagging...
+    % [[ EXCEPTION while printing message 'Messagging...'
+       % with arguments user:true:
+       % raised: format('too many arguments')
+    % ]]
+% 
+% true.
+% 
+% ?- debug_call( ex, 'Messagging...', true ).
+% % Messagging...
+% true.
+%==
 %
 % @author nicos angelopoulos
 % @version  0.1 2014/03/27
@@ -422,6 +440,7 @@ debug_portray( _Topic, _Term ).
 % @version  0.4 2014/09/22  renamed from debug_call/3
 % @version  0.5 current     added ns_sel
 % @version  1.1 2018/3/20   prefer +2 arity in debug_call/2
+% @version  1.2 2020/3/07   make it also a replacement for debug/3 (but with old 3rd arg behaviour.
 %
 debug_call( Topic, Goal, Args ) :-
     debug_call( Topic, Goal, '', Args ).
@@ -440,9 +459,17 @@ debugging_call( Topic, call(Goal), Mess, Args ) :-
     call( Goal ),
     debug_message( Topic, Mess, Args ).
 debugging_call( Topic, Goal, Mess, Args ) :-
+    compound( Goal ),
     call( Goal ),
+    !,
     debug_message( Topic, Mess, Args ).
-
+% 20.03.07: this makes debug_call/3 a replacement for debug/3...
+debugging_call( Topic, Mess, '', DbgCallArgs ) :-
+    % as of SWI-Prolog 8.?.? there is an error thrown when true is used instead of [] as 3rd arg of debug/3
+    atomic( Mess ),
+    !,
+    ( DbgCallArgs == true -> Args = []; DbgCallArgs = Args ),
+    debug( Topic, Mess, Args ).
 debugging_call( Topic, Goal, Mess, Args ) :-
     Called = debug_call(Topic,Goal,Mess,Args),
     message_report( 'failure ignored on: ~w', Called, warning ).

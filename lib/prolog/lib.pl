@@ -207,7 +207,8 @@ Also loads everything.
 ==
 ?- lib(& bio_db).
 ==
-Loads the skeleton of the module (cells usually laod the module dependencies like this).
+Loads the skeleton of the module (cells usually load the module dependencies like this).
+That is, file pack(prolog/bio_db.pl), but not the cell files in pack(cell/ * ). 
 
 ==
 ?- lib(& bio_db(hs)).
@@ -421,6 +422,7 @@ Listens to =|debug(lib)|=.
 @version  2.3 2019/4/18,  user:lib_code_loader/3 hook & lib_r/2, suggests failure messages via lib_suggests_warns flag & options
 @version  2.4 2019/4/22,  small fix release
 @version  2.5 2019/5/8,   bioc (for bioconductor) load term 
+@version  2.6 2020/3/8,   fixed cell-loading warnings
 @see http://stoics.org.uk/~nicos/sware/lib
 
 */
@@ -437,31 +439,8 @@ Loads code or/and indices of Repo into the current context.
 When Repo =|homonym(Repository)|= then only the homonims of local dir
 (adjusted for pack dir structure) are added to as coming from Repository.
 
-Operands
-  * SysLibrary
-    An installed library (atomic). Is loaded with use_module( library(SysLibrary) ).
-  * Pack
-    A pack known to SWI. If pack is not installed then the server is contacted to look
-    for name-matching packs that can be installed. If there is at least
-    one matching pack, it can be installed interactively.
-  * LibDir
-    Declares a library directory should be 
-      * atomic,       
-           an absolute path
-      * rel(Rel)     
-           Rel will be absolute_file_name/3 to be made into an absolute location
-      * alias(Dir)    
-           as above, but ensures that nothing in Dir is interpreted as a command
-      * compound 
-           compound terms are tried to be expanded to an existing directory
 
-    The default options for libs are
-      * load(Load=false)
-      * index(Idx=true)
-      * homonyms(Hmns=true)
-      * type(Type=lib)
-
-  * Command
+  * Operand
     One of 
     * homonyms(From)
        attach homonyms From pack
@@ -497,12 +476,13 @@ Opts
      suggest the library is downloaded if it is not locally installed ?
   * type(Type)
      enforce a particular type of repository (pack or lib)
+
   
 The defaults depend on whether Repo is a pack or a lib. 
-* Packs get defaults
-    [load(true),index(true),homonym(false),type(pack)]
-* Libs get defaults
-    [load(false),index(true),homonym(true),type(lib)]
+  * opts(Opts=PackDefs)
+     PackDefs= =|[load(true),index(true),homonym(false),type(pack)]|=
+  * opts(Opts=LibDefs)
+     LibDefs = =|[load(false),index(true),homonym(true),type(lib)]|=
 
 When invoked with code attaching operands (SysLibrary, Pack or Lib) 
 the predicate will first load anything that needs to be loaded in their native module
@@ -562,13 +542,16 @@ The above two directives can be shortened to:
 ?- lib(stoics_lib:kv_decompose/3).
 ==
 
+Current version can be found by:
 ==
-?- lib( version(2:5:0, date(2019,5,8)) ).
-true.
+?- 
+    lib( version(Vers,Date) ).
+Vers = 2:6:0,
+Date = date(2020, 3, 8).
 ==
 
 @author nicos angelopoulos
-@version  2:5 2019/5/8
+@version  2:6 2020/3/8
 @tbd when predicate is missing from stoics_lib while loading from b_real, we get clash between main and lazy, error should be clearer (the pred select_all/3 was actually not defined in file either)
 
 */
@@ -622,7 +605,7 @@ lib( end(Src), _Cxt, Opts ) :-
     % lib_alias( Alias, Cxt, Opts ).
 lib( version(V,D), _, _Args ) :-
     !,
-    V = 2:5:0, D = date(2019,5,8).
+    V = 2:6:0, D = date(2020,3,8).
 lib( suggests(Lib), _, _Args ) :- 
     !,
     lib_suggests( Lib ).
@@ -684,6 +667,7 @@ lib( &(Pack), Cxt, _Opts ) :-
     % absolute_file_name( pack(Pack), PackD, [file_type(directory),access(exist)] ),
     !,
     asserta( lib_tables:lib_skeleton_only(Pack) ),
+    debug( lib, 'Loading of ampersand pack with: ~w', [Cxt:use_module(library(Pack))] ),
     Cxt:use_module( library(Pack) ),
     once( retract(lib_tables:lib_skeleton_only(Pack)) ).
 
@@ -692,6 +676,7 @@ lib( &(CellIn), Cxt, Opts ) :-
     lib_cell( CellIn, Main, Cell, Opts ),
     % Cxt:use_module( library(Main) ),
     asserta( lib_tables:lib_skeleton_only(Main) ),
+    debug( lib, 'Loading of ampersand cell (~w) with: ~w', [CellIn,Cxt:use_module(library(Main))] ),
     Cxt:use_module( library(Main) ),
     once( retract(lib_tables:lib_skeleton_only(Main)) ),
 
@@ -1059,7 +1044,11 @@ lib_export_cell( Main, RelCell, Cxt ) :-
                         )
                         ),
                         \+ predicate_property(Cxt:Pid,_),
-                        Cxt:import(Mod:Pid)
+                        functor( Pid, Pnm, Par ),
+                        % export(Mod:Pid),
+                        % Cxt:import(Mod:Pid)
+                        Cxt:import(Cod:Pnm/Par),
+                        Cxt:export(Cxt:Pnm/Par)
                   ), Pids ),
     debug( lib, 'lib imported in context: ~w, from mod: ~w, having cell, ~w, the predicates: ~w', [Cxt,Main,RelCell,Pids] ).
 

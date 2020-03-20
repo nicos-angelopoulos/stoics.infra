@@ -41,7 +41,6 @@ locate( FileSpec, Exts, DefExt, Location ) :-
 	include( loc_prefix_atom(Bname), DFiles, Candidates ),
 	locate_in_prefix_candidates( Candidates, Bname, DefExt, LcBname ),
 	directory_file_path( Dir, LcBname, Location ).
-
 locate( File, Exts, DefExt, Location ) :-
 	en_list( Exts, ExtsL ),
 	expand_spec( File, Expanded ),

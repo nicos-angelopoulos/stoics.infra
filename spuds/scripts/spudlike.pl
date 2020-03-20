@@ -1,4 +1,4 @@
-:-  module( spudlike, [spudlike/0] ).
+:-  module( spudlike, [spudlike/0,spudlike/1] ).
 
 :- debug(spudlike).
 
@@ -9,6 +9,7 @@ See doc for spudlike/0.
 */
 
 /** spudlike.
+    spudlike(Opts).
 
     (Re-)Start a server at Port serving all currently installed packs.<br>
     Only tested on linux.
@@ -17,27 +18,61 @@ See doc for spudlike/0.
 % upsh spudlike
 ==
 
+Opts
+
+  * allow(Allow=[])
+  Ips allowed to connect to server
+
+  * browser(Browser=true)
+  whether to start a browser window authomatically. if not a boolean is taken to be the page to start
+
+  * kill(Kill=true)
+  whether to kill existing server
+
+  * port(Port=3003)
+  port for server
+
+  * scripts(Scripts=false)
+  experimental: untested, whether to load to server, upsh locatable scripts
+
+  * server(Server=localhost)
+  domain name of the server to access
+
 You can add something like the following to a launcher in your linux windows manager:
 ==
-/usr/local/users/nicos/local/git/bin/swipl -f none -l /usr/local/users/nicos/local/git/lib/swipl/pack/spuds/scripts/spudlike.pl -g spudlike
+/usr/local/users/nicos/local/git/bin/swipl -f none 
+    -g "doc_collect(true),[pack(spuds/scripts/spudlike)]" -t spudlike
+
+/usr/local/users/nicos/local/git/bin/swipl -f none 
+    -g "[pack(spuds/scripts/spudlike)]" -g spudlike
+
+/usr/local/users/nicos/local/git/bin/swipl -f none 
+    -g "doc_collect(true),[pack(spuds/scripts/spudlike)]" 
+        -g "spudlike(browser('search?for=stoics_lib&in=all&match=summary'))"
+
 ==
-which will also give you doc for any start-up loading packs. The "-f" is critical in avoiding to load stuff from ~/.swiplrc that will not
-be documented as they are loaded before the server started.
+which will also give you doc for any start-up loading packs (and spudlike/0,1). The "-f" is critical in that normal user profile is not loaded before
+the server has been started (in which case it will not be in the doc server).
 
 @author nicos angelopoulos
 @version  0.2 2018/01/26
-@version  0.3 2018/02/07   removed dependency to by_unix
-@version  0.4 2019/03/21   generalise for home network use. added options and CLI example
-
+@version  0.3 2018/02/07,  removed dependency to by_unix
+@version  0.4 2019/03/21,  generalise for home network use. added options and CLI example
+@version  0.5 2020/03/19,  steadfast kill code; doc enhancements; work in tmp dir courtesy tmp_file/2; browser to page
 */
 
 spudlike :-
     spudlike( [] ).
-spudlike( Args ) :-
+spudlike( ArgS ) :-
+    ( is_list(ArgS) -> Args=ArgS; Args=[ArgS] ),
+    tmp_file( spudlike, Tmp ),
+    make_directory( Tmp ),
+    working_directory( _, Tmp ),
+    debug( spudlike, 'Working dir: ~w', [Tmp] ),
     ( getenv('HOST',Host) -> 
         atomic_list_concat( ['spudlike_', Host, '.pl'], HostPrefsB )
         ;
-        Host = localhost,
+        % Host = localhost,
         HostPrefsB = 'spudlike.pl'
     ),
     ( ( 
@@ -56,15 +91,19 @@ spudlike( Args ) :-
     ),
     append( Args, UserOpts, Opts ),
     debug( spudlike, 'Opts: ~w', [Opts] ),
-    ( memberchk(port(Port),Opts) -> true; Port = 3003 ),
-    ( memberchk(server(Server),Opts) -> true; Server = localhost ),
-    ( memberchk(kill(Kill),Opts) -> true; Kill = true ),
+    options_val( port(Port), Opts, 3003 ),
+    options_val( server(Server), Opts, localhost ),
+    options_val( kill(Kill), Opts, true ),
+    % ( memberchk(port(Port),Opts) -> true; Port = 3003 ),
+    % ( memberchk(server(Server),Opts) -> true; Server = localhost ),
+    % ( memberchk(kill(Kill),Opts) -> true; Kill = true ),
     findall( allow(Allow), member(allow(Allow),Opts), AllowsPrv ),
     ( AllowsPrv = [] -> 
         ( Server == localhost ->
             Allows = [] % doc_server/2 defaults are fine
             ;
-            process_output( hostname, '-I', Atom ),
+            % process_output( hostname, ['-I'], Atom ),
+            process_output( hostname, [], Atom ),
             atom_concat( IP, ' \n', Atom ),
             Allows = [allow(IP)]
         )
@@ -72,12 +111,19 @@ spudlike( Args ) :-
         AllowsPrv = Allows
     ),
     debug( spudslike, 'Server: ~w, Port: ~w', [Server,Port] ),
-    spudlike( Server, Port, Allows, Kill ),
+    options_val( scripts(Scripts), Opts, true ),
+    spudlike( Server, Port, Allows, Kill, Scripts ),
     ( memberchk(browser(Browser),Opts) -> true; Browser = true ),
+    debug( spudslike, 'Browser: ~w', [Browser] ),
     ( Browser == false ->
         true
         ;
-        atomic_list_concat( ['http://',Host,':',Port,'/pldoc'], '', Url ),
+        ( Browser == true ->
+            atomic_list_concat( ['http://',Server,':',Port,'/pldoc'], '', Url )
+            ;
+            atomic_list_concat( ['http://',Server,':',Port,'/pldoc/',Browser], '', Url )
+        ),
+        debug( spudslike, 'URL: ~w', [Url] ),
         www_open_url(Url)
     ),
     spudlike_busy.
@@ -87,7 +133,7 @@ spudlike_busy :-
     !,
     spudlike_busy.
 
-spudlike( localhost, Port, Allows, Kill ) :-
+spudlike( localhost, Port, Allows, Kill, Scripts ) :-
     spudlike_kill( Kill, localhost ),
     doc_server( Port, Allows ),
     debug( spudlike, 'doc_server(~w,~w)', [Port,Allows] ),
@@ -97,18 +143,41 @@ spudlike( localhost, Port, Allows, Kill ) :-
     absolute_file_name( Pack, Packed, AbsOpts ),
     !,
     debug( spudlike, 'Packs directory: ~p', Packed ),
-    directory_files( Packed, AllSubs ),
-    once( select('.',AllSubs,NodSubs) ),
-    once( select('..',NodSubs,NtdSubs) ),
+    directory_files( Packed, WithDotsSubs ),
+    once( select('.',WithDotsSubs,NodSubs) ),
+    once( select('..',NodSubs,Subs) ),
     % os_dir_dirs( Packed, Packs ),
-    maplist( spudlike_load(Packed), NtdSubs ),
+    maplist( spudlike_load(Packed), Subs ),
+    spudlike_scripts( Scripts, Packed, Subs ),
     atomic_list_concat( ['http://localhost:',Port,'/pldoc'], '', Url ),
     debug( spudlike, '~w', [Url] ).
-spudlike( Remote, _Port, _Allows, _Kill ) :-
+spudlike( Remote, _Port, _Allows, _Kill, _Scripts ) :-
     % fixme: pass Opts ?
     getenv( 'USER', User ),
     atomic_list_concat( [User,Remote], '@', From ),
     process_create( path(ssh), ['-Y',From,pupsh,spudlike], [] ).
+
+spudlike_scripts( true, _Packed, _PackSubs ) :- 
+    !,
+    % fixme(here).
+    % do the bin first
+    % use tmp module ?
+    % user:file_search_path( home, Home ),
+    % ( expand_file_name( '$HOME', [Home|_] ) -> true; Home = '/home/nicos' ),
+    expand_file_name( '$HOME', [Home|_] ),
+    directory_file_path( Home, bin, Bin ),
+    directory_file_path( Bin, cline_upsh, Cline ),
+    directory_files( Cline, ClineSubs ),
+    findall( _, ( member(PlF,ClineSubs), atom_concat(_,pl,PlF), write(doing(PlF)),nl,
+                  directory_file_path( Cline, PlF, PlP ),
+                  consult(tmp:PlP)
+                  % consider abolishing all tmp:_ ?
+                ),
+                    _ ), 
+    % then do the Subs (again tmp:module)
+    % fixme(Subs).
+    true.
+spudlike_scripts(_,_,_).
 
 spudlike_load( _, 'Downloads' ) :-
     !.
@@ -117,12 +186,18 @@ spudlike_load( Root, Pack ) :-
     exists_directory( Path ),
     !,
     debug( spudlike, '...loading: ~w', Pack ),
-    ( catch(lib(Pack),_,fail) -> 
+    spudlike_loads( Pack, LoadThis ),
+    ( catch(lib(LoadThis),_,fail) -> 
         true
         ;
-        debug( spudlike, '...FAILED to load it', true )
+        debug( spudlike, '...FAILED to load it', [] )
     ).
 spudlike_load( _Root, _Pack ).  % skipping litter files
+
+spudlike_loads( Pack, LoadThis ) :-
+    spudlike_loads_specific( Pack, LoadThis ),
+    !.
+spudlike_loads( Pack, Pack ).
 
 spudlike_kill( true, localhost ) :-   % only attempt when running locally
     current_prolog_flag( unix, true ),
@@ -130,9 +205,23 @@ spudlike_kill( true, localhost ) :-   % only attempt when running locally
     debug( spudlike, 'This process id: ~d', ThisPid ), nl,
     psa_lines( spudlike, LnsPrv ),
     exclude( atom_sub('grep cline'), LnsPrv, LnsCline ),
-    ( (include( atom_sub('swipl -x'),LnsCline,LnsSwi),LnsSwi\==[]) -> true; LnsSwi = LnsCline ),
-    ( (include(atom_sub('upsh'),LnsSwi,LnsUpsh),LnsUpsh \==[]) -> true; LnsUpsh = LnsSwi ),
-    include( atom_sub('swipl'), LnsUpsh, Lns ),
+    include( atom_sub('-g spudlike'), LnsCline, LnsG ),
+    ( LnsG = [] -> 
+        include( atom_sub('-t spudlike'), LnsCline, Lns )
+        ;
+        Lns = LnsG
+    ),
+
+    % ( (include( atom_sub('swipl'),LnsCline,LnsSwi),write(here(LnsSwi)), nl,LnsSwi\==[]) -> true; LnsSwi = LnsCline ),
+    % debug( spudlike, 'Swi lines: ~w', [LnsSwi] ),
+    % upsh: (but currently SWI throws error anyway
+    % ( (include( atom_sub('swipl -f'),LnsCline,LnsSwi),LnsSwi\==[]) -> true; LnsSwi = LnsCline ),
+    % ( (include(atom_sub('upsh'),LnsSwi,LnsUpsh),LnsUpsh \==[]) -> true; LnsUpsh = LnsSwi ),
+    % include( atom_sub('swipl'), LnsUpsh, Lns ),
+    % % findall( Aln, (member(Aln,LnsSwi),atom_concat(_,spudlike,Aln)), Lns ),
+    % include( atom_sub('spudlike'),LnsCline,LnsSwi),write(here(LnsSwi)), nl,LnsSwi\==[]) -> true; LnsSwi = LnsCline ),
+
+    debug( spudlike, 'Identified lines: ~w', [Lns] ),
     member( Ln, Lns ),
     once( (atomic_list_concat([_|T],' ',Ln),member(Pid,T),Pid \== '',atom_number(Pid,PidNum) ) ),
     PidNum =\= ThisPid,
@@ -144,7 +233,7 @@ spudlike_kill( true, localhost ) :-   % only attempt when running locally
 spudlike_kill( true, _Server ) :-
     current_prolog_flag( unix, true ),
     !,
-    debug( spudlike, 'No running spudlike found.', true ).
+    debug( spudlike, 'No running spudlike found.', [] ).
 spudlike_kill( _, _Server ). 
     % SWI will throw an error if an old instance is running... so let it succeed here
 
@@ -189,3 +278,9 @@ process_output( Exe, Args, Atom ) :-
    Create = process_create(path(Exe),Args,Opts),
    setup_call_cleanup( Create, read_string(Out,_,Output), close(Out) ),
    atom_string( Atom, Output ).
+
+options_val( Compound, Opts, Def ) :-
+    ( memberchk(Compound,Opts) -> true; arg(1,Compound,Def) ),
+    !.
+
+spudlike_loads_specific( terminus_store_prolog, terminus_store ).

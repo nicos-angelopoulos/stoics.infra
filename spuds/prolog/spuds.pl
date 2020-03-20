@@ -13,6 +13,9 @@
 
 /** <module> persistent, user code inclusive, doc server for linux
 
+This library is largely obsolete, however examples/spudlike.pl is actively maintained.
+
+
   This library creates, uses and manages a persistent documentation server on a single port. 
 In addition to serving all Prolog library code as per doc_server/1, spuds/1 also serves
 installed packs and all user code declared as such, on the same server.
@@ -135,7 +138,7 @@ spuds_srv_basename( spudsd ).
 %% spuds_version( -Version, -Date ).
 %
 %  Version and release Date (date(Y,M,D) term).
-spuds_version( 0:1:5, date(2014,3,31) ).
+spuds_version( 1:1:0, date(2020,3,19) ).
 
 %% spuds_pid( -Pid ).
 % 
