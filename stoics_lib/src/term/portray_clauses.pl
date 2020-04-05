@@ -5,7 +5,7 @@ OptS can be a list or single option term from the following:
 
 Opts
   * mode(Mode=append)
-    append or write
+    prepend, append or write; prepending (for now) reads old terms to memory
 
   * stream(Stream)
     default is user_output
@@ -22,11 +22,23 @@ a(b, c).
 b(d, e).
 c(f, g.t).
 true.
+
+?- File = 'test_prep.pl',
+    portray_clauses( [b(3,4),c(5,6)], file(File) ),
+    portray_clauses( [a(1,2)], [file(File),mode(prepend)] ),
+    atom_concat( 'cat ', File, Cat ),
+    shell( Cat ).
+
+a(1, 2).
+b(3, 4).
+c(5, 6).
+
 ==
 
 @author nicos angelopoulos
 @version  0.1 2016/12/10
 @version  0.2 2018/12/10, removed some private code reference and added WOpts
+@version  0.3 2020/04/05, added mode(prepend)
 
 */
 
@@ -35,14 +47,29 @@ true.
 portray_clauses( List, Opt ) :-
     en_list( Opt, Opts ),
     ( memberchk(file(File),Opts) ->
-        ( memberchk(mode(Mode),Opts) -> true; Mode = write ),
+        ( memberchk(mode(ModePrv),Opts) -> 
+            ( ModePrv = prepend ->
+                Mode = write,
+                portray_clauses_read_olds( File, Olds )
+                ;
+                Mode = ModePrv
+            )
+            ; Mode = write ),
         open( File, Mode, Out )
         ;
         ( memberchk(stream(Out),Opts) -> true; Out= user_output )
     ),
     ( memberchk(write_opts(WOpts), Opts) -> true; WOpts = [quoted(true)] ),
     portray_clauses_opts( WOpts, List, Out ),
-    ( var(File) -> true; close( Out ) ).
+    ( var(File) -> true
+        ;
+        close( Out ),
+        ( ModePrv == prepend ->
+            portray_clauses( Olds, [file(File),mode(append)]  )
+            ;
+            true
+        )
+    ).
 
 portray_clauses_opts( [], List, Out ) :- !,
     portray_clauses_onto( List, Out ).
@@ -58,3 +85,15 @@ portray_clauses_onto_opts( [], _, _WOpts ).
 portray_clauses_onto_opts( [H|T], Out, WOpts ) :-
     portray_clause( Out, H, WOpts ),
     portray_clauses_onto_opts( T, Out, WOpts ).
+
+portray_clauses_read_olds( File, Olds ) :-
+    open( File, read, In ),
+    read_term( In, Term, [] ),
+    portray_clauses_read_stream_olds( Term, Olds, In ).
+
+portray_clauses_read_stream_olds( end_of_file, Olds, _In ) :-
+    !,
+    Olds = [].
+portray_clauses_read_stream_olds( Term, [Term|Terms], In ) :-
+    read_term( In, Next, [] ),
+    portray_clauses_read_stream_olds( Next, Terms, In ).
