@@ -129,17 +129,25 @@ os_ext_opts( Ext, Stem, Os, Opts ) :-
 	% throw( instantiation_error ).
 
 os_ext_file( atom, Stem, Ext, Os, _Opts ) :-
-	ground(Ext),
-	!,
-	atomic_list_concat( ExtPartsPrv, '.', Ext ),
-	( ExtPartsPrv = [''|ExtParts] -> true; ExtParts = ExtPartsPrv ),
-	atomic_list_concat( OsParts, '.', Os ),
-	once(append(AStemParts,ExtParts,OsParts)), 
-	atomic_list_concat( AStemParts, '.', AStem ),
-	os_cast( atom, AStem, Stem ). % fixme: can pass Opts with os_ext/3 added to os_cast (for reporting).
-os_ext_file( atom, Stem, Ext, Os, _Opts ) :-  % os_ext( X, S, abc.def.ghi ).
-	file_name_extension( AStem, AExt, Os ),
-    maplist( os_cast(atom), [AStem,AExt], [Stem,Ext] ).
+	( ground(Ext) ->
+        % os_ext( '', xag ).
+        ( Ext == '' ->
+            % \+ os_ext( '', xag.abc ).
+            atomic_list_concat( [_Part], '.', Os ),
+	        os_cast( atom, Os, Stem )
+            ;
+	        atomic_list_concat( ExtParts, '.', Ext ),
+	        atomic_list_concat( OsParts, '.', Os ),
+	        once(append(AStemParts,ExtParts,OsParts)), 
+	        atomic_list_concat( AStemParts, '.', AStem ),
+	        os_cast( atom, AStem, Stem )  % fixme: can pass Opts with os_ext/3 added to os_cast (for reporting).
+        )
+        ;
+        % os_ext( X, S, abc.def.ghi ).
+	    file_name_extension( AStem, AExt, Os ),
+        maplist( os_cast(atom), [AStem,AExt], [Stem,Ext] )
+    ).
+
 %
 os_ext_file( string, Stem, Ext, Os, Opts ) :-
 	atom_string( OsAtom, Os ),
