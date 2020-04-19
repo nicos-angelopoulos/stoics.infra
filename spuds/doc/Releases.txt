@@ -1,3 +1,6 @@
+1:2 
+     20.04.19   SCRIPT    allow for ignores in bin/upsh_line (should also enable for local libs that are not installed)
+
 1:1         @   20.03.19
      20.03.19   SCRIPT:   work in /tmp/ via tmp_file/2
                 SCRIPT:   doc example now allows for server that documents spudlike/0
