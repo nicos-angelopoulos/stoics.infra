@@ -20,6 +20,7 @@
 :- ensure_loaded('../src/lib_expects').
 :- ensure_loaded('../src/lib_promise').
 :- ensure_loaded('../src/lib_message').
+:- ensure_loaded('../src/lib_pack_install').
 
 :- dynamic(lib_tables:lib_repo/4).             % +Repo, +Type, +Root, +Load 
 :- dynamic(lib_tables:lib_repo_index/2).       % +Repo, +IdxFile
