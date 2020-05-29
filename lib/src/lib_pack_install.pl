@@ -14,12 +14,14 @@ lib_pack_install( Pack ) :-
     Mess2 = 'Installing from: ~w',
     lib_message_report( Mess2, [Loc], informational ),
     pack_install( Loc ).
+lib_pack_install( Pack ) :-
+    pack_install( Pack ).
 
 lib_pack_install_known_issue( real, Loc ) :-
     current_prolog_flag( version, Vers ), 
-    80200 < Vers,
+    Vers < 80200,
     Loc = 'http://stoics.org.uk/~nicos/sware/packs/real/real-2.0.tgz'.
 lib_pack_install_known_issue( prosqlite, Loc ) :-
     current_prolog_flag( version, Vers ), 
-    80200 < Vers,
+    Vers < 80200,
     Loc = 'http://stoics.org.uk/~nicos/sware/packs/prosqlite/prosqlite-1.5.tgz'.

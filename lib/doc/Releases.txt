@@ -3,11 +3,13 @@
 
 Tbd: document @, & (remove fixme: code that might have been needed due to MAIN instead of PACK variable bug.).
 
-2.7 
+2.7          @ 20.05.29
+      20.05.29 ADDED:   native pack_install that deals with known SWI/pack incompatibilities
+                        here, to deal with the new pack.lib binaries required by 8.2.0
       20.03.17 DOC:     layout that was also breaking the tags
       20.03.08 DOC:     skeleton clarification + tiny typo
 
-2.6         @  20.09.08  
+2.6          @ 20.09.08  
       20.03.08 FIX:     the warning spewed by loading old (bio_db) module.
 
 2.5         @  19.05.08
