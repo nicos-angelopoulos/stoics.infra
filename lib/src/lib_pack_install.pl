@@ -9,7 +9,7 @@ introduced in SWI 8.2.0.
 lib_pack_install( Pack ) :-
     lib_pack_install_known_issue( Pack, Loc ),
     !,
-    Mess1 = 'There is a known compatibility issue with you SWI version and pack: ~w.',
+    Mess1 = 'There is a known compatibility issue with this SWI version and pack: ~w.',
     lib_message_report( Mess1, [Pack], informational ),
     Mess2 = 'Installing from: ~w',
     lib_message_report( Mess2, [Loc], informational ),

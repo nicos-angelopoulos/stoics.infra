@@ -3,6 +3,9 @@
 
 Tbd: document @, & (remove fixme: code that might have been needed due to MAIN instead of PACK variable bug.).
 
+2.8
+      20.05.29 FIXED:   rephrased informational message
+
 2.7          @ 20.05.29
       20.05.29 ADDED:   native pack_install that deals with known SWI/pack incompatibilities
                         here, to deal with the new pack.lib binaries required by 8.2.0
