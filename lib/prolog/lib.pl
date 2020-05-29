@@ -853,7 +853,7 @@ lib_missing( true, Pack, Cxt, Args, Load ) :-
     catch( prolog_pack:pack_list(Pack), _, fail ),
     prolog_pack:confirm( pack_on_server(Mode,Pack), yes, [] ),
     !,
-    pack_install( Pack ),
+    lib_pack_install( Pack ),
     lib_missing_load( Load, Cxt, Pack ).
 
 lib_missing_suggested( WarnFlag, Pack, Cxt, Opts ) :-
