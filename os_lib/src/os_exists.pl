@@ -232,9 +232,8 @@ os_is_dlink( Os, dir ) :-
 	\+ read_link( Os, _, _Target ),
 	!.
 os_is_dlink( Os, link ) :-
-	exists_directory( Os ),
-	read_link( Os, Target, _ ),
-	exists_directory( Target ).
+	read_link( Os, _Target, Abs ),
+	exists_directory( Abs ).
 
 os_is_flink( Os, file ) :-
 	exists_file( Os ),
