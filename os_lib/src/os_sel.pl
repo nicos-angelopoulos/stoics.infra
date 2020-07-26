@@ -19,10 +19,10 @@ PatternS, a list of, or one of:
    Oses with extension Ext
 
   * postfix(Psf)
-   is a postfix of the stem fo Os
+   is a postfix of the stem of Os
 
   * prefix(Pfx)
-   is a prefix of the stem fo Os
+   is a prefix of the stem of Os
 
   * sub(SubAtom)
    sub_atom/5 succeeds on the stem of the Os
