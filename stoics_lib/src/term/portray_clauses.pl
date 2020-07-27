@@ -1,6 +1,10 @@
+
+:- use_module(library(listing)).      % portray_clause/2,3
+
 /** portray_clauses( +List, +OptS ).
 
 Record a bunch of clauses to either a stream or a file. Supports append and write modes.
+
 OptS can be a list or single option term from the following:
 
 Opts
