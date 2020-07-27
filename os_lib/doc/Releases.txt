@@ -1,6 +1,10 @@
 ---   Releases   ---
 --------------------
 
+1.5
+     20.07.26   DOC:      tiny typo
+     20.06.11   FIXED:    type dlink, d-part was checking for dir
+     20.04.08   FIXED:    '' as ext in os_ext/n
 1.4         @   19.04.22
      19.03.26   OPTS:     sub/1 (os_sel/4)
                 SCRIPT:   new cp_rec.pl script

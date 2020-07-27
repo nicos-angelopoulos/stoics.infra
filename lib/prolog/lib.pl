@@ -20,6 +20,7 @@
 :- ensure_loaded('../src/lib_expects').
 :- ensure_loaded('../src/lib_promise').
 :- ensure_loaded('../src/lib_message').
+:- ensure_loaded('../src/lib_pack_install').
 
 :- dynamic(lib_tables:lib_repo/4).             % +Repo, +Type, +Root, +Load 
 :- dynamic(lib_tables:lib_repo_index/2).       % +Repo, +IdxFile
@@ -853,7 +854,7 @@ lib_missing( true, Pack, Cxt, Args, Load ) :-
     catch( prolog_pack:pack_list(Pack), _, fail ),
     prolog_pack:confirm( pack_on_server(Mode,Pack), yes, [] ),
     !,
-    pack_install( Pack ),
+    lib_pack_install( Pack ),
     lib_missing_load( Load, Cxt, Pack ).
 
 lib_missing_suggested( WarnFlag, Pack, Cxt, Opts ) :-

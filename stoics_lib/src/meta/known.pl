@@ -16,7 +16,7 @@
     indexes a number of options and this wrapper provides 
 
       1.  a uniform way of dealing with failure
-      2.  a away to avoid creating an intermediate predicate
+      2.  a way to avoid creating an intermediate predicate
 
     if Cat should either be atomic (a description of the category
     expected for Tkn), In addition it can be of the form
@@ -33,7 +33,7 @@
 ==
 ?- [user].
 theme_background( colour, blue ).
-theme_background( monochromoe, grey ).
+theme_background( monochrome, grey ).
 ^D
 ?- known( theme_background(colour,Clr) ).
 Clr = blue.

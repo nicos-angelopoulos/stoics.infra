@@ -9,7 +9,7 @@ options_append_known_process_option( version ).
 
 Look for PredName_defaults/1 (Defs) and if that exists append its argument to the end of OptS to get All.<br>
 OptS is casted to a list before the append, so single terms are allowed as options.<br>
-In addition, if file user_profile('.pl'/Pname) exists, its terms are appended between OptS and
+In addition, if file user_profile(stoics/options/Pname[.pl]) exists, its terms are appended between OptS and
 the argument of PredName_defaults/1.<br>
 Appending of the profile terms, can be by passed with options append_profile(false).<br>
 Listens to debug(options_append).
@@ -132,6 +132,7 @@ The default OAopts list is [funnel(debug)].
   
 @author nicos angelopoulos
 @version  0.2 2014/9/20
+@version  0.3 2020/5/9, changed file location to: user_profile(stoics/options/Pname[.pl])
 @tbd  add option! for making sure that only recognised options (with additional,"silent" defaults) are accepted ??
 @see ~/bin/cline/keep.pl for debug option example
 @see pack(options/examples/ex_app.pl)
@@ -197,7 +198,8 @@ options_append_types_remove( _Defaulty, OptsWT, Opts ) :-
 options_append_profile_options( true, Pname, Args, Semi ) :-
     % JW: 16.11.14
     AbsOpts = [access(read), file_errors(fail), file_type(prolog)],
-    absolute_file_name(user_profile('.pl'/Pname), File, AbsOpts ),
+    directory_file_path( 'stoics/options', Pname, Bname ),
+    absolute_file_name(user_profile(Bname), File, AbsOpts ),
     !,
     read_file_to_terms( File, Terms, [] ),
     append( Args, Terms, Semi ),

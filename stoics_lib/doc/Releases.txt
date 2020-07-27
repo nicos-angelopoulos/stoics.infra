@@ -2,6 +2,9 @@
 --------------------
 
 1.2
+     20.07.27   DEPS:   explicit loading of library(listing) in portray_clauses.pl
+     20.04.25   DOC:    couple of small typos in known/3
+     20.04.05   OPTS:   mode(prepend) with doc example
      20.03.17   DOC:    small typos in expand_spec/2
      19.12.29   IFACE:  allow ground term structures in second argument atom_sub/2
 

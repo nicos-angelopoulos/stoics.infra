@@ -26,6 +26,9 @@ Opts
   * browser(Browser=true)
   whether to start a browser window authomatically. if not a boolean is taken to be the page to start
 
+  * ignore(AbsIgnore=_)
+  ignore file in this absolute location
+
   * kill(Kill=true)
   whether to kill existing server
 
@@ -75,17 +78,15 @@ spudlike( ArgS ) :-
         % Host = localhost,
         HostPrefsB = 'spudlike.pl'
     ),
-    ( ( 
-        getenv('HOME',Home),
-        directory_file_path(Home,'.pl', HostPrefsD),
-        directory_file_path(HostPrefsD,HostPrefsB,AbsHostPrefsF),
-        exists_file(AbsHostPrefsF)
-      )     ->
+    getenv('HOME',Home),
+    directory_file_path(Home,'.pl', HostPrefsD),
+    directory_file_path(HostPrefsD,HostPrefsB,AbsHostPrefsF),
+    ( exists_file(AbsHostPrefsF) ->
         debug( spudlike, 'Preferences from: ~w', [AbsHostPrefsF] ),
         spudlike_read_file( AbsHostPrefsF, UserOpts )
         ;
-        atom_concat( '~/', HostPrefsB, RepPrefsF ),
-        debug( spudlike, 'No preferences file found (~w).', [RepPrefsF] ),
+        %  atom_concat( '~/', HostPrefsB, RepPrefsF ),
+        debug( spudlike, 'No preferences file found (~p).', [AbsHostPrefsF] ),
             % fixme, also for .pl/spudlike.pl here
         UserOpts = []
     ),
@@ -112,7 +113,8 @@ spudlike( ArgS ) :-
     ),
     debug( spudslike, 'Server: ~w, Port: ~w', [Server,Port] ),
     options_val( scripts(Scripts), Opts, true ),
-    spudlike( Server, Port, Allows, Kill, Scripts ),
+    findall( Ign, member(ignore(Ign),Opts), Ignore ),
+    spudlike( Server, Port, Allows, Kill, Scripts, Ignore ),
     ( memberchk(browser(Browser),Opts) -> true; Browser = true ),
     debug( spudslike, 'Browser: ~w', [Browser] ),
     ( Browser == false ->
@@ -133,7 +135,7 @@ spudlike_busy :-
     !,
     spudlike_busy.
 
-spudlike( localhost, Port, Allows, Kill, Scripts ) :-
+spudlike( localhost, Port, Allows, Kill, Scripts, Ignore ) :-
     spudlike_kill( Kill, localhost ),
     doc_server( Port, Allows ),
     debug( spudlike, 'doc_server(~w,~w)', [Port,Allows] ),
@@ -148,16 +150,16 @@ spudlike( localhost, Port, Allows, Kill, Scripts ) :-
     once( select('..',NodSubs,Subs) ),
     % os_dir_dirs( Packed, Packs ),
     maplist( spudlike_load(Packed), Subs ),
-    spudlike_scripts( Scripts, Packed, Subs ),
+    spudlike_scripts( Scripts, Packed, Subs, Ignore ),
     atomic_list_concat( ['http://localhost:',Port,'/pldoc'], '', Url ),
     debug( spudlike, '~w', [Url] ).
-spudlike( Remote, _Port, _Allows, _Kill, _Scripts ) :-
+spudlike( Remote, _Port, _Allows, _Kill, _Scripts, _Ignore ) :-
     % fixme: pass Opts ?
     getenv( 'USER', User ),
     atomic_list_concat( [User,Remote], '@', From ),
     process_create( path(ssh), ['-Y',From,pupsh,spudlike], [] ).
 
-spudlike_scripts( true, _Packed, _PackSubs ) :- 
+spudlike_scripts( true, _Packed, _PackSubs, Ignore ) :- 
     !,
     % fixme(here).
     % do the bin first
@@ -168,8 +170,15 @@ spudlike_scripts( true, _Packed, _PackSubs ) :-
     directory_file_path( Home, bin, Bin ),
     directory_file_path( Bin, cline_upsh, Cline ),
     directory_files( Cline, ClineSubs ),
+    /* 
+
+    ignores([/home/nicos/bin/cline_upsh/publish_pack.pl])
+    plp(/home/nicos/bin/cline_upsh/publish_pack.pl)
+      
+    */
     findall( _, ( member(PlF,ClineSubs), atom_concat(_,pl,PlF), write(doing(PlF)),nl,
-                  directory_file_path( Cline, PlF, PlP ),
+                  directory_file_path(Cline, PlF, PlP),
+                  \+ memberchk(PlP, Ignore),
                   consult(tmp:PlP)
                   % consider abolishing all tmp:_ ?
                 ),
@@ -177,7 +186,7 @@ spudlike_scripts( true, _Packed, _PackSubs ) :-
     % then do the Subs (again tmp:module)
     % fixme(Subs).
     true.
-spudlike_scripts(_,_,_).
+spudlike_scripts(_,_,_,_).
 
 spudlike_load( _, 'Downloads' ) :-
     !.
