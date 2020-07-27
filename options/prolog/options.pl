@@ -108,6 +108,8 @@ missing curly brackets in the errors DCG (2016/11/14).
 
 */
 
+:- use_module(library(apply)).  % partition/4
+
 :- use_module(library(lib)).
 :- lib(source(options), homonyms(true)).
         % this shouldn't be necessary but SWIPL (at least 7.3.31-9)
