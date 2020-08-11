@@ -7,6 +7,7 @@
                      % lib_expects/1+2,
                      % lib_init/1
 
+:- ensure_loaded(library(lists)).        % append/3...
 :- ensure_loaded(library(prolog_pack)).
     % query_pack_server/3
 
