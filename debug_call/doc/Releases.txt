@@ -4,6 +4,9 @@
 TBD
    17.03.10   debug_call with Success/failure by colour too (see SWI installation)
 ---
+
+1.4  20.08.17   DEPS:    explicit loads of library(apply) and library(lists)
+
 1.3         @   20.03.07 
      19.12.29   ADDED:   single colour support in debug_call_consec/4
      20.03.07   IFACE:   debug_call/3 is now a shortcut for (old behaviour) of debug/3

@@ -91,6 +91,8 @@ D = date(2020,3,7).
 */
 debug_call_version( 1:3:0, date(2019,4,22) ).
 
+:- use_module(library(apply)).   % maplist/4,...
+:- use_module(library(lists)).   % member/4,...
 :- use_module(library(lib)).
 
 :- lib(source(debug_call), [homonyms(true),index(false)]).
