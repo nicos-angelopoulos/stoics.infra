@@ -12,6 +12,7 @@
                 pack_errors_version/2       % +Version, +Date
                         ] ).
 
+:- use_module( library(lists) ).            % append/3,...
 :- use_module( library(error) ).            % is_of_type/2.
 
 /**  <module> Contextual error handling for packs

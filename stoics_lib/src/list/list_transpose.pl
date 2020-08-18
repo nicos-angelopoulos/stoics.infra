@@ -1,3 +1,4 @@
+:- use_module(library(apply)).  % maplist/2.
 :- lib( skim/3 ).
 
 /** list_transpose( +List, -Transpose ).

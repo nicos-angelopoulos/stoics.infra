@@ -1,4 +1,6 @@
 
+:- use_module(library(lists)).  % append/3.
+
 :- lib(break_nth/4).
 
 /** codes_n_digits( +InCodes, +N, Codes ).

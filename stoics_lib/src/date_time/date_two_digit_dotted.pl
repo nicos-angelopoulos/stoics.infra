@@ -1,7 +1,8 @@
 
+:- use_module(library(apply)).  % maplist/3.
+
 :- lib(get_date_time/1).
 :- lib(n_digits_integer_codes/3).
-
 
 date_two_digit_dotted( Dotted ) :-
 	get_date_time( Curr ),

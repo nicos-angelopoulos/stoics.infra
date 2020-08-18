@@ -1,6 +1,9 @@
 ---   Releases   ----
 ---------------------
 
+2.2
+     20.08.17   DEPS       explicit loading of autoload SWI libs
+
 2.1         @   19.04.22
      19.04.22   LICENCE:   tag as MIT
      19.02.25   OPTS:      option(Oname) can now be part of the source identification

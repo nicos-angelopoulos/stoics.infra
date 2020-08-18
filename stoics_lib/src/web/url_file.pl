@@ -1,5 +1,6 @@
 
 :- use_module(library(http/http_open)). % fixme: doit dynamically
+:- use_module(library(listing)).       % portray_clause/2.
 
 :- lib(get_datetime/1).
 :- lib(suggests(options)).

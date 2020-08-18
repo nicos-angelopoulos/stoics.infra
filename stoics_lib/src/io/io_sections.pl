@@ -1,4 +1,6 @@
 
+:- use_module(library(readutil)).   % read_line_to_codes/2.
+
 io_sections_defaults( [separator(`//`),process(=),process_options(false),
                        terminating_separator(true),
 				   separator_id(false)] ).

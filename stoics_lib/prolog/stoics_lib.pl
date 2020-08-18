@@ -113,7 +113,7 @@
 
 % :- ensure_loaded( '../src/auxil/stoics_lib_module.pl' ).
 
-:- use_module( library(lib) ).
+:- use_module(library(lib)).
 :- lib( source(stoics_lib), [index(true),homonyms(false)] ).
 
 :- lib(stoics_lib/0).
