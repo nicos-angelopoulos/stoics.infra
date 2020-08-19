@@ -2,6 +2,7 @@
 --------------------
 
 1.3  
+     20.08.19  DEPS:    explicit loading of library(filesex)
      20.08.08  DEPS:    explicit loading of library(lists) for append/3, select/3, ... (does autoload)
      20.07.21  DEPS:    explicit loading of library(apply) for partition/4 (does autoload)
      20.05.09  OPTS:    changed location of user profile to user_profile(stoics/options/Pname[.pl])

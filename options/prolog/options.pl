@@ -110,6 +110,7 @@ missing curly brackets in the errors DCG (2016/11/14).
 
 :- use_module(library(lists)).  % append/3,select/3,...
 :- use_module(library(apply)).  % partition/4
+:- use_module(library(filesex)).% directory_file_path/3,...
 
 :- use_module(library(lib)).
 :- lib(source(options), homonyms(true)).
