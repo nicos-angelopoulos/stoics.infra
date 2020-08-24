@@ -1,5 +1,13 @@
 :-  module( spudlike, [spudlike/0,spudlike/1] ).
 
+:- use_module(library(lists)).          % append/3.
+:- use_module(library(apply)).          % exclude/3, include/3.
+:- use_module(library(debug)).          % /1,3.
+:- use_module(library(process)).        % process_create/3.
+:- use_module(library(readutil)).       % read_line_to_codes/2.
+:- use_module(library(doc_http)).       % doc_server/2.
+:- use_module(library(www_browser)).    % www_open_url/1.
+
 :- debug(spudlike).
 
 /** <module> spudlike.
@@ -62,6 +70,7 @@ the server has been started (in which case it will not be in the doc server).
 @version  0.3 2018/02/07,  removed dependency to by_unix
 @version  0.4 2019/03/21,  generalise for home network use. added options and CLI example
 @version  0.5 2020/03/19,  steadfast kill code; doc enhancements; work in tmp dir courtesy tmp_file/2; browser to page
+@version  0.6 2020/08/20,  first take on running on macs (no killing yet)
 */
 
 spudlike :-
@@ -237,7 +246,7 @@ spudlike_kill( true, localhost ) :-   % only attempt when running locally
     debug( spudlike, 'Killing process id: ~d', PidNum ), nl,
     !,
     debug( spudlike, 'Killing old spudlike process: ~w', Pid ), nl,
-    process_create( path(kill), ['-9',Pid], [] ),
+    catch( process_create( path(kill), ['-9',Pid], [] ), _, true ),
     sleep(3).
 spudlike_kill( true, _Server ) :-
     current_prolog_flag( unix, true ),
@@ -246,6 +255,15 @@ spudlike_kill( true, _Server ) :-
 spudlike_kill( _, _Server ). 
     % SWI will throw an error if an old instance is running... so let it succeed here
 
+psa_lines( spudlike, Lines) :-
+    current_prolog_flag( apple, true ),
+    !,
+    setup_call_cleanup(
+            process_create(path(ps), ['-Af' ],
+                           [ stdout(pipe(Out))
+                           ]),
+            read_lines(Out, Lines),
+            close(Out)).
 psa_lines( spudlike, Lines) :-
         setup_call_cleanup(
             process_create(path(ps), [ '--columns',300, '-Af' ],

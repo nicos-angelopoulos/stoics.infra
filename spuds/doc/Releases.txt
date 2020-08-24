@@ -1,5 +1,7 @@
 1:2 
-     20.04.19   SCRIPT    allow for ignores in bin/upsh_line (should also enable for local libs that are not installed)
+     20.08.20   DEPS:     explicit loading of auto-loads
+                OS:       support for macs, no killing yet
+     20.04.19   SCRIPT:   allow for ignores in bin/upsh_line (should also enable for local libs that are not installed)
 
 1:1         @   20.03.19
      20.03.19   SCRIPT:   work in /tmp/ via tmp_file/2
