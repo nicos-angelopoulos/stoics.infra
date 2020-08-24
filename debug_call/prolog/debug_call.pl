@@ -106,7 +106,7 @@ debug_call_version( 1:3:0, date(2019,4,22) ).
 %
 %  Only call debug if we are debugging Topic.
 %
-%  If Goal with arity +2 is available call that instead of Goal with extra arguemnts Mess and Args
+%  If Goal with arity +2 is available call that instead of Goal with extra arguments Mess and Args
 %  that will be passed to debug/3. If the goal (original or +2) fail, nothing is printed by
 %  debug_call and the debug_call(T,G) itself succeeds.
 % 
