@@ -41,6 +41,18 @@ relevant while debugging. Includes pre-canned, often used calls.
 ?- debug_call( ex, dims, [m1,m2]/[[a(x),a(y),a(z)],[xy(a,b),xy(c,d),xy(e,f)]] ).
 %  Dimensions for matrices,  (m1) nR: 3, nC: 1. (m2) nR: 3, nC: 2.
 
+?- debug_call( ex, enum, testo/[a,b,c] ).
+% Starting enumeration of list: testo
+% 1.a
+% 2.b
+% 3.c
+% Ended enumeration of list: testo
+true.
+
+?- debug_call( ex, info, 'My message is ~w.'/long ).
+% My message is long.
+true.    % message above is printed in informational colour
+
 ?- debug_call( ex, wrote, loc(file,csv) ).
 % Could not locate wrote on file specified by: file, and extensions: csv
 ?- csv_write_file( 'file.csv', [] ).
@@ -341,10 +353,11 @@ debug_portray( Topic, Term ) :-
 debug_portray( _Topic, _Term ).
 
 %% debug_call( +Topic, +Goal, +Arg ).
-%% debug_call( +Topic, +Goal, +Mess, +Arg ).
+%% debug_call( +Topic, +Goal, +Pfx, +Arg ).
 %
-%  Automates often used debug calls. When Pfx is missing it is assumed to be ''. It can also be used 
-%  to call arbitrary Goal and then print a message after it has successfull completed.
+% Automates often used debug calls. When Pfx is missing it is assumed to be ''. Predicate can also be used 
+% to call arbitrary Goal and then print a message after it has successfull completed. As of 1.2 it can also
+% work as a replacement to debug/3.
 %  
 %  When Goal is a known abbreviation, then Arg usually qualifies the output generated.
 %  When Goal is of the form call(Goal), Arg will be passed to debug(Topic,Mess,Arg). 
@@ -356,8 +369,13 @@ debug_portray( _Topic, _Term ).
 %    prints the dimensions of matrix, see mtx_dims/3
 %  * end
 %    translates to finishing ~Arg or starting ~Topic if Arg == true
+%  * enum
+%    print lists and deconstructed terms, where each item is prefixed with an index number
 %  * goal
-%    anything that does n't match any of the above is retried as call(Goal)
+%    anything that does n't match any of the above is retrived as call(Goal)
+%  * info
+%    print using informational machinery (usually different/green colour, to debug's blue)
+%    term should Mess/Args in the debug/3 version
 %  * length
 %    prints the lenghts of a bunch of lists. Args should be ListNames/Lists. 
 %    uses non list ListNames if debuging the length of a single list, in which case
@@ -440,17 +458,18 @@ debug_portray( _Topic, _Term ).
 % @version  0.2 2014/04/24  added wrote
 % @version  0.3 2014/07/2   added task
 % @version  0.4 2014/09/22  renamed from debug_call/3
-% @version  0.5 current     added ns_sel
-% @version  1.1 2018/3/20   prefer +2 arity in debug_call/2
-% @version  1.2 2020/3/07   make it also a replacement for debug/3 (but with old 3rd arg behaviour.
+% @version  0.5 2014/??/??  added ns_sel
+% @version  1.1 2018/03/20  prefer +2 arity in debug_call/2
+% @version  1.2 2020/03/07  now can be used as a replacement for debug/3 (but with old 3rd arg behaviour, allowing eg 'true').
+% @version  1.3 2020/09/07  added canned calls info and enum
 %
 debug_call( Topic, Goal, Args ) :-
     debug_call( Topic, Goal, '', Args ).
 
-debug_call( Topic, Goal, Mess, Args ) :-
+debug_call( Topic, Goal, Pfx, Args ) :-
     debugging_topic( Topic ),
     !,
-    debugging_call( Topic, Goal, Mess, Args ).
+    debugging_call( Topic, Goal, Pfx, Args ).
 debug_call( _Topic, _Goal, _Mess, _Args ).
 
 debugging_call( Topic, Goal, Mess, Args ) :-
@@ -542,6 +561,19 @@ debug_consec_color( Topic, Clr, Mess, Args ) :-
     debug_message( Topic, Mess, Args ),
     retractall( debug_call_message_property(debug(_),color(_)) ).
 
+debug_call_topic( info, Pfx, Arg, _Topic ) :-
+    ( (\+ var(Arg),Arg = Mess/Args) ->
+        true
+        ;
+        % fixme: not sure what to do here ?
+        Mess = Arg,
+        Args = []
+    ),
+    % lib_message_report( Format, Args, Kind ) :-
+    debug_message_prefixed( Pfx, Mess, Prefixed ),
+	phrase('$messages':translate_message(debug(Prefixed,Args)), Lines),
+	print_message_lines(current_output, kind(informational), Lines).
+
 debug_call_topic( length, Pfx, NamesPrv/ListsPrv, Topic ) :-
                             % add version without names
     ( is_list(NamesPrv) -> Names=NamesPrv, ListsPrv=Lists, With = 'Lengths for lists, '
@@ -558,6 +590,25 @@ debug_call_topic( length, Pfx, NamesPrv/ListsPrv, Topic ) :-
     findall( [Name,Length], (nth1(N,Names,Name),nth1(N,Lengths,Length)), NLNest ),
     flatten( NLNest, NLs ),
     debug_message( Topic, Message, NLs ). % do the messaging
+debug_call_topic( enum, Pfx, InArg, Topic ) :-
+    ground( InArg ),
+    ( InArg = Left/Term -> true; Left = unnamed, Term = InArg ),
+    ( is_list(Term) ->
+        length( Term, Len ),
+        number_codes( Len, LenCs ),
+        length( LenCs, SpcLen ),
+        debug_call_topic_list_delim( Left, Topic, Pfx, 'Starting enumeration of list: ~w' ),
+        debug_call_topic_enum( Term, 1, SpcLen, Topic ),
+        debug_call_topic_list_delim( Left, Topic, Pfx, 'Ended enumeration of list: ~w' )
+        ;
+        Term =.. Args,
+        length( Args, Len ),
+        number_codes( Len, LenCs ),
+        length( LenCs, SpcLen ),
+        debug_call_topic_list_delim( Left, Topic, Pfx, 'Starting enumeration of list: ~w' ),
+        debug_call_topic_enum( Args, 1, SpcLen, Topic ),
+        debug_call_topic_list_delim( Left, Topic, Pfx, 'Ended enumeration of list: ~w' )
+    ).
 debug_call_topic( list, _Pfx, InArg, Topic ) :-
     ground( InArg ),
     ( InArg = Left/List -> 
@@ -565,16 +616,15 @@ debug_call_topic( list, _Pfx, InArg, Topic ) :-
         ;
         List = InArg, Hdr = '', Ftr = ''
     ),
-    debug_call_topic_list_delim( Hdr, Topic, Pfx, 'Starting enumeration of list: ~w' ),
+    debug_call_topic_list_delim( Hdr, Topic, Pfx, 'Starting listing of list: ~w' ),
     maplist( debug_message(Topic,'~w'), List ),
-    debug_call_topic_list_delim( Ftr, Topic, Pfx, 'Ended enumeration of list: ~w' ).
+    debug_call_topic_list_delim( Ftr, Topic, Pfx, 'Ended listing of list: ~w' ).
 debug_call_topic( dims, Pfx, NamesPrv/MtxsPrv, Topic ) :-
     ( is_list(NamesPrv) -> Names=NamesPrv, MtxsPrv=Mtxs, With = 'Dimensions for matrices, '
                            ; [NamesPrv] = Names, [MtxsPrv]=Mtxs, With = 'Dimensions for matrix, ' 
     ),
     debug_message_prefixed( Pfx, With, Prefixed ),
     maplist( debug_mtx_dims, Mtxs, NRows, NCols ),
-
     findall( PartM, (member(_,Names),PartM=' (~w) nR: ~d, nC: ~d.'), MParts ),
     atomic_list_concat( MParts, '', Right ),
     findall( [Name,NRow,NCol], (nth1(N,Names,Name),nth1(N,NRows,NRow),nth1(N,NCols,NCol)), NNest ),
@@ -668,6 +718,18 @@ debug_call_topic( ns_sel, Pfx, Term, Topic ) :-
         debug_message_prefixed( Pfx, Mess, Prefixed ),
         debug_message( Topic, Prefixed, MArgs )
     ).
+
+debug_call_topic_enum( [], _I, _Len, _Topic ).
+debug_call_topic_enum( [H|T], I, Len, Topic ) :-
+    number_codes( I, ICs ),
+    length( ICs, ICsLen ),
+    PadLen is Len - ICsLen,
+    findall( ' ', between(1,PadLen,_), Spcs ),
+    atomic_list_concat( Spcs, '', Pad ),
+    atomic_list_concat( [Pad,'~d.~w'], '', Mess ),
+    debug_message( Topic, Mess, [I,H] ),
+    J is I + 1,
+    debug_call_topic_enum( T, J, Len, Topic ).
 
 debug_call_topic_list_delim( '', _Topic, _Pfx, _Mess ).
 debug_call_topic_list_delim( ListName, Topic, Pfx, Mess ) :-

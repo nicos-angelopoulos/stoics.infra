@@ -7,6 +7,8 @@ TBD
 
  
 1.4  
+     20.09.07   IFACE:   added enum debugging call, with example
+                         added info debugging call, with example
      20.08.24   DOC:     misspelt "argument"
      20.08.17   DEPS:    explicit loads of library(apply) and library(lists)
 
