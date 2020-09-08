@@ -7,6 +7,7 @@ TBD
 
  
 1.4  
+     20.09.08   IFACE:   added options debugging call
      20.09.07   IFACE:   added enum debugging call, with example
                          added info debugging call, with example
      20.08.24   DOC:     misspelt "argument"

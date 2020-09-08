@@ -393,6 +393,8 @@ debug_portray( _Topic, _Term ).
 %    first argument is the item selected from second arg list. reports differently if 2nd arg is a singleton, but always does report
 %  * odir
 %    output directory (Arg should exist and be a directory)
+%  * options
+%    options used on call to predicate
 %  * pwd 
 %    message about the current directory location (if Arg == false, it is ignored)
 %  * read
@@ -575,22 +577,18 @@ debug_call_topic( info, Pfx, Arg, _Topic ) :-
 	phrase('$messages':translate_message(debug(Prefixed,Args)), Lines),
 	print_message_lines(current_output, kind(informational), Lines).
 
-debug_call_topic( length, Pfx, NamesPrv/ListsPrv, Topic ) :-
-                            % add version without names
-    ( is_list(NamesPrv) -> Names=NamesPrv, ListsPrv=Lists, With = 'Lengths for lists, '
-                           ; [NamesPrv] = Names, [ListsPrv]=Lists, With = 'Length for list, ' 
+debug_call_topic( dims, Pfx, NamesPrv/MtxsPrv, Topic ) :-
+    ( is_list(NamesPrv) -> Names=NamesPrv, MtxsPrv=Mtxs, With = 'Dimensions for matrices, '
+                           ; [NamesPrv] = Names, [MtxsPrv]=Mtxs, With = 'Dimensions for matrix, ' 
     ),
     debug_message_prefixed( Pfx, With, Prefixed ),
-    maplist( length, Lists, Lengths ),
-    findall( ['~w: ~w',', '], member(_,Lengths), WsNest ),
-    flatten( WsNest, WsL ),
-    once( append(WsLComma,[_],WsL) ),
-    append( WsLComma, ['.'], WsLDot ),
-    atomic_list_concat( WsLDot, '', Right ),
+    maplist( debug_mtx_dims, Mtxs, NRows, NCols ),
+    findall( PartM, (member(_,Names),PartM=' (~w) nR: ~d, nC: ~d.'), MParts ),
+    atomic_list_concat( MParts, '', Right ),
+    findall( [Name,NRow,NCol], (nth1(N,Names,Name),nth1(N,NRows,NRow),nth1(N,NCols,NCol)), NNest ),
+    flatten( NNest, Vars ),
     atom_concat( Prefixed, Right, Message ),
-    findall( [Name,Length], (nth1(N,Names,Name),nth1(N,Lengths,Length)), NLNest ),
-    flatten( NLNest, NLs ),
-    debug_message( Topic, Message, NLs ). % do the messaging
+    debug_message( Topic, Message, Vars ). % do the messaging !
 debug_call_topic( enum, Pfx, InArg, Topic ) :-
     ground( InArg ),
     ( InArg = Left/Term -> true; Left = unnamed, Term = InArg ),
@@ -610,6 +608,22 @@ debug_call_topic( enum, Pfx, InArg, Topic ) :-
         debug_call_topic_enum( Args, 1, SpcLen, Topic ),
         debug_call_topic_list_delim( Left, Topic, Pfx, 'Ended enumeration of list: ~w' )
     ).
+debug_call_topic( length, Pfx, NamesPrv/ListsPrv, Topic ) :-
+                            % add version without names
+    ( is_list(NamesPrv) -> Names=NamesPrv, ListsPrv=Lists, With = 'Lengths for lists, '
+                           ; [NamesPrv] = Names, [ListsPrv]=Lists, With = 'Length for list, ' 
+    ),
+    debug_message_prefixed( Pfx, With, Prefixed ),
+    maplist( length, Lists, Lengths ),
+    findall( ['~w: ~w',', '], member(_,Lengths), WsNest ),
+    flatten( WsNest, WsL ),
+    once( append(WsLComma,[_],WsL) ),
+    append( WsLComma, ['.'], WsLDot ),
+    atomic_list_concat( WsLDot, '', Right ),
+    atom_concat( Prefixed, Right, Message ),
+    findall( [Name,Length], (nth1(N,Names,Name),nth1(N,Lengths,Length)), NLNest ),
+    flatten( NLNest, NLs ),
+    debug_message( Topic, Message, NLs ). % do the messaging
 debug_call_topic( list, _Pfx, InArg, Topic ) :-
     ground( InArg ),
     ( InArg = Left/List -> 
@@ -620,28 +634,6 @@ debug_call_topic( list, _Pfx, InArg, Topic ) :-
     debug_call_topic_list_delim( Hdr, Topic, Pfx, 'Starting listing of list: ~w' ),
     maplist( debug_message(Topic,'~w'), List ),
     debug_call_topic_list_delim( Ftr, Topic, Pfx, 'Ended listing of list: ~w' ).
-debug_call_topic( dims, Pfx, NamesPrv/MtxsPrv, Topic ) :-
-    ( is_list(NamesPrv) -> Names=NamesPrv, MtxsPrv=Mtxs, With = 'Dimensions for matrices, '
-                           ; [NamesPrv] = Names, [MtxsPrv]=Mtxs, With = 'Dimensions for matrix, ' 
-    ),
-    debug_message_prefixed( Pfx, With, Prefixed ),
-    maplist( debug_mtx_dims, Mtxs, NRows, NCols ),
-    findall( PartM, (member(_,Names),PartM=' (~w) nR: ~d, nC: ~d.'), MParts ),
-    atomic_list_concat( MParts, '', Right ),
-    findall( [Name,NRow,NCol], (nth1(N,Names,Name),nth1(N,NRows,NRow),nth1(N,NCols,NCol)), NNest ),
-    flatten( NNest, Vars ),
-    atom_concat( Prefixed, Right, Message ),
-    debug_message( Topic, Message, Vars ). % do the messaging !
-debug_call_topic( var, Pfx, DbgTerm, Topic ) :-
-    arg( 1, DbgTerm, Var ),
-    arg( 2, DbgTerm, Val ),
-    Mess = 'Variable: ~a, value: ~w',
-    debug_message_prefixed( Pfx, Mess, Prefixed ),
-    debug_message( Topic, Prefixed, [Var,Val] ).
-debug_call_topic( term, Pfx, DbgTerm, Topic ) :-
-    Mess = '~w',
-    debug_message_prefixed( Pfx, Mess, Prefixed ),
-    debug_message( Topic, Prefixed, [DbgTerm] ).
 debug_call_topic( odir, Pfx, Odir, Topic ) :-
     ( exists_directory(Odir) ->
         Mess = 'Ouput in directory: ~w'
@@ -650,6 +642,19 @@ debug_call_topic( odir, Pfx, Odir, Topic ) :-
     ),
     debug_message_prefixed( Pfx, Mess, Prefixed ),
     debug_message( Topic, Prefixed, [Odir] ).
+debug_call_topic( options, _Pfx, InArg, Topic ) :-
+    ( InArg = Left/Opts -> true; Left = unnamed, Opts = InArg ),
+    debug( Topic, 'Options in predicate: ~w, are: ~w', [Left,Opts] ).
+debug_call_topic( term, Pfx, DbgTerm, Topic ) :-
+    Mess = '~w',
+    debug_message_prefixed( Pfx, Mess, Prefixed ),
+    debug_message( Topic, Prefixed, [DbgTerm] ).
+debug_call_topic( var, Pfx, DbgTerm, Topic ) :-
+    arg( 1, DbgTerm, Var ),
+    arg( 2, DbgTerm, Val ),
+    Mess = 'Variable: ~a, value: ~w',
+    debug_message_prefixed( Pfx, Mess, Prefixed ),
+    debug_message( Topic, Prefixed, [Var,Val] ).
 debug_call_topic( wrote, Pfx, ForLoc, Topic ) :-
     ( ForLoc = loc(Spec,Ext) -> true; Spec=ForLoc, Ext = '' ),
     catch( locate(Spec,Ext,Loc), Excp, true ),
