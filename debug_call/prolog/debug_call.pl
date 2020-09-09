@@ -116,13 +116,11 @@ debug_call_version( 1:3:0, date(2019,4,22) ).
 :- lib(stoics_lib:datime_readable/1).
 :- lib(end(debug_call) ).
 
-debug_call( Topic, Goal, Pfx, Args ) :-
-
 %% debuc( +Topic, +Goal ).
 %% debuc( +Topic, +Goal, +Args ).
 %% debuc( +Topic, +Goal, +Pfx, +Args ).
 % 
-% Shorthand for debug_call/n.
+% Shorthands for debug_call/n.
 %
 %@author nicos angelopoulos
 %@version  0:1 2020/9/9
