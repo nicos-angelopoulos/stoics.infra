@@ -3,7 +3,7 @@
             debug_call/2,
             debug_call/3,
             debug_call/4,
-            debuc/2, debuc/3, debuc/4,
+            debuc/1, debuc/2, debuc/3, debuc/4,
             debug_chain/2, debug_chain/3,
             debug_consec/3, debug_consec/4,
             debug_message/3,
@@ -120,11 +120,13 @@ debug_call_version( 1:3:0, date(2019,4,22) ).
 %% debuc( +Topic, +Goal, +Args ).
 %% debuc( +Topic, +Goal, +Pfx, +Args ).
 % 
-% Shorthands for debug_call/n.
-%
+% Shorthands for debug_call/2,3,4 and debug/1.
+% 
 %@author nicos angelopoulos
 %@version  0:1 2020/9/9
 %
+debuc( Topic ) :-
+    debug( Topic ).
 debuc( Topic, Goal ) :-
     debug_call( Topic, Goal ).
 debuc( Topic, Goal, Args ) :-
