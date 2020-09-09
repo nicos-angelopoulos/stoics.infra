@@ -3,6 +3,7 @@
             debug_call/2,
             debug_call/3,
             debug_call/4,
+            debuc/2, debuc/3, debuc/4,
             debug_chain/2, debug_chain/3,
             debug_consec/3, debug_consec/4,
             debug_message/3,
@@ -114,6 +115,24 @@ debug_call_version( 1:3:0, date(2019,4,22) ).
 :- lib(stoics_lib:message_report/3).
 :- lib(stoics_lib:datime_readable/1).
 :- lib(end(debug_call) ).
+
+debug_call( Topic, Goal, Pfx, Args ) :-
+
+%% debuc( +Topic, +Goal ).
+%% debuc( +Topic, +Goal, +Args ).
+%% debuc( +Topic, +Goal, +Pfx, +Args ).
+% 
+% Shorthand for debug_call/n.
+%
+%@author nicos angelopoulos
+%@version  0:1 2020/9/9
+%
+debuc( Topic, Goal ) :-
+    debug_call( Topic, Goal ).
+debuc( Topic, Goal, Args ) :-
+    debug_call( Topic, Goal, Args ).
+debuc( Topic, Goal, Pfx, Args ) :-
+    debug_call( Topic, Goal, Pfx, Args ).
 
 %% debug_call( +Topic, +Goal ).
 %

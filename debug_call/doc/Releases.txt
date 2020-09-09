@@ -7,6 +7,7 @@ TBD
 
  
 1.4  
+     20.09.09   IFACE:   debuc/2,3,4 shorhands for debug_call/2,3,4
      20.09.08   IFACE:   added options debugging call
      20.09.07   IFACE:   added enum debugging call, with example
                          added info debugging call, with example
