@@ -93,6 +93,7 @@ os_sel_oses( os_dirs, Oses, Opts ) :-
 	!,
 	os_dirs( Oses, [stem(rel)|Opts] ).
 os_sel_oses( os_all, Oses, Opts ) :-
+    !,
     os_files( Files, [stem(rel)|Opts] ),
     os_dirs( Dirs, [stem(rel)|Opts] ),
     append( Dirs, Files, Oses ).
