@@ -242,4 +242,6 @@ os_is_flink( Os, file ) :-
 os_is_flink( Os, link ) :-
 	exists_file( Os ),
 	read_link( Os, Target, _ ),
-	exists_file( Target ).
+    os_path( Dir, _, Os ),
+    os_path( Dir, Target, Destination ),
+	exists_file( Destination ).

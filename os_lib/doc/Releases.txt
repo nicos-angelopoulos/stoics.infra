@@ -3,6 +3,7 @@
 
 1.5
      20.08.17   FIXED:    missing cut in os_sel(os_all,...)
+                FIXED:    testing of links that are not in current dir
      20.08.17   DEPS:     explicit loading of autoload SWI libs
      20.07.26   DOC:      tiny typo
      20.06.11   FIXED:    type dlink, d-part was checking for dir
