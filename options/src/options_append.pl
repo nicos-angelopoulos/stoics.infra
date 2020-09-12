@@ -309,20 +309,25 @@ options_append_option_process_version_return_list( [_H|T], ThisV ) :-
     options_append_option_process_version_return_list( T, ThisV ).
 
 options_append_option_process_debug( debug, Pname ) :-
+    options_append_option_process_debug_register( Pname ),
     options_append_option_process_debug_arg( Pname, true ).
 options_append_option_process_debug( debug(DbgS), Pname ) :-
     options_en_list( DbgS, Dbgs ),
+    options_append_option_process_debug_register( Pname ),
     maplist( options_append_option_process_debug_arg(Pname), Dbgs ).
 options_append_option_process_debug( debug(DbgS,Prior), Pname ) :-  % fixme, this is now dealt by '$restore' ?
     options_en_list( DbgS, Dbgs ),
+    options_append_option_process_debug_register( Pname ),
     debugging_status( Pname, Prior ),
     maplist( options_append_option_process_debug_arg(Pname), Dbgs ).
+
+options_append_option_process_debug_register( Pname ) :-
+    ( debug:debugging(Panme,_,_) -> true; assert(debug:debugging(Pname,false,[user])) ).
 
 options_append_option_process_debug_arg( _, Var ) :-
     var( Var ),
     !,
     throw( options_append(instantiation_of_debug) ).
-
 /*
 options_append_option_process_debug_arg( Pname, _ ) :- !,
     \+ prolog_debug:debug_topic(Pname).
