@@ -322,7 +322,7 @@ options_append_option_process_debug( debug(DbgS,Prior), Pname ) :-  % fixme, thi
     maplist( options_append_option_process_debug_arg(Pname), Dbgs ).
 
 options_append_option_process_debug_register( Pname ) :-
-    ( debug:debugging(Panme,_,_) -> true; assert(debug:debugging(Pname,false,[user])) ).
+    ( prolog_debug:debugging(Pname,_,_) -> true; assert(prolog_debug:debugging(Pname,false,[user])) ).
 
 options_append_option_process_debug_arg( _, Var ) :-
     var( Var ),
