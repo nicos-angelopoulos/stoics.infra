@@ -2,6 +2,7 @@
 --------------------
 
 1.5
+     20.09.14   OPTS:     added stem() in os_sel/3,4
      20.08.17   FIXED:    missing cut in os_sel(os_all,...)
                 FIXED:    testing of links that are not in current dir
      20.08.17   DEPS:     explicit loading of autoload SWI libs
