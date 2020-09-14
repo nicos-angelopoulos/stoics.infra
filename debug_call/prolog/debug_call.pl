@@ -415,7 +415,7 @@ debug_portray( _Topic, _Term ).
 %  * options
 %    options used on call to predicate
 %  * pwd 
-%    message about the current directory location (if Arg == false, it is ignored)
+%    message about current dir Location (=Arg), (if Arg == false, location is not shown)- see examples
 %  * read
 %    reports reading from a file. Arg should be file specification suitable for locate/3.
 %    Either loc(File,Exts) or simply File in which case Exts = ''.
@@ -456,6 +456,15 @@ debug_portray( _Topic, _Term ).
 %?-  Etcs = [suv-17.09.26.txg,suv-17.09.21.txg], Etc = suv-17.09.26.txg,
 %    debug_call( suv, ns_sel, c(Etc,Etcs,'suv file',true) )
 % Continuing with: suv file, as: suv-17.09.26.txg, from non singleton list: [suv-17.09.26.txg,suv-17.09.21.txg]
+%
+% ?- debuc( ex, pwd, here ).
+% % Pwd at, here, is: '/Users/nicosangelopoulos/.local/share/swi-prolog/pack/Downloads/bio_db_repo-publish/bio_db_repo-20.09.14/data/hs/maps/hgnc/'
+% true.
+% 
+% ?- debuc( ex, pwd, false ).
+% % Pwd: '/Users/nicosangelopoulos/.local/share/swi-prolog/pack/Downloads/bio_db_repo-publish/bio_db_repo-20.09.14/data/hs/maps/hgnc/'
+% true.
+% 
 %==
 % 
 % At some point around SWI-Prolog 8, behaviour of debug/3 changed in being more strict about messages with no arguments.
