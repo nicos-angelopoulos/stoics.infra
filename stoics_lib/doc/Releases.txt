@@ -2,6 +2,7 @@
 --------------------
 
 1.2
+     20.09.13   FIXED:  missing loading of library(debug)
      20.07.27   DEPS:   explicit loading of autoload SWI libs
      20.07.27   DEPS:   explicit loading of library(listing) in portray_clauses.pl
      20.04.25   DOC:    couple of small typos in known/3

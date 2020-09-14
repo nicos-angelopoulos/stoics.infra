@@ -1,4 +1,5 @@
 
+:- use_module(library(debug)).  % /3.
 :- use_module(library(http/http_open)). % fixme: doit dynamically
 :- use_module(library(listing)).       % portray_clause/2.
 
