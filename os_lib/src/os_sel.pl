@@ -2,7 +2,7 @@
 :- lib(options).
 :- lib( stoics_lib:atom_sub/2 ).
 
-os_sel_defaults( [dir('.'),sub(false),version(0:5)] ).
+os_sel_defaults( [dir('.'),stem(rel),sub(false),version(0:5)] ).
 
 /** os_sel( +Oses, +PatternS, -Sel ).
     os_sel( +Oses, +PatternS, -Sel, +Opts ).
