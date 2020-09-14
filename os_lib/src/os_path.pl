@@ -4,6 +4,8 @@
 
 /** os_path( +Dir, +File, -Path ). 
     os_path( -Dir, -File, +Path ). 
+    os_path{ +Parts, -Path ).
+    os_path( -Parts, +Path ).
 
   Mostly a polymorphic directory_file_path/3 nickname.
 Also '' is the default rather than '/' when dealing with absolute paths.
@@ -76,11 +78,28 @@ Abc = hmrn(what/if/not).
 
 ?- os_path( "what/if", foo.txt, Abc ).
 Abc = "what/if/foo.txt".
+
+?- os_path( Parts, 'a/b/c.txt' ), os_path( Parts, Rel ).
+Parts = [a, b, c.txt],
+Rel = 'a/b/c.txt'.
+
+?- os_path( Parts, '/a/b/c.txt' ), os_path( Parts, Rel ).
+Parts = ['', a, b, c.txt],
+Rel = '/a/b/c.txt'.
+
 ==
 
 @author nicos angelopoulos
-@version  0.3.1 2016/1/23
+@version  0.4 2020/9/14
 */
+os_path( Parts, Path ) :-
+    ground( Path ),
+    !,
+    os_path_decon( Path, Parts ).
+os_path( Parts, Path ) :-
+    % do not use at_con/3, see example above...
+    atomic_list_concat( Parts, '/', Prov ),
+    os_cast( Prov, Path ).
 os_path( Dir, File, Path ) :-
     File == '.', 
     !,
@@ -161,3 +180,14 @@ os_path_type_de( string, String, Dir, File ) :-
 
 os_path_type_de_dir( '/', '' ) :- !.
 os_path_type_de_dir( Dir, Dir ).
+
+os_path_decon( Path, Parts ) :-
+    os_path( '.', File, Path ),
+    Path == File,
+    !,
+    Parts = [Path].
+os_path_decon( Path, Parts ) :-
+    os_path( Dir, Base, Path ),
+    os_path_decon( Dir, Darts ),
+    append( Darts, [Base], Parts ),
+    !.

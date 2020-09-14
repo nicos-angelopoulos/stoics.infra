@@ -11,6 +11,7 @@
               os_postfix/3,              % +PsfxS, ?Fname, ?Posted
               os_postfix/4,              % +PsfxS, ?Fname, ?Posted, +Opts
               os_abs/2, os_abs/3,        % +Os, -Abs[, +Opts]
+              os_path/2,                 % ?Parts, ?Path
               os_path/3,                 % +-Dir, +-File, -+Path
               os_slashify/2,             % +-Path, -+Slashed
               os_parts/2,                % +-Parts, -+Stem
@@ -181,6 +182,7 @@ The library predicates can be split to 4 groups.
   * os_dir_stem_ext/4
   * os_dir_stem_ext/2
   * os_postfix/3
+  * os_path/2
   * os_path/3
   * os_parts/3
   * os_slashify/2
