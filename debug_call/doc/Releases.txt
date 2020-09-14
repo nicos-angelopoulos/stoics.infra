@@ -7,6 +7,7 @@ TBD
 
  
 1.4  
+     20.09.14   DOC:     tidy up comment for debug_call/3,4.
      20.09.09   IFACE:   debuc/2,3,4 shorhands for debug_call/2,3,4
                          debuc/1 shorthand for debug/1
      20.09.08   IFACE:   added options debugging call

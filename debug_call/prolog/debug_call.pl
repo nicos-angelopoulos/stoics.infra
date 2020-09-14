@@ -377,7 +377,7 @@ debug_portray( _Topic, _Term ).
 %
 % Automates often used debug calls. When Pfx is missing it is assumed to be ''. Predicate can also be used 
 % to call arbitrary Goal and then print a message after it has successfull completed. As of 1.2 it can also
-% work as a replacement to debug/3.
+% work as a replacement to debug/3. With 1.3 the debuc/3 shorthand was introduced.
 %  
 %  When Goal is a known abbreviation, then Arg usually qualifies the output generated.
 %  When Goal is of the form call(Goal), Arg will be passed to debug(Topic,Mess,Arg). 
@@ -459,14 +459,15 @@ debug_portray( _Topic, _Term ).
 %==
 % 
 % At some point around SWI-Prolog 8, behaviour of debug/3 changed in being more strict about messages with no arguments.
-% As of version 1.2 debug_call/3 can act as a replacement of debug/3 but with the ord behaviour.
+% As of version 1.2 debug_call/3 can act as a replacement of debug/3 but with the old behaviour.
+%
 %==
 % ?- debug( ex, 'Messagging...', true ).
-% % Messagging...
-    % [[ EXCEPTION while printing message 'Messagging...'
-       % with arguments user:true:
-       % raised: format('too many arguments')
-    % ]]
+% Messagging...
+% [[ EXCEPTION while printing message 'Messagging...'
+%       with arguments user:true:
+%       raised: format('too many arguments')
+%    ]]
 % 
 % true.
 % 
@@ -483,7 +484,8 @@ debug_portray( _Topic, _Term ).
 % @version  0.5 2014/??/??  added ns_sel
 % @version  1.1 2018/03/20  prefer +2 arity in debug_call/2
 % @version  1.2 2020/03/07  now can be used as a replacement for debug/3 (but with old 3rd arg behaviour, allowing eg 'true').
-% @version  1.3 2020/09/07  added canned calls info and enum
+% @version  1.3 2020/09/14  added canned calls info and enum, debuc/2,3,4
+% @see debuc/3 (shorthand for debug_call/3).
 %
 debug_call( Topic, Goal, Args ) :-
     debug_call( Topic, Goal, '', Args ).
