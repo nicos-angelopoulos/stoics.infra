@@ -33,6 +33,7 @@
               io_close/2,              % +FileR, -Stream
               io_open/3,               % +FileR, +Mode, -Stream
               io_sections/3,           % +File, -Sections, +Opts
+              io_streams/3,            % ?Input, ?Output, ?Error
             % kv/
               kv_compose/3,            % +Ks, +Vs, -KVs
               kv_compose/4,            % +List1, +List2, -KVsCont, -Tkvs
