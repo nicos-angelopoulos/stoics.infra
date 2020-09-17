@@ -45,6 +45,7 @@
               os_cast/2,                 % +Os, -Typed
               os_cast/3,                 % +Type, +Os, -Typed
               os_tmp_dir/1,              % -Os
+              os_type_base/2,            % ?Type, ?Base
               os_version/2,              % -Vers, -Date
 
               % logical
@@ -277,6 +278,7 @@ The library predicates can be split to 4 groups.
 :- lib(os_mv/2).
 :- lib(os_cp/2).
 :- lib(os_ln_s/2).
+:- lib(os_type_base/2).
 
 :- lib(stoics_lib:at_con/3).
 :- lib(stoics_lib:holds/2).

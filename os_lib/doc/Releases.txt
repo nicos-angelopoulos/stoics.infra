@@ -2,6 +2,8 @@
 --------------------
 
 1.5
+     20.09.17   OPTS:     allow type(Type) to return the value and Type=base(Base), (fixed Type=dir, too)
+                IFACE:    os_type_base/2
      20.09.16   OPTS:     added outputs_to() & outputs_as_tty(), with example
      20.09.14   OPTS:     added stem() in os_sel/3,4
                 IFACE:    os_path/2

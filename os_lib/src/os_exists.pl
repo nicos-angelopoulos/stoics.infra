@@ -23,7 +23,7 @@ Opts
     reverse polarity, if true require Os not to exist
 
   * type(Type)
-    in addition to existance require file type-ness (dir,link,file,flink,dlink,any)
+    in addition to Os existing, require file type-ness (dir,link,file,flink,dlink,any). Can be used to return the type, when input is a variable. Type = base(BaseType) streamline type to either file or dir (see os_type_base/2).
 
   * mode(Mode=exists)
     one of exist, read, write and append
@@ -66,13 +66,9 @@ false.
 
 ?- os_exists( file2, [on_exit(error),message(informational)] ), writeln(later).
 % os:os_exists/2: OS entity: file2, does not exist
-?- 
 
 ?- os_exists( file2, not(true) ).
 true.
-
-?- os_exists( file1, not(true) ).
-false.
 
 ?- os_exists( file1, [not(true),err(error)] ).
 ERROR: os:os_exists/2: OS entity: file1, already exists
@@ -92,6 +88,8 @@ false.
 ?- os_exists( dir1/link2, type(link) ).
 true.
 
+?- os_exists( dir1/link2, type(base(Base)) ).
+Base = file.
 ==
 */
 os_exists( Os ) :-
@@ -107,7 +105,13 @@ os_exists_1( true, Os, Opts ) :-
 	os_exists_not( Os, Opts ).
 os_exists_1( false, Os, Opts ) :-
 	options( [type(Type), mode(Mode)], Opts ),
-	os_exists_true( Os, Type, Mode, Opts ).
+    ( (\+ var(Type),Type=base(BaseType)) ->
+        true
+        ;
+        OsType = Type
+    ),
+	os_exists_true( Os, OsType, Mode, Opts ),
+    os_type_base( OsType, BaseType ).
 
 os_exists_true( Os, Type, Mode, Opts ) :-
 	exists_file( Os ),
@@ -125,10 +129,8 @@ os_exists_true( Os, Type, Mode, Opts ) :-
 os_exists_true( Os, _Type, _Mode, Opts ) :-
     throw( os_exists_not(Os), [os:os_exists/2|Opts] ).
 
-os_exists_dir( any, Os, Mode, Opts ) :-
-	os_exists_dir_mode( Mode, Os, Opts ),
-	!.
 os_exists_dir( dir, Os, Mode, Opts ) :-
+	\+ read_link( Os, _, _ ),
 	os_exists_dir_mode( Mode, Os, Opts ),
 	!.
 os_exists_dir( dlink, Os, Mode, Opts ) :-
@@ -137,6 +139,9 @@ os_exists_dir( dlink, Os, Mode, Opts ) :-
 	!.
 os_exists_dir( link, Os, Mode, Opts ) :-
 	read_link( Os, _, _ ),
+	os_exists_dir_mode( Mode, Os, Opts ),
+	!.
+os_exists_dir( any, Os, Mode, Opts ) :-
 	os_exists_dir_mode( Mode, Os, Opts ),
 	!.
 % 18.09.29: fixme: clarify the logic here... ?
@@ -176,9 +181,6 @@ os_exists_dir_mode_write( false, Os, Opts, _Out, _OsTest ) :-
 	% fixme: test OsTest ?
     throw( os_mode(Os,write), [os:os_exists/2|Opts] ).
 
-os_exists_file( any, Os, Mode, Opts ) :-
-	!,
-	os_exists_file_mode( Mode, Os, Opts ).
 os_exists_file( file, Os, Mode, Opts ) :-
 	\+ read_link( Os, _, _ ),
 	!,
@@ -188,9 +190,13 @@ os_exists_file( flink, Os, Mode, Opts ) :-
 	os_exists_file_mode( Mode, Os, Opts ),
 	!.
 os_exists_file( link, Os, Mode, Opts ) :-
-	read_link( Os, _, _ ),
+	% read_link( Os, _, _ ),
+	os_is_flink( Os, _Which ),
 	os_exists_file_mode( Mode, Os, Opts ),
 	!.
+os_exists_file( any, Os, Mode, Opts ) :-
+	!,
+	os_exists_file_mode( Mode, Os, Opts ).
 os_exists_file( Unmatched, Os, _Mode, Opts ) :-
 	os_is_flink( Os, Which ),
     throw( os_type(Os,Unmatched,Which), [os:os_exists/2|Opts] ).
