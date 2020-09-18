@@ -88,7 +88,8 @@ debug_calls uses dynamic -..
 @version 0.3 2017/3/9
 @version 1.1 2018/3/20
 @version 1.2 2019/4/22
-@version 1.3 2020/3/7, not published yet
+@version 1.3 2020/3/7
+@version 1.4 2020/9/18
 
 */
 
@@ -97,12 +98,12 @@ debug_calls uses dynamic -..
 Current version and release date for the library.
 
 ==
-?- debug_call_version( V, D ).
-V = 1:3:0,
-D = date(2020,3,7).
+?- debug_call_version( -V, -D ).
+V = 1:4:0,
+D = date(2020,9,18).
 ==
 */
-debug_call_version( 1:3:0, date(2019,4,22) ).
+debug_call_version( 1:4:0, date(2020,9,18) ).
 
 :- use_module(library(apply)).   % maplist/4,...
 :- use_module(library(lists)).   % member/4,...
