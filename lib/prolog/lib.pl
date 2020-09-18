@@ -425,6 +425,8 @@ Listens to =|debug(lib)|=.
 @version  2.4 2019/4/22,  small fix release
 @version  2.5 2019/5/8,   bioc (for bioconductor) load term 
 @version  2.6 2020/3/8,   fixed cell-loading warnings
+@version  2.7 2020/3/8,   compatibility with pack changes in SWI-8.2, fixed layout breaking tags
+@version  2.8 2020/9/18,  miinroor changes, library(lists) explicit loading + info messages
 @see http://stoics.org.uk/~nicos/sware/lib
 
 */
@@ -548,12 +550,12 @@ Current version can be found by:
 ==
 ?- 
     lib( version(Vers,Date) ).
-Vers = 2:6:0,
-Date = date(2020, 3, 8).
+Vers = 2:8:0,
+Date = date(2020, 9, 18).
 ==
 
 @author nicos angelopoulos
-@version  2:6 2020/3/8
+@version  2:8 2020/9/18
 @tbd when predicate is missing from stoics_lib while loading from b_real, we get clash between main and lazy, error should be clearer (the pred select_all/3 was actually not defined in file either)
 
 */
@@ -607,7 +609,7 @@ lib( end(Src), _Cxt, Opts ) :-
     % lib_alias( Alias, Cxt, Opts ).
 lib( version(V,D), _, _Args ) :-
     !,
-    V = 2:6:0, D = date(2020,3,8).
+    V = 2:8:0, D = date(2020,9,18).
 lib( suggests(Lib), _, _Args ) :- 
     !,
     lib_suggests( Lib ).
