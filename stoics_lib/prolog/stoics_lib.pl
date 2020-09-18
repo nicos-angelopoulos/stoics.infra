@@ -224,5 +224,6 @@
 :- lib(en_append/3).
 :- lib(url_file/2).
 :- lib(call_morph/4).
+:- lib(io_streams/3).
 
 :- lib( end(stoics_lib) ).
