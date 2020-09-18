@@ -227,6 +227,7 @@ The library predicates can be split to 4 groups.
 @version  1.2.0 2018/8/5   added os_files/1,2 and os_dirs/1,2 (with options) and removed os_dir_files/2 and os_dir_dirs/2.  
 @version 1.3 2018/10/1 cleaner error handling via throw, new opt dots(D), os_cast/3 arguments switch
 @version 1.4 2019/4/22 option sub(Sub); cp_rec.pl script; list of postfixes, etc
+@version 1.5 2019/4/22 os_path/2, fixes and new options to os_mill/4 ; os_exists/2 (return type) & os_sel/4
 @see http://www.stoics.org.uk/~nicos/sware/os
 @see http://www.stoics.org.uk/~nicos/sware/os/html/os_lib.html
 @see doc/Releases.txt
@@ -292,9 +293,9 @@ Current version and release date for the library.
 
 ==
 ?- os_version( V, D ) :-
-    V = 1:4:0,
-    D = date(2019,4,22)
+    V = 1:5:0,
+    D = date(2020,9,18)
 ==
 
 */
-os_version( 1:4:0, date(2019,4,22) ).
+os_version( 1:5:0, date(2020,9,18) ).
