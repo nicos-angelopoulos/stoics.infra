@@ -1,7 +1,7 @@
 ---   Releases   ---
 --------------------
 
-1.2
+1.2         @   20.09.18
      20.09.15   IFACE:  io_streams/3, generalises set_prolog_IO/3
      20.09.13   FIXED:  missing loading of library(debug)
      20.07.27   DEPS:   explicit loading of autoload SWI libs
