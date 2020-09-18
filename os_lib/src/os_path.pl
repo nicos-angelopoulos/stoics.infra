@@ -4,8 +4,8 @@
 
 /** os_path( +Dir, +File, -Path ). 
     os_path( -Dir, -File, +Path ). 
-    os_path{ +Parts, -Path ).
     os_path( -Parts, +Path ).
+    os_path( +Parts, -Path ).
 
   Mostly a polymorphic directory_file_path/3 nickname.
 Also '' is the default rather than '/' when dealing with absolute paths.
