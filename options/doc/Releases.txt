@@ -1,6 +1,7 @@
 ---   Releases   ---
 --------------------
 
+1.4  20.09.27  OPTS:    module based debug switching on
 1.3         @  20.9.18
      20.09.11  DEBUG:   register debugging topic for calling predicates
      20.08.19  DEPS:    explicit loading of library(filesex)
