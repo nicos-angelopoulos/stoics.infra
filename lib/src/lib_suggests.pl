@@ -68,5 +68,5 @@ lib_suggests_opts( Opts, Lib ) :-
     % catch( lib(Lib,Opts), _, fail ),
     lib( Lib, Opts ),
     !.
-lib_suggests_opts( Lib ) :-  % fixme:
+lib_suggests_opts( _Opts, Lib ) :-  % fixme:
     debug( lib, 'Suggested library not installed: ~w', Lib ).

@@ -87,19 +87,25 @@ lib_r( Rlib, Opts ) :-
             ),
             r_lib_sys( Rlib )
             ;
-            ( (SuggFlag==install;SuggFlag==debug) -> 
-                ( prolog_pack:confirm( contact_r_server(Rlib), yes, [] ) ->
-                    ( memberchk(bioc(true),Opts) ->
-                        real:r_call( requireNamespace("BiocManager",quietly='TRUE'), [rvar(BiocX)] ),
-                        (BiocX == true -> true; real:r_call('install.packages'("BiocManager"),[])),
-                            real:r_call('BiocManager::install'(+ Rlib),  []),
-                            real:r_call(library(Rlib), [])
-                            ;
-                            real:r_call('install.packages'(+ Rlib),  []),
-                            real:r_call(library(Rlib), [])
-                    )
+            % not-installed Rlib...
+            % fixme: clarify logic of warnings...
+            ( memberchk(suggests_warns(false),Opts) ->
+                true   % no warning, successed 
+                ;
+                ( (SuggFlag==install ; SuggFlag==debug)  -> 
+                    ( prolog_pack:confirm( contact_r_server(Rlib), yes, [] ) ->
+                        ( memberchk(bioc(true),Opts) ->
+                            real:r_call( requireNamespace("BiocManager",quietly='TRUE'), [rvar(BiocX)] ),
+                            (BiocX == true -> true; real:r_call('install.packages'("BiocManager"),[])),
+                                real:r_call('BiocManager::install'(+ Rlib),  []),
+                                real:r_call(library(Rlib), [])
+                                ;
+                                real:r_call('install.packages'(+ Rlib),  []),
+                                real:r_call(library(Rlib), [])
+                        )
                     ;
                     true
+                    )
                 )
                 ;
                 fail
@@ -426,7 +432,8 @@ Listens to =|debug(lib)|=.
 @version  2.5 2019/5/8,   bioc (for bioconductor) load term 
 @version  2.6 2020/3/8,   fixed cell-loading warnings
 @version  2.7 2020/3/8,   compatibility with pack changes in SWI-8.2, fixed layout breaking tags
-@version  2.8 2020/9/18,  miinroor changes, library(lists) explicit loading + info messages
+@version  2.8 2020/9/18,  minor changes, library(lists) explicit loading + info messages
+@version  2.8 2021/1/23,  honour developer suggests_warns(false), logic needs further work
 @see http://stoics.org.uk/~nicos/sware/lib
 
 */
