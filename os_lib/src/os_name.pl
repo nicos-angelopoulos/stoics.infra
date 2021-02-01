@@ -63,7 +63,7 @@ os_name( Entity, Type ) :-
 os_name( Entity, Type ) :-
 	functor( Entity, Alias, 1 ),
 	!,
-	holds( file_alias_path(Alias,_), HasPath ),
+	holds( prolog_source:file_alias_path(Alias,_), HasPath ),
 	os_name_alias( HasPath, Entity, Type ).
 os_name( Entity, _Name ) :-
 	throw( pack_error(os,of_unknown_name(Entity)) ).

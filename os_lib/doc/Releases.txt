@@ -1,6 +1,10 @@
 ---   Releases   ---
 --------------------
 
+1.6
+            @   21.02.01
+                DEPS:     clarify dependency on prolog_source:file_alias_path/2
+
 1.5         @   20.09.18
      20.09.17   OPTS:     allow type(Type) to return the value and Type=base(Base), (fixed Type=dir, too)
                 IFACE:    os_type_base/2
