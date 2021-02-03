@@ -264,7 +264,8 @@ options_option_required( Opts, Needed, Enlist, OwnOpts, Rest ) :-
     option_arg_ground( IsGround, Ground, Termplate, Opts ),
     option_arg_enlist( Enlist, Termplate, Needed ).
 options_option_required( Opts, Needed, _Enlist, _OwnOpts, _Rest ) :-
-    throw( pack_error(options,opt_required(Needed,Opts)) ).
+    PeOpts = [pred(options/2),pack(options)],
+    throw( pack_error(opt_required(Needed,Opts)), PeOpts ).
 
 /** option_arg_ground( +Ground, ?Termlate ).
 
@@ -278,7 +279,8 @@ option_arg_ground( false, Ground, Termlate, Opts ) :-
 % options_arg_non_ground( true, Termlate, Opts ) :- fail
 options_arg_non_ground( false, _Termlate, _Opts ).  % Termlate is NOT required to be ground
 options_arg_non_ground( error, Needed, Opts ) :-
-    throw( pack_error(options,opt_mustbe_ground(Needed,Opts)) ).
+    PeOpts = [pred(options/2),pack(options)],
+    throw( pack_error(opt_mustbe_ground(Needed,Opts)), PeOpts ).
 
 option_arg_enlist( true, Termlate, Needed ) :-
     Termlate =.. [Name,Arg1|Args],
