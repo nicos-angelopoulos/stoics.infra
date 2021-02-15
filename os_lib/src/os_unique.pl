@@ -56,11 +56,11 @@ os_unique_by_date_test :-
 %     min length of date Id (_ye_,_mo_,_da_) if using By=date/n or integer when By=verions/n (Nth component), and an integer
 %   * place_token(Plc=before)
 %     or _after_, where to place the token in relation to the date
-%   * sep_parts(Psep='_')
+%   * sep_parts(Psep='-')
 %     how to conjoin Token and unique part (was token_sep)
 %   * sep_sub(Ssep='.')     
 %     inter date component separator (was date_sep)
-%   * sep_token(Sep='-')
+%   * sep_token(Sep='_')
 %     separator to be used in bonding TokenS into Token
 %   * type(Type=dir)
 %     should the unique entry be a _dir_ectory or a _file_.
@@ -191,12 +191,12 @@ construct_unique_base_name_by_date( By, TConc, Opts, Type, Dir, Bname ) :-
      append( XLengths, NLengths, Lengths ),
      findall_date_components( ByAtoms, Lengths, Dcomps ),
      memberchk( ext(Ext), Opts ),
-    memberchk( sep_sub(DSep), Opts ),
+     memberchk( sep_sub(DSep), Opts ),
      atomic_list_concat( Dcomps, DSep, DateBit ),
-    memberchk( place_token(PlcTkn), Opts ),
-    options( sep_parts(PSep), Opts ),
-    os_unique_concat( PlcTkn, TConc, PSep, DateBit, CurrStem ),
-    type_ext_full( Type, Ext, CurrStem, Current ),
+     memberchk( place_token(PlcTkn), Opts ),
+     options( sep_parts(PSep), Opts ),
+     os_unique_concat( PlcTkn, TConc, PSep, DateBit, CurrStem ),
+     type_ext_full( Type, Ext, CurrStem, Current ),
      keep_to_unique_base_name_by_date( Current, ByLists, Lengths, PlcTkn, PSep, DSep, Type, Dir, Ext, Bname ).
 
 os_unique_create( false, _Type, _Os ).
@@ -206,6 +206,7 @@ os_unique_create( true, Type, Os ) :-
 type_ext_full( dir, _Ext, Current, Current ).
 type_ext_full( file, Ext, Current, Full ) :-
     file_name_extension( Current, Ext, Full ).
+    % os_ext( Ext, Current, Full ).
 
 findall_date_components( ByAtoms, Lens, Dcomps ) :-
      get_date_time( Datime ),

@@ -4,6 +4,7 @@
 1.6
      21.02.15   IFACE:    dir() option in os_exists/2 and os_unique/3
                 DEPS:     load library(dates)
+                FIXED:    os_ext( '', X, abc.csv )
      21.02.01   DEPS:     clarify dependency on prolog_source:file_alias_path/2
 
 1.5         @   20.09.18

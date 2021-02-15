@@ -133,7 +133,7 @@ os_ext_file( atom, Stem, Ext, Os, _Opts ) :-
         % os_ext( '', xag ).
         ( Ext == '' ->
             % \+ os_ext( '', xag.abc ).
-            atomic_list_concat( [_Part], '.', Os ),
+            % atomic_list_concat( [_Part], '.', Os ),
 	        os_cast( atom, Os, Stem )
             ;
 	        atomic_list_concat( ExtParts, '.', Ext ),
