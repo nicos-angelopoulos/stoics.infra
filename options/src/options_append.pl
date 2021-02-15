@@ -148,7 +148,8 @@ The default OAopts list is [funnel(debug)].
 options_append( Pname, Args, Opts ) :-
     options_append( Pname, Args, Opts, [funnel(debug),funnel(version)] ).
 options_append( Pname, ArgS, Opts, OAoptS ) :-
-    options_en_list( OAoptS, OAoptsWA ),
+    options_en_list( OAoptS, OAoptsWA0 ),
+    append( OAoptsWA0, [funnel(debug),funnel(version)], OAoptsWA ),
     atom_concat( Pname, '_defaults', Dname ),
     ( ArgS == true ->
         ArgsPrv = []
