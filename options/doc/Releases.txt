@@ -3,7 +3,7 @@
 
 
 1.5 
-     21.02.15  FIXED:   pass process/1 and version/1 as defs in options_append/4 
+     21.02.15  FIXED:   pass process/1 and version/1 as defs in options_append/4 too
      21.02.03  DEBUG:   switch to new pack_error arguments
 1.4         @  21.01.22
      20.09.27  OPTS:    module based debug switching on
