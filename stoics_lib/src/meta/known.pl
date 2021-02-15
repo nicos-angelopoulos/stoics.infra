@@ -27,8 +27,8 @@
     If Tkn is missing is taken to be the first arg of Goal.
     If category is missing it is taken to be values().
 
-    Goal will call with a cut after it is invocations so it
-    will only be allowed to succeed once.
+    Goal is called deterministically (ie a cut is placed right after is called),
+    it can thus only succeed once.
 
 ==
 ?- [user].
