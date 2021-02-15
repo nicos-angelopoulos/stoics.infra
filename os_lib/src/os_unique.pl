@@ -3,6 +3,7 @@ os_unique_defaults( Defs ) :-
      Defs = [ 
                 by(date([ye,mo,da,[ho,mi],[se]]) ),
                 create(true),
+                dir('.'),
                 ext(csv),
                 max_length(ya,2), 
                 min_length(_,2),
@@ -31,7 +32,7 @@ os_unique_by_date_test :-
 %% os_unique( +TokenS, -Os ).
 %% os_unique( +TokenS, -Os, +Opts ).
 %  
-% Create a unique file or directory named Os by using date elements
+% Create a unique file or directory named Os, in Dir, by using date elements
 % and a Token or list of Tokens. Token can be a list in which case the Separator option will
 % also apply within the token parts.
 %  
@@ -45,6 +46,8 @@ os_unique_by_date_test :-
 %     For building unique via version give  version(Pfx,Compon,Type,Whc) (version/0 is short for version(v,'',1,int,1))
 %   * create(Create=true)
 %     by default the file is created
+%   * dir(Dir='.')
+%     parent directory
 %   * ext(Ext=csv)
 %     extension to add to OsEntry iff type is file
 %   * max_length(Dp=ye,Ye=2) 
@@ -79,6 +82,10 @@ os_unique_by_date_test :-
 % ?- os_unique( res, Dname, [] ).
 % Dname = 'res-14.05.22.10.40.57'.
 % 
+% ?- os_unique( res, Dname, dir('/tmp') ).
+% Dname = 'res-21.02.15/'
+% % note: dir is created in /tmp
+%
 % ?- os_unique( res, Dname, [min_length(_,3)] ).
 % Dname = 'res-014.005.022'.
 %
@@ -123,33 +130,36 @@ os_unique_by_date_test :-
 %
 % @author nicos angelopoulos
 % @version  0.3 2016/2/23
-% @version  0.4 2016/9/2  changed name from os_unique_by_date, now it also does versioning
+% @version  0.4 2016/9/2   changed name from os_unique_by_date, now it also does versioning
+% @version  0.5 2021/2/15  added option dir()
 %
 os_unique( Tkn, Bname ) :-
     os_unique( Tkn, Bname, [] ).
 os_unique( Tkn, Bname, InOpts ) :-
-    options_append( os_unique, InOpts, Opts ),
+     options_append( os_unique, InOpts, Opts ),
      memberchk( by(By), Opts ),
-    en_list( Tkn, Tkns ),
-    options( sep_token(TSep), Opts ),
-    atomic_list_concat( Tkns, TSep, TknConc ),
+     en_list( Tkn, Tkns ),
+     options( sep_token(TSep), Opts ),
+     atomic_list_concat( Tkns, TSep, TknConc ),
      options( type(Type), Opts ),
-    os_unique_by( By, TknConc, Type, BnamePrv, Opts ),
-    options( create(Create), Opts ),
-    os_unique_create( Create, Type, BnamePrv ),
-    os_cast( BnamePrv, Bname ).
+     options( dir(Dir), Opts ),
+     os_unique_by( By, TknConc, Type, Dir, BnamePrv, Opts ),
+     options( create(Create), Opts ),
+     os_path( Dir, BnamePrv, +(AbsOs) ),
+     os_unique_create( Create, Type, AbsOs ),
+     os_cast( BnamePrv, Bname ).
 
-os_unique_by( date, TConc, Type, Bname, Opts ) :-
+os_unique_by( date, TConc, Type, Dir, Bname, Opts ) :-
+     !,
+     ByTerm = [ye,mo,da,[ho,mi],[se]],
+     construct_unique_base_name_by_date( ByTerm, TConc, Opts, Type, Dir, Bname ).
+os_unique_by( date(ByTerm), TConc, Type, Dir, Bname, Opts ) :-
     !,
-    ByTerm = [ye,mo,da,[ho,mi],[se]],
-     construct_unique_base_name_by_date( ByTerm, TConc, Opts, Type, Bname ).
-os_unique_by( date(ByTerm), TConc, Type, Bname, Opts ) :-
+     construct_unique_base_name_by_date( ByTerm, TConc, Opts, Type, Dir, Bname ).
+os_unique_by( version, TConc, UType, Dir, Bname, Opts ) :-
     !,
-     construct_unique_base_name_by_date( ByTerm, TConc, Opts, Type, Bname ).
-os_unique_by( version, TConc, UType, Bname, Opts ) :-
-    !,
-    os_unique_by( version(v,[],int,1), TConc, UType, Bname, Opts ).
-os_unique_by( version(Pfx,Comps,VType,Whc), TConc, UType, Bname, Opts ) :-
+    os_unique_by( version(v,[],int,1), TConc, UType, Dir, Bname, Opts ).
+os_unique_by( version(Pfx,Comps,VType,Whc), TConc, UType, Dir, Bname, Opts ) :-
     options( ext(Ext), Opts ),
     options( sep_sub(SSep), Opts ),
     options( sep_parts(PSep), Opts ),
@@ -164,7 +174,7 @@ os_unique_by( version(Pfx,Comps,VType,Whc), TConc, UType, Bname, Opts ) :-
     at_con( [Pfx,CandVers], '', CandPfxd ),
     os_unique_concat( PlcTkn, TConc, PSep, CandPfxd, CandStem ),
     type_ext_full( UType, Ext, CandStem, Bname ),
-    \+ os_exists( Bname ),
+    \+ os_exists( Bname, dir(Dir) ),
     !.
 
 os_unique_by_version_candidate_component( int, Min, Atom ) :-
@@ -173,7 +183,7 @@ os_unique_by_version_candidate_component( int, Min, Atom ) :-
 % fixme: implement:  Atom = a, b, ..., z, aa, ab, ..., az, .... , zz^n
 % os_unique_by_version_candidate_component( atom, Min, Atom ).
 
-construct_unique_base_name_by_date( By, TConc, Opts, Type, Bname ) :-
+construct_unique_base_name_by_date( By, TConc, Opts, Type, Dir, Bname ) :-
      partition( atom, By, ByAtoms, ByLists ),
      get_date_time( Datime ),
      findall( max(Key,Len), (member(max_length(KeyIn,Len),Opts),expand_date_key(KeyIn,Datime,Key)), XLengths ),
@@ -187,7 +197,7 @@ construct_unique_base_name_by_date( By, TConc, Opts, Type, Bname ) :-
     options( sep_parts(PSep), Opts ),
     os_unique_concat( PlcTkn, TConc, PSep, DateBit, CurrStem ),
     type_ext_full( Type, Ext, CurrStem, Current ),
-     keep_to_unique_base_name_by_date( Current, ByLists, Lengths, PlcTkn, PSep, DSep, Type, Ext, Bname ).
+     keep_to_unique_base_name_by_date( Current, ByLists, Lengths, PlcTkn, PSep, DSep, Type, Dir, Ext, Bname ).
 
 os_unique_create( false, _Type, _Os ).
 os_unique_create( true, Type, Os ) :-
@@ -213,20 +223,22 @@ os_unique_concat( before, Tkn, Sep, Date, Conc ) :-
 os_unique_concat( after, Tkn, Sep, Date, Conc ) :-
     atomic_list_concat( [Date,Tkn], Sep, Conc ).
 
-keep_to_unique_base_name_by_date( Current, _ByLists, _Lengths, _Plc, _TSep, _DSep, _Type, _Ext, Bname ) :-
+keep_to_unique_base_name_by_date( Current, _ByLists, _Lengths, _Plc, _TSep, _DSep, Type, Dir, _Ext, Bname ) :-
+    % fixme: Type -> map to something more generic for os_exists/2 ?
+    \+ os_exists( Current, [type(Type),dir(Dir)] ),
     % fixme:
-     \+ exists_file( Current ),
-     \+ exists_directory( Current ),
+     % \+ exists_file( Current ),
+     % \+ exists_directory( Current ),
      !,
      Bname = Current.
-keep_to_unique_base_name_by_date( Full, [H|T], Lengths, Plc, TSep, DSep, Type, Ext, Bname ) :-
+keep_to_unique_base_name_by_date( Full, [H|T], Lengths, Plc, TSep, DSep, Type, Dir, Ext, Bname ) :-
      findall_date_components( H, Lengths, Dcomps ),
-    type_ext_full( Type, Ext, Current, Full ),
-    place_stem_date_fragment( Plc, Current, TSep, DSep, Dcomps, Next ),
-    type_ext_full( Type, Ext, Next, NextFull ),
+     type_ext_full( Type, Ext, Current, Full ),
+     place_stem_date_fragment( Plc, Current, TSep, DSep, Dcomps, Next ),
+     type_ext_full( Type, Ext, Next, NextFull ),
      % atomic_list_concat( [Current|Dcomps], IdSep, Next ),
      % we could introduce another separator here.
-     keep_to_unique_base_name_by_date( NextFull, T, Lengths, Plc, TSep, DSep, Type, Ext, Bname ).
+     keep_to_unique_base_name_by_date( NextFull, T, Lengths, Plc, TSep, DSep, Type, Dir, Ext, Bname ).
 
 place_stem_date_fragment( before, SoFar, _TSep, DSep, Dcomps, Next ) :-
      atomic_list_concat( [SoFar|Dcomps], DSep, Next ).

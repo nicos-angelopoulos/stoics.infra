@@ -1,5 +1,5 @@
 
-os_exists_defaults( [err(test),not(false),type(any),mode(exist)] ).
+os_exists_defaults( [dir('.'),err(test),not(false),type(any),mode(exist)] ).
 
 /** os_exists( +Os ).
     os_exists( +Os, +Opts ).
@@ -15,6 +15,9 @@ introduces two new file types: flink and dlink, for file point link or file, and
 directory pointing link or directory.
 
 Opts
+  * dir(Dir='.')
+     parent directory
+
   * err(Err=test)
     test for report and fail, fail for failing, error for throwing, true for success<br>
     (see options: err(E), on_exit(O) and message(M) in throw/2)
@@ -23,7 +26,9 @@ Opts
     reverse polarity, if true require Os not to exist
 
   * type(Type)
-    in addition to Os existing, require file type-ness (dir,link,file,flink,dlink,any). Can be used to return the type, when input is a variable. Type = base(BaseType) streamline type to either file or dir (see os_type_base/2).
+    in addition to Os existing, require file type-ness (dir,link,file,flink,dlink,any).
+    Can be used to return the type, when input is a variable. 
+    Type = base(BaseType) streamline type to either file or dir (see os_type_base/2).
 
   * mode(Mode=exists)
     one of exist, read, write and append
@@ -96,9 +101,11 @@ os_exists( Os ) :-
 	os_exists( Os, [] ).
 
 os_exists( OsPrv, Args ) :-
-	os_cast( atom, OsPrv, Os ),
+	os_cast( atom, OsPrv, OsAtm ),
 	options_append( os_exists, Args, Opts ),
 	options( not(Not), Opts ),
+	options( dir(Dir), Opts ),
+     ( Dir == '.' -> OsAtm = Os ; os_path( Dir, OsAtm, +(Os) ) ),
 	os_exists_1( Not, Os, [os(OsPrv)|Opts] ).
 
 os_exists_1( true, Os, Opts ) :-
@@ -225,9 +232,11 @@ os_exists_file_mode_wins( _, Os ) :-  % sys is the default
 	!,
 	access_file( Os, execute ).
 
-os_exists_not( Os, _Opts ) :-
-	\+ exists_file( Os ),
-	\+ exists_directory( Os ),
+os_exists_not( Os, Opts ) :-
+     options( dir(Dir), Opts ),
+     ( Dir == '.' -> Os = AbsOs; os_path( Dir, Os, +(AbsOs) ) ),
+	\+ exists_file( AbsOs ),
+	\+ exists_directory( AbsOs ),
 	!.
 os_exists_not( _Os, Opts ) :-
 	memberchk( os(Os), Opts ),

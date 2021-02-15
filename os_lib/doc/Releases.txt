@@ -2,8 +2,8 @@
 --------------------
 
 1.6
-            @   21.02.01
-                DEPS:     clarify dependency on prolog_source:file_alias_path/2
+     21.02.15   IFACE:    dir() option in os_exists/2 and os_unique/3
+     21.02.01   DEPS:     clarify dependency on prolog_source:file_alias_path/2
 
 1.5         @   20.09.18
      20.09.17   OPTS:     allow type(Type) to return the value and Type=base(Base), (fixed Type=dir, too)
