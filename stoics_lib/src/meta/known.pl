@@ -18,8 +18,8 @@
       1.  a uniform way of dealing with failure
       2.  a way to avoid creating an intermediate predicate
 
-    if Cat should either be atomic (a description of the category
-    expected for Tkn), In addition it can be of the form
+    Cat should either be atomic (a description of the category
+    expected for Tkn) or of the form
 
       * values(Cat) values of the first Tkn arg of Goal are appended to Cat
       * valuess()   values of the first Tkn arg of Coal become Cat
