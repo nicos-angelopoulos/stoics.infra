@@ -22,7 +22,7 @@
     expected for Tkn) or of the form
 
       * values(Cat) values of the first Tkn arg of Goal are appended to Cat
-      * valuess()   values of the first Tkn arg of Coal become Cat
+      * values()   values of the first Tkn arg of Coal become Cat
 
     If Tkn is missing is taken to be the first arg of Goal.
     If category is missing it is taken to be values().
