@@ -205,8 +205,8 @@ os_unique_create( true, Type, Os ) :-
 
 type_ext_full( dir, _Ext, Current, Current ).
 type_ext_full( file, Ext, Current, Full ) :-
-    file_name_extension( Current, Ext, Full ).
-    % os_ext( Ext, Current, Full ).
+    % file_name_extension( Current, Ext, Full ).
+    os_ext( Ext, Current, Full ).
 
 findall_date_components( ByAtoms, Lens, Dcomps ) :-
      get_date_time( Datime ),
