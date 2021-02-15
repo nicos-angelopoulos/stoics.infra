@@ -239,6 +239,7 @@ The library predicates can be split to 4 groups.
 
 :- use_module(library(lists)).      % select/3,...
 :- use_module(library(apply)).      % maplist/3,...
+:- use_module(library(date)).       % date_time_value/3.
 :- use_module(library(debug)).      % /1,3.  -> switch to debuc/1,3
 :- use_module(library(filesex)).    % link_file/3, make_directory_path/1.
 :- use_module(library(prolog_source)).    % file_alias_path/2.
