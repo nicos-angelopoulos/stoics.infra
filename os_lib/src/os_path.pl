@@ -162,10 +162,14 @@ os_path_unalias( Dir, Dir ).
 */
 
 
-os_path_type_de( atom, Path, Dir, File ) :-
+os_path_type_de( atom, Path, Dir, RelF ) :-
 	os_slashify( PathNoSlash, Path ),
-	directory_file_path( DirPrv, File, PathNoSlash ),
-	os_path_type_de_dir( DirPrv, Dir ).
+    ( ground(Dir) ->
+	    directory_file_path( Dir, RelF, PathNoSlash )
+        ;
+	    directory_file_path( DirPrv, RelF, PathNoSlash ),
+	    os_path_type_de_dir( DirPrv, Dir )
+    ).
 os_path_type_de( slash, DirFile, Dir, File ) :-
 	( Dir/File = DirFile -> true; /(File) = DirFile, Dir = (/) ).
 os_path_type_de( alias, Aliased, Dir, File ) :-
