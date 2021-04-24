@@ -178,22 +178,26 @@ spudlike_scripts( true, _Packed, _PackSubs, Ignore ) :-
     expand_file_name( '$HOME', [Home|_] ),
     directory_file_path( Home, bin, Bin ),
     directory_file_path( Bin, cline_upsh, Cline ),
-    directory_files( Cline, ClineSubs ),
-    /* 
-
-    ignores([/home/nicos/bin/cline_upsh/publish_pack.pl])
-    plp(/home/nicos/bin/cline_upsh/publish_pack.pl)
-      
-    */
-    findall( _, ( member(PlF,ClineSubs), atom_concat(_,pl,PlF), write(doing(PlF)),nl,
-                  directory_file_path(Cline, PlF, PlP),
-                  \+ memberchk(PlP, Ignore),
-                  consult(tmp:PlP)
-                  % consider abolishing all tmp:_ ?
-                ),
-                    _ ), 
+    ( exists_directory(Cline) ->
+          directory_files( Cline, ClineSubs ),
+          /* 
+          
+          ignores([/home/nicos/bin/cline_upsh/publish_pack.pl])
+          plp(/home/nicos/bin/cline_upsh/publish_pack.pl)
+                         
+          */
+          findall( _, ( member(PlF,ClineSubs), atom_concat(_,pl,PlF), write(doing(PlF)),nl,
+                         directory_file_path(Cline, PlF, PlP),
+                         \+ memberchk(PlP, Ignore),
+                         consult(tmp:PlP)
+                         % consider abolishing all tmp:_ ?
+                         ),
+                              _ )
     % then do the Subs (again tmp:module)
     % fixme(Subs).
+          ;
+          true
+    ),
     true.
 spudlike_scripts(_,_,_,_).
 
