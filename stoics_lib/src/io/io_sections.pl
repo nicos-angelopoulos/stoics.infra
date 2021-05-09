@@ -55,7 +55,7 @@ Opts
 
 
  ?- write('example 3'), nl.
- ?- 
+ ?- assert( 
 
  ?- write('private example'), nl.
  ?- cd( '/usr/local/users/nicos/work/2015/15.10.05-lmtk3_substrates' ).
