@@ -2,7 +2,13 @@
 --------------------
 
 1.3
+     21.05.08   NEW:    created directory examples/
+                EXAMPL: examples/sectioned.txt for io_sections/3 (and new doc comments in predicate)
+                DOC:    option separator_call(G)@io_sections/3
+                IFACE:  pass first arg of io_sections/3 via absolute_file_name/3, before open/3
+                OPTS:   include_separator(Inc)@io_sections/3
      21.02.15   DOC:    minor grammar fix in known/3
+
 1.2         @   20.09.18
      20.09.15   IFACE:  io_streams/3, generalises set_prolog_IO/3
      20.09.13   FIXED:  missing loading of library(debug)
