@@ -314,7 +314,8 @@ os_mill_created( false, Created, _Milled, _File, _Opts ) :-
 
 os_mill_created_not( true, _Milled, _File ).  % take no action (true = succeed)
 os_mill_created_not( error, Milled, File ) :-
-    throw( pack_error(os,os_mill/4,os_created_not(Milled,File)) ).
+    % throw( pack_error(os,os_mill/4,os_created_not(Milled,File)) ).
+    throw( os_created_not(Milled,File), [os:os_mill/4] ).
 os_mill_created_not( fail, _Milled, _File ) :-
     fail.
 os_mill_created_not( debug, Milled, File ) :-

@@ -2,6 +2,7 @@
 --------------------
 
 1.6
+     21.05.20   FIXED:    os_mill/4 not created error update to options version of pack_errors
      21.04.24   FIXED     os_path( -Sub, -RelPath, +Path ).
      21.02.15   IFACE:    dir() option in os_exists/2 and os_unique/3
                 DEPS:     load library(dates)
