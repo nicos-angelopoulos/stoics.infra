@@ -36,40 +36,40 @@ The Goal is called as call( Goal, RelFromOs, Milled, Co ).
 
 Opts
   * call_options(Co=[])
-    the argument is passed as the last argument to Goal. (Set to false for no options argument on the call.)
+     the argument is passed as the last argument to Goal. (Set to false for no options argument on the call.)
   * call_module(Mod=user)
-    at which module to call Goal
+     at which module to call Goal
   * debug(Dbg)
-    whether to print debugs (see options_append/4) (default does nothing)
+     whether to print debugs (see options_append/4) (default does nothing)
   * dir(Dir)
-    directory for both Os and Milled (no default)
+     directory for both Os and Milled (no default)
   * ext(Ext)
-    if given, change the extension in Milled (ignored for dirs),
-    when Milled is ground the extension is added
+     if given, change the extension in Milled (ignored for dirs),
+     when Milled is ground the extension is added
   * homonymous(Homon=false)
-    use Goal's term name as the stem
+     use Goal's term name as the stem
   * milled(MillOs)
-    returns the full milled OS name (file or directory)
+     returns the full milled OS name (file or directory)
   * not_created(Created=error)
-    check Os was created at exit; if not take action: true, error, fail, debug
+     check Os was created at exit; if not take action: true, error, fail, debug
   * odir(ODir)
-    directory for output (takes precendence over Dir)
+     directory for output (takes precendence over Dir)
   * on_exists(OnX=true)
-    callable that is qurried if Milled already exists, eg to load an R object from a saved file
-    called as call(OnX,Milled), if OnX has a module, then it is used as is, else Mod is : prepended.
+     callable that is qurried if Milled already exists, eg to load an R object from a saved file
+     called as call(OnX,Milled), if OnX has a module, then it is used as is, else Mod is : prepended.
   * outputs_to(OutsTo=user)
-    if a different filename is given, it is used for redirecting both user_output and user_error.
-    When =|Type=dir\= OutsTo is assumed to be a file within (Milled, is created in this case).
+     if a different filename is given, it is used for redirecting both user_output and user_error.
+     When =|Type=dir\= OutsTo is assumed to be a file within (Milled, is created in this case).
   * outputs_as_tty(OutsTty=true),
-    only relevant when OutsTo is a filename. =|OutsTty=true|= makes the file a tty output (stream_property/2).
+     only relevant when OutsTo is a filename. =|OutsTty=true|= makes the file a tty output (stream_property/2).
   * postfix(Psf=f(File) )
-    postfix for the new file name (see os_postfix/3)
+     postfix for the new file name (see os_postfix/3)
   * recreate(R=false)
-    whether to recreate OsEntry
+     whether to recreate OsEntry
   * separator(Sep='_')
-    separator for Psf
+     separator for Psf
   * type(Type=file)
-    or dir for directory
+     or dir for directory
 
 The predicate uses os_dir_stem_ext/2 to construct OS, so its options can be used 
 in addition to the above.
