@@ -3,8 +3,11 @@
 
 Tbd: document @, & (remove fixme: code that might have been needed due to MAIN instead of PACK variable bug.).
 
+2.10  21.07.17
+               DOC:     rogue == was messing up code boxes
+
 2.9          @ 21.01.23
-      20.01.23          honour suggests_warns(false)
+      21.01.23 FIXED:   honour suggests_warns(false)
 
 2.8          @ 20.09.18
       20.08.09 DEPS;    explicitly load lists
