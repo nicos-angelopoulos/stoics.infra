@@ -244,6 +244,7 @@ Loads all sub-cells of a library.
 
 ==
 ?- load_files( library(bio_db) ).
+==
 
 Will load everything even if cell based loading ahs taken place. (use_module(library(bio_db)) would work.)
 
@@ -280,9 +281,9 @@ Searching for that on doc server, should make it easy enough to get to it.
 it can also be used as a straight forward shorthand, 
 replacement for use_module(library(Lib)).
 
- ==
+==
  ?- lib(Atomic).
- ==
+==
  is equivelant to =|use_module(library(Atomic))|= if Atomic is a system library
  or an installed Pack, while it will interogate the SWI pack server 
  for matching packs if Atomic is atomic and not an installed pack.
