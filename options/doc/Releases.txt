@@ -3,6 +3,7 @@
 
 
 1.5 
+     21.08.26  DEPS:    explicit loading of library(readutil)
      21.02.15  FIXED:   pass process/1 and version/1 as defs in options_append/4 too
      21.02.03  DEBUG:   switch to new pack_error arguments
 1.4         @  21.01.22

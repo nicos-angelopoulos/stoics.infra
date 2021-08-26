@@ -1,4 +1,5 @@
 
+:- use_module(library(readutil)).   % read_file_to_terms/3
 :- lib(debugging_status/2).
 
 options_append_known_process_option( debug ).
