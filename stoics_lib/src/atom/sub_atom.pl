@@ -37,6 +37,8 @@ sub_atom( Full, Part ) :-
 
 %% sub_atom( +Full, ?Pre, ?Post, ?Part ).
 % 
+% As sub_atom/5 but without the Length, 3rd, argument.
+%
 %==
 % ?- sub_atom( full, Pre, Post, ul ).
 % Pre = f,

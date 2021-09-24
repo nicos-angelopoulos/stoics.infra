@@ -2,6 +2,7 @@
 --------------------
 
 1.3
+     21.09.24   DOC:    sub_atom/4 had no text at all
      21.05.08   NEW:    created directory examples/
                 EXAMPL: examples/sectioned.txt for io_sections/3 (and new doc comments in predicate)
                 DOC:    option separator_call(G)@io_sections/3
