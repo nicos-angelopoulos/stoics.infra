@@ -7,10 +7,10 @@
                      % lib_expects/1+2,
                      % lib_init/1
 
+:- ensure_loaded(library(apply)).        % exclude/3, ...
 :- ensure_loaded(library(lists)).        % append/3, ...
 :- ensure_loaded(library(debug)).        % debug/1+3, ? 
-:- ensure_loaded(library(prolog_pack)).
-    % query_pack_server/3
+:- ensure_loaded(library(prolog_pack)).  % query_pack_server/3
 
 :- ensure_loaded('../src/lib_init').
 :- ensure_loaded('../src/lib_load').
