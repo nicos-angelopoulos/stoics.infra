@@ -4,6 +4,7 @@
 Tbd: document @, & (remove fixme: code that might have been needed due to MAIN instead of PACK variable bug.).
 
 2.10  21.07.17
+               DEPS:    library(debug)
                DOC:     rogue == was messing up code boxes
 
 2.9          @ 21.01.23
