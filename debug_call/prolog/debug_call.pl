@@ -423,7 +423,7 @@ debug_portray( _Topic, _Term ).
 %  * start 
 %    translates to starting ~Arg or starting ~Topic if Arg == true
 %  * task(Wch)  
-%    time of start/stop of a task. Other values are allowed put printed as is. 
+%    time of start/stop (Wch) of a task. Other values for Wch are allowed but printed as they come. Arg can be a term (as of Version 1.5).
 %  * term
 %    simply spew the input term
 %  * var
@@ -703,9 +703,9 @@ debug_call_topic( read, Pfx, ForLoc, Topic ) :-
 debug_call_topic( task(Whc), Pfx, Task, Topic ) :-
     datime_readable( Readable ),
     debug_call_topic_time_which_readable( Whc, Whcable ),
-    atomic_list_concat( [Readable,' ',Whcable,' task: ', Task,'.'], Mess ),
+    atomic_list_concat( [Readable,' ',Whcable,' task: ~w.'], Mess ),
     debug_message_prefixed( Pfx, Mess, Prefixed ),
-    debug_message( Topic, Prefixed, [] ).
+    debug_message( Topic, Prefixed, [Task] ).
 debug_call_topic( start, Pfx, Arg, Topic ) :-
     Mess = 'Starting: ~w',
     debug_message_prefixed( Pfx, Mess, Prefixed ),
