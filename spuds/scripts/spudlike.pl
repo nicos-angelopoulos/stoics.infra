@@ -186,7 +186,7 @@ spudlike_scripts( true, _Packed, _PackSubs, Ignore ) :-
           plp(/home/nicos/bin/cline_upsh/publish_pack.pl)
                          
           */
-          findall( _, ( member(PlF,ClineSubs), atom_concat(_,pl,PlF), write(doing(PlF)),nl,
+          findall( _, ( member(PlF,ClineSubs), atom_concat(_,pl,PlF), write(doing_bin_script(PlF)),nl,
                          directory_file_path(Cline, PlF, PlP),
                          \+ memberchk(PlP, Ignore),
                          consult(tmp:PlP)
@@ -195,6 +195,25 @@ spudlike_scripts( true, _Packed, _PackSubs, Ignore ) :-
                               _ )
     % then do the Subs (again tmp:module)
     % fixme(Subs).
+          ;
+          true
+    ),
+    absolute_file_name( user_app_data(pack), PackD ),
+    ( exists_directory(PackD) ->
+          directory_files( PackD, Packs ),
+          findall( _, ( member(Pack,Packs),
+                        directory_file_path(Pack,scripts,ScriptsD),
+                        write(scripts_dir(ScriptsD)), nl,
+                        absolute_file_name(pack(ScriptsD), AbsScriptsD),
+                        exists_directory(AbsScriptsD),
+                        directory_files(AbsScriptsD,Scripts),
+                        member(Script,Scripts),
+                        file_name_extension(_Base,pl,Script),
+                        write(doing_pack_script(Script)), nl,
+                        directory_file_path(AbsScriptsD,Script,AbsScript),
+                        consult(tmp:AbsScript)
+                      ),
+                         _ )
           ;
           true
     ),

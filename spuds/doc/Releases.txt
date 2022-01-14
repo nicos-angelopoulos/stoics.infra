@@ -1,4 +1,5 @@
 1:2 
+     20.09.01   IFACE:    scripts are now also loaded from Pack/script/ locations
      20.08.20   DEPS:     explicit loading of auto-loads
                 OS:       support for macs, no killing yet
      20.04.19   SCRIPT:   allow for ignores in bin/upsh_line (should also enable for local libs that are not installed)
@@ -56,3 +57,4 @@
 									     Thanks to Michael Hendricks.
 
 0:0:1     2013 March 11     Released as a pack at SWI website.
+
