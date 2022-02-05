@@ -36,6 +36,7 @@ As of 0.4 imported_from/2 is used to find default module.
 ?- mod_goal( mod1, g1, MG ).
 MG = mod1:g1.
 
+
 ?- mod_goal( M, G, mod2:g2(a,b,c) ).
 M = mod2,
 G = g2(a, b, c).
