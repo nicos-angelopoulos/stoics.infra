@@ -8,43 +8,50 @@
     known( +Goal, +Cat ).
     known( +Goal, +Tkn, +Cat ).
 
-    If call(Goal) fails, then an error is thrown (via pack_errors)
-    saying that Tkn (usually the first arg of Goal) is not 
-    recognised as belonging to category Cat.
+If call(Goal) fails, then an error is thrown (via pack_errors)
+saying that Tkn (usually the first arg of Goal) is not 
+recognised as belonging to category Cat.
 
-    The idea is that Goal is a predicate whose 1st argument
-    indexes a number of options and this wrapper provides 
+The main idea is to uniformly deal with failure when calling predicates for which the clause
+definitions expect a ground 1st argument.
 
-      1.  a uniform way of dealing with failure
-      2.  a way to avoid creating an intermediate predicate
+This meta-predicate 
+  1.  provides a uniform way of dealing with failure on ground 1st argument clauses
+  2.  avoids the creation of an intermediate predicate
 
-    Cat should either be atomic (a description of the category
-    expected for Tkn) or of the form
+Cat should be of the form
+  * values(Cat) 
+     error shows Cat as the name, and the values of the first arg of Goal as the accepted values
+  * 'values()'
+     values of the first Tkn arg of Goal are 
+  * arbitrary_term
+     in which case is taken to be the category name
 
-      * values(Cat) values of the first Tkn arg of Goal are appended to Cat
-      * values()   values of the first Tkn arg of Coal become Cat
+If Tkn is missing is taken to be the first arg of Goal.
 
-    If Tkn is missing is taken to be the first arg of Goal.
-    If category is missing it is taken to be values().
+If Cat is missing it is taken to be values().
 
-    Goal is called deterministically (ie a cut is placed right after is called),
-    it can thus only succeed once.
+Goal is called deterministically (ie a cut is placed right after is called),
+it can thus only succeed once.
 
 ==
 ?- [user].
-theme_background( colour, blue ).
-theme_background( monochrome, grey ).
+theme_background(colour, blue).
+theme_background(monochrome, grey).
 ^D
-?- known( theme_background(colour,Clr) ).
+?- known(theme_background(colour,Clr)).
 Clr = blue.
 
-?- known( theme_background(wrong,Clr) ).
+?- known(theme_background(wrong,Clr)).
 ERROR: user:theme_background/2: Token: wrong, is not a recognisable: value in [colour,monochromoe]
 
-?- known( theme_background(wrong,Clr), colour_theme ).
+?- known(theme_background(wrong,Clr), colour_theme).
 ERROR: user:theme_background/2: Token: wrong, is not a recognisable: colour_theme
 
-?- known( theme_background(wrong,Clr), values(colour_theme) ).
+?- known(theme_background(wrong,Clr), values(colour_theme)).
+ERROR: user:theme_background/2: Token: wrong, is not a recognisable: colour_theme (values: [colour,monochromoe])
+
+?- known(theme_background(wrong,Clr), ex_token, values()).
 ERROR: user:theme_background/2: Token: wrong, is not a recognisable: colour_theme (values: [colour,monochromoe])
 ==
 
