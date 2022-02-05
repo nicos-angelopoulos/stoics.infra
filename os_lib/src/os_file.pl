@@ -63,7 +63,7 @@ os_file_defaults( Defs ) :-
 % File = 'doc/html/h2-bg.png' ;
 % File = 'doc/html/multi-bg.png'...
 %==
-% @author nicos angelopoulos
+% @author nicos angelopoulos 
 % @version  0.1 2016/1/31, this version without ref to lib(os_sub)
 % @version  0.2 2018/7/23, added options, dir(Dir) and sub(true)
 % @version  0.3 2018/10/1, added option dots(Dots)
