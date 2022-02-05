@@ -82,7 +82,7 @@ os_file( File, Args ) :-
     options_append( os_file, Args, Opts ),
     options( [dir(Dir),dots(Dots),solutions(Sol),stem(Stem),sub(Sub)], Opts ),
     absolute_file_name( Dir, Abs, [file_type(directory),solutions(first)] ),
-    known( os_file_sol(Sol, File, Dir, Abs, Stem, Dots, Sub) ).
+    known( os_lib:os_file_sol(Sol, File, Dir, Abs, Stem, Dots, Sub) ).
 
 os_file_sol( single, File, Dir, Abs, Stem, Dots, Sub ) :-
     os_file( File, '', Dir, Abs, Stem, Dots, Sub ).

@@ -5,6 +5,7 @@
      22.02.05   DOC:    known/3, improvements + 1 more example
                 ADDED:  mod_goal/2, use imported_from/2 to locate module
                 IFACE:  imported_from/2 look in user:Goal if failed to find the property for Goal
+                FIXED:  known/1+2+3, allow module prepended Goal.
      21.09.24   DOC:    sub_atom/4 had no text at all
      21.05.08   NEW:    created directory examples/
                 EXAMPL: examples/sectioned.txt for io_sections/3 (and new doc comments in predicate)
