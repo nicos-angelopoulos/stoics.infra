@@ -11,7 +11,8 @@ mod_goal_defaults( [override(false)] ).
     mod_goal( +Goal, -Moal ).
 
 Construct and deconstruct a goal and its module prepended form.
-When Mod is missing is taken to be user. Opts are passed to 
+When Mod is missing imported_from/2 is used to locate the module. 
+If the latter fails, the module is set to _user_. Opts are passed to 
 errors so real source can be reported.
 
 Opts
@@ -28,6 +29,8 @@ When de-constructing, Goal will be a goal with no module prepent.
 When constructing, Moal will be a module prepented goal
 
 Incompatibility: 0.3 removed the mod_goal/4 version that had OverR as 3rd argument.
+
+As of 0.4 imported_from/2 is used to find default module.
 
 ==
 ?- mod_goal( mod1, g1, MG ).
@@ -66,11 +69,13 @@ ERROR: Trail: [caller:id/3]
 @version 0.1   2014
 @version 0.2   2017/9/25,  default value for Override changed to false, added mod_goal/2
 @version 0.3   2018/10/11, update error + options version, pushes trails to errorrs
-@tbd  investigate imported_from for locating default Mod
+@version 0.4   2022/02/05, use imported_from/2 for locating default Mod
 
 */
 mod_goal( Goal, Moal ) :-
-    mod_goal( user, Goal, Moal, [] ).
+    ( Goal = _:G -> true; G = Goal ),
+    ( imported_from( G, Gmod ) -> true; Gmod = user ),
+    mod_goal( Gmod, Goal, Moal, [] ).
 mod_goal( Mod, Goal, Moal ) :-
     mod_goal( Mod, Goal, Moal, [] ).
 mod_goal( Mod, Goal, Moal, Args ) :-

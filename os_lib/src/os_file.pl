@@ -1,3 +1,5 @@
+:- lib(stoics_lib:known/1).
+
 os_file_defaults( Defs ) :-
     Defs = [ dir('.'), stem(rel), sub(false), 
              dots(false), solutions(single),
@@ -66,6 +68,7 @@ os_file_defaults( Defs ) :-
 % @version  0.2 2018/7/23, added options, dir(Dir) and sub(true)
 % @version  0.3 2018/10/1, added option dots(Dots)
 % @version  0.4 2018/11/4, added option solutions(Sol)
+% @version  0.4 2022/02/5, pass Sol through known/1
 % 
 os_file( File ) :-
     os_file( File, [] ).
@@ -79,7 +82,7 @@ os_file( File, Args ) :-
     options_append( os_file, Args, Opts ),
     options( [dir(Dir),dots(Dots),solutions(Sol),stem(Stem),sub(Sub)], Opts ),
     absolute_file_name( Dir, Abs, [file_type(directory),solutions(first)] ),
-    os_file_sol( Sol, File, Dir, Abs, Stem, Dots, Sub ).
+    known( os_lib:os_file_sol(Sol, File, Dir, Abs, Stem, Dots, Sub) ).
 
 os_file_sol( single, File, Dir, Abs, Stem, Dots, Sub ) :-
     os_file( File, '', Dir, Abs, Stem, Dots, Sub ).
@@ -116,7 +119,7 @@ os_file_obj( Desc, Rel, Entry, File, _Dir, Abs, Stem, _Dots, _Sub ) :-
         )
     ).
 os_file_obj( Desc, Rel, Entry, File, _Dir, Abs, Stem, Dots, true ) :-
-   os_exists( Desc, type(dlink) ),
+    os_exists( Desc, type(dlink) ),
     os_path( Abs, Entry, Rbs ),
     os_file( File, Rel, Desc, Rbs, Stem, Dots, true ).
 
