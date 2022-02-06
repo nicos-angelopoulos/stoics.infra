@@ -1048,5 +1048,7 @@ message( expected_from(false,Pid,From) ) -->
     ['Predicate: ~w is not defined (source apparently available at: ~w; not asked to load)'-[Pid,From]].
 message( expected_from(true,Pid,From) ) -->
     ['Predicate: ~w is not defined (source apparently available at: ~w; which was loaded).'-[Pid,From]].
+message( input_file_missing(Os) ) -->
+    ['Input file: ~w, is missing.'-[Os]].
 message( true ) -->
     [].
