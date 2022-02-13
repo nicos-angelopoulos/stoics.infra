@@ -4,6 +4,7 @@
 :- lib(mod_goal/2).
 :- lib(imported_from/2).
 
+:- dynamic(known_call_succ/1).
 /** known( +Goal ).
     known( +Goal, +Cat ).
     known( +Goal, +Tkn, +Cat ).
@@ -53,12 +54,23 @@ ERROR: user:theme_background/2: Token: wrong, is not a recognisable: colour_them
 
 ?- known(theme_background(wrong,Clr), ex_token, values()).
 ERROR: user:theme_background/2: Token: wrong, is not a recognisable: colour_theme (values: [colour,monochromoe])
+
+?- lib(os_lib).
+
+?- cd(pack('stoics_lib/src/meta')).
+
+?- os_file( Os ).
+Os = call_morph.pl ;
+...
+
+?- os_file( Os, solutions(all) ).
+ERROR: os_lib:os_lib:os_file_sol/7: Token: all, is not a recognisable: value in [single,findall]
 ==
 
 @author nicos angelopoulos
 @version  0.1 2017/2/22
 @version  0.2 2019/7/25,  Goal is now passed through mod_goal/2
-@version  0.3 2019/7/25,  Allow module prepended Goal.
+@version  0.3 2022/2/13,  Allow module prepended Goal. Allow multi solution Goals (see os_file examples).
 
 */
 
@@ -70,14 +82,24 @@ known( G, Cat ) :-
     arg( 1, Goal, Tkn ),
     known( G, Tkn, Cat ).
 
-known( G, _Tkn, _Cat ) :-
-    mod_goal( G, MG ),
-    call( MG ),
-    !.
 known( G, Tkn, Cat ) :-
-    ( G = Gmod:Goal -> true; imported_from(G,Gmod), Goal = G ),
-    functor( Goal, Gn, Ga ),
-    known_not( Cat, Gmod, Goal, Gn/Ga, Tkn ),
+    mod_goal( G, MG ),
+    MG = Mod:Goal,
+    functor( Goal, Pn, Pa ),  % stoics_lib:use arity/3 if you get problems with non () functor calls
+    MGi = Mod:Pn/Pa,
+    known( MG, Tkn, Cat, MGi ).
+
+known( MG, _Tkn, _Cat, MGi ) :-
+    call( MG ),
+    assert( known_call_succ(MGi) ).
+known( _MG, _Tkn, _Cat, MGi ) :-
+     known_call_succ( MGi ), 
+     !,
+     retractall( known_call_succ(MGi) ),
+     fail.
+known( MG, Tkn, Cat, MGi ) :-
+    MG = Gmod:Goal,
+    known_not( Cat, Gmod, Goal, MGi, Tkn ),
     !.
 
 known_not( values(), Gmod, G, Gspc, Tkn ) :-
