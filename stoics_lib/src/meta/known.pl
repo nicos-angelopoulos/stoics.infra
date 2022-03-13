@@ -99,16 +99,19 @@ known( _MG, _Tkn, _Cat, MGi ) :-
      fail.
 known( MG, Tkn, Cat, MGi ) :-
     MG = Gmod:Goal,
-    known_not( Cat, Gmod, Goal, MGi, Tkn ),
+    known_goal_values( Goal, Gmod, Vals ),
+    known_not( Cat, Vals, Gmod, Goal, MGi, Tkn ),
     !.
 
-known_not( values(), Gmod, G, Gspc, Tkn ) :-
-    known_goal_values( G, Gmod, Vals ),
+known_not( _, Vals, _Gmod, _G, _Gspc, Tkn ) :-
+    memberchk( Tkn, Vals ),
+    !,
+    fail.
+known_not( values(), Vals, Gmod, _G, Gspc, Tkn ) :-
     term_to_atom( Vals, Vatm ),
     atom_concat( 'value in ', Vatm, ErrCat ),
     throw( pack_error(wrong_token(Tkn,ErrCat), Gmod:Gspc) ).
-known_not( values(Cat), Gmod, G, Gspc, Tkn ) :-
-    known_goal_values( G, Gmod, Vals ),
+known_not( values(Cat), Vals, Gmod, _G, Gspc, Tkn ) :-
     term_to_atom( Vals, Vatm ),
     atomic_list_concat( [Cat,' (values: ',Vatm,')'], ErrCat ),
     throw( pack_error(wrong_token(Tkn,ErrCat),Gmod:Gspc) ).

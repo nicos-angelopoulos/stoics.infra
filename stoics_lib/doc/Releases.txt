@@ -2,6 +2,7 @@
 --------------------
 
 1.3
+     22.03.13   FIXED:  known/3 when token exists and call fails, also fail the meta-call
      22.02.13   IFACE:  known/3, allows multi solution calls
      22.02.05   DOC:    known/3, improvements + 1 more example
                 ADDED:  mod_goal/2, use imported_from/2 to locate module

@@ -91,9 +91,9 @@ os_file_sol( findall, Files, Dir, Abs, Stem, Dots, Sub ) :-
 
 os_file( File, Rel, Dir, Abs, Stem, Dots, Sub ) :-
     os_cast( Dir, +SysDir ),
-   directory_files( SysDir, EntriesUno ),
+    directory_files( SysDir, EntriesUno ),
     sort( EntriesUno, Entries ),
-   member( Entry, Entries ),
+    member( Entry, Entries ),
     Entry \== '.', Entry \== '..',
     os_file_dot( Dots, Entry ),
     os_path( Dir, Entry, Desc ),
@@ -105,7 +105,7 @@ os_file_dot( false, Os ) :-
     \+ atom_concat( '.', _, Os ).
 
 os_file_obj( Desc, Rel, Entry, File, _Dir, Abs, Stem, _Dots, _Sub ) :-
-   os_exists( Desc, [type(flink),err(test)] ),
+    os_exists( Desc, [type(flink),err(test)] ),
     !,
     ( Stem == false ->
        os_cast( Entry, File )
@@ -144,8 +144,8 @@ os_files_defaults( [dir('.'),sub(false)] ).
 % @see os_file/2
 %
 os_files( Files ) :-
-   findall( File, os_file(File), Files ).
+    findall( File, os_file(File), Files ).
 os_files( Files, Opts ) :-
-   % just so we get the version() option updated:
-   options_append( os_file, Opts, _All ),
-   findall( File, os_file(File,Opts), Files ).
+    % just so we get the version() option updated:
+    options_append( os_file, Opts, _All ),
+    findall( File, os_file(File,Opts), Files ).
