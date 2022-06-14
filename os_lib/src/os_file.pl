@@ -88,14 +88,14 @@ os_file( File, Args ) :-
     options_append( os_file, Args, Opts ),
     options( [dir(Dir),dots(Dots),read_link(RLnk),solutions(Sol),stem(Stem),sub(Sub)], Opts ),
     absolute_file_name( Dir, Here, [file_type(directory),solutions(first)] ),
-    known( os_lib:os_file_sol(Sol, File, Dir, Here, RLnk, Stem, Dots, Sub) ).
+    known( os_lib:os_file_sol(Sol, File, Dir, Here, Here, RLnk, Stem, Dots, Sub) ).
 
-os_file_sol( single, File, Dir, Here, RLnk, Stem, Dots, Sub ) :-
-    os_file( File, '', Dir, Here, RLnk, Stem, Dots, Sub ).
-os_file_sol( findall, Files, Dir, Here, RLnk, Stem, Dots, Sub ) :-
-    findall( File, os_file(File,'',Dir,Here,RLnk,Stem,Dots,Sub), Files ).
+os_file_sol( single, File, Dir, Top, Here, RLnk, Stem, Dots, Sub ) :-
+    os_file( File, '', Dir, Top, Here, RLnk, Stem, Dots, Sub ).
+os_file_sol( findall, Files, Dir, Top, Here, RLnk, Stem, Dots, Sub ) :-
+    findall( File, os_file(File,'',Dir,Top,Here,RLnk,Stem,Dots,Sub), Files ).
 
-os_file( File, Rel, Dir, Here, RLnk, Stem, Dots, Sub ) :-
+os_file( File, Rel, Dir, Top, Here, RLnk, Stem, Dots, Sub ) :-
     os_cast( Dir, +SysDir ),
     directory_files( SysDir, EntriesUno ),
     sort( EntriesUno, Entries ),
@@ -104,46 +104,46 @@ os_file( File, Rel, Dir, Here, RLnk, Stem, Dots, Sub ) :-
     os_file_dot( Dots, Entry ),
     os_path( Dir, Entry, Desc ),
     os_path( Rel, Entry, RelDesc ),
-    os_file_obj( Desc, RelDesc, Entry, File, Dir, Here, RLnk, Stem, Dots, Sub ).
+    os_file_obj( Desc, RelDesc, Entry, File, Dir, Top, Here, RLnk, Stem, Dots, Sub ).
 
 os_file_dot( true, _Os ).
 os_file_dot( false, Os ) :- 
     \+ atom_concat( '.', _, Os ).
 
-os_file_obj( Desc, Rel, Entry, File, _Dir, Here, RLnk, Stem, _Dots, _Sub ) :-
+os_file_obj( Desc, Rel, Entry, File, _Dir, Top, Here, RLnk, Stem, _Dots, _Sub ) :-
     os_exists( Desc, [type(flink),err(test)] ),
     !,
-    os_file_obj_return( RLnk, Stem, Rel, Entry, Here, File ),
+    os_file_obj_return( RLnk, Stem, Rel, Entry, Top, Here, File ),
     !.
-os_file_obj( Desc, Rel, Entry, File, _Dir, Here, RLnk, Stem, Dots, true ) :-
+os_file_obj( Desc, Rel, Entry, File, _Dir, Top, Here, RLnk, Stem, Dots, true ) :-
     os_exists( Desc, type(dlink) ),
     os_path( Here, Entry, There ),
-    os_file( File, Rel, Desc, There, RLnk, Stem, Dots, true ).
+    os_file( File, Rel, Desc, Top, There, RLnk, Stem, Dots, true ).
 
-os_file_obj_return( false, false, _Rel, Entry, _Here, File ) :-
+os_file_obj_return( false, false, _Rel, Entry, _Top, _Here, File ) :-
      os_cast( Entry, File ).
-os_file_obj_return( false, abs, _Rel, Entry, Here, File ) :-
+os_file_obj_return( false, abs, _Rel, Entry, _Top, Here, File ) :-
      os_path( Here, Entry, Path ),
      os_cast( Path, File ).
-os_file_obj_return( false, rel, Rel, _Entry, _Here, File ) :-
+os_file_obj_return( false, rel, Rel, _Entry, _Top, _Here, File ) :-
     os_cast( Rel, File ).
-os_file_obj_return( true, Stem, Rel, Entry, Here, File ) :-
+os_file_obj_return( true, Stem, Rel, Entry, Top, Here, File ) :-
      ( os_exists(Rel,[type(link),err(test)]) ->
-          os_file_obj_return_link( Stem, Rel, Entry, Here, File )
+          os_file_obj_return_link( Stem, Rel, Entry, Top, Here, File )
           ;
           % then re-use code for when RLnk is false
-          os_file_obj_return( false, Stem, Rel, Entry, Here, File )
+          os_file_obj_return( false, Stem, Rel, Entry, Top, Here, File )
      ).
 
-os_file_obj_return_link( false, Rel, _Entry, _Here, File ) :-
+os_file_obj_return_link( false, Rel, _Entry, _Top, _Here, File ) :-
      read_link( Rel, _, Target ),
      % fixme: untested, makes little sense, but warning has been given at docs of Opts
      os_path( Target, _, File ).
-os_file_obj_return_link( abs, Rel, _Entry, Here, File ) :-
+os_file_obj_return_link( abs, Rel, _Entry, Top, _Here, File ) :-
      read_link( Rel, _, Target ),
-     os_path( Here, Target, Path ),
-     os_cast( Path, File ).
-os_file_obj_return_link( rel, Rel, _Entry, _Here, File ) :-
+     absolute_file_name( Target, AbsFile, [relative_to(Top)] ),
+     os_cast( AbsFile, File ).
+os_file_obj_return_link( rel, Rel, _Entry, _Top, _Here, File ) :-
     os_cast( Rel, File ).
 
 os_files_defaults( [dir('.'),sub(false)] ).
