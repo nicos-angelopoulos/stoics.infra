@@ -128,19 +128,19 @@ os_file_obj_return( false, abs, _Rel, Entry, Here, File ) :-
 os_file_obj_return( false, rel, Rel, _Entry, _Here, File ) :-
     os_cast( Rel, File ).
 os_file_obj_return( true, Stem, Rel, Entry, Here, File ) :-
-     ( os_exists(Entry,[type(link),err(test)]) ->
+     ( os_exists(Rel,[type(link),err(test)]) ->
           os_file_obj_return_link( Stem, Rel, Entry, Here, File )
           ;
           % then re-use code for when RLnk is false
           os_file_obj_return( false, Stem, Rel, Entry, Here, File )
      ).
 
-os_file_obj_return_link( false, _Rel, Entry, _Here, File ) :-
-     read_link( Entry, _, Target ),
+os_file_obj_return_link( false, Rel, _Entry, _Here, File ) :-
+     read_link( Rel, _, Target ),
      % fixme: untested, makes little sense, but warning has been given at docs of Opts
      os_path( Target, _, File ).
-os_file_obj_return_link( abs, _Rel, Entry, Here, File ) :-
-     read_link( Entry, _, Target ),
+os_file_obj_return_link( abs, Rel, _Entry, Here, File ) :-
+     read_link( Rel, _, Target ),
      os_path( Here, Target, Path ),
      os_cast( Path, File ).
 os_file_obj_return_link( rel, Rel, _Entry, _Here, File ) :-
