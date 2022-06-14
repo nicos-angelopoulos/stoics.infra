@@ -157,7 +157,7 @@ os_files_defaults( [dir('.'),sub(false)] ).
 %==
 % ?- absolute_file_name( pack(os_lib/src), Abs ), os_files( Files, dir(Abs) ).
 % Abs = '/usr/local/users/nicos/local/git/lib/swipl-7.7.18/pack/os_lib/src',
-% Files = ['/usr/local/users/nicos/local/git/lib/swipl-7.7.18/pack/os_lib/src/os_make_path.pl', '/usr/local/users/nicos/local/git/lib/swipl-7.7.18/pack/os_lib/src/os_term.pl', '/usr/local/users/nicos/local/git/lib/swipl-7.7.18/pack/os_lib/src/os_dir_stem_ext.pl', ... ]
+% Files = [os_abs.pl, os_base.pl, os_cast.pl, os_cp.pl, os_dir.pl, os_dir_stem_ext.pl, os_errors.pl, os_exists.pl, os_ext.pl|...].
 % 
 %==
 %
