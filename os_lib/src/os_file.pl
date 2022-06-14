@@ -1,9 +1,12 @@
 :- lib(stoics_lib:known/1).
 
 os_file_defaults( Defs ) :-
-    Defs = [ dir('.'), stem(rel), sub(false), 
-             dots(false), solutions(single),
-             version(0:0:4)
+    Defs = [ dir('.'), dots(false),
+             read_link(false),
+             solutions(single), stem(rel), sub(false), 
+             version(0:0:4),
+             % type checking
+             options_types([read_link-boolean,solutions-oneof([single,findall]),stem-oneof([abs,false,rel])])
              ].
 
 %% os_file( ?File ).
@@ -14,17 +17,20 @@ os_file_defaults( Defs ) :-
 %
 % Opts
 %   * dir(Dir='.')
-%      directory in which to find File
+%      Directory in which to find File.
 %   * dots(Dots=false)
-%      set to true if dot starting files are required<br>
-%      note that '.' and '..' are never returned
+%      Set to =true= if dot starting files are required.<br>
+%      Note that '.' and '..' are never returned.
+%   * read_link(Rlnk=false)
+%     If =true=, return the target of links rather than the links (via read_link/3).<br>
+%     This makes most sense when =|Stem==abs|=.
 %   * solutions(Sol=single)
-%     or findall for returning a list of all solutions
+%     Alternatively set to =findall= for returning a list of all solutions.
 %   * stem(Stem=rel)
-%      what stem to add to returned files, 
-%      rel: relative (default else), abs: absolute, false: no, stem
+%      What stem to add to returned files,<br>
+%      rel: relative, abs: absolute, false: no stem
 %   * sub(Sub=false)
-%      find files within sub directories when true
+%      Find files within sub directories when set to =true=.
 %
 %==
 % ?- cd(pack('os_lib/examples/testo')).
@@ -80,16 +86,16 @@ os_file( File, _Opts ) :-
    os_exists( File, type(flink) ).
 os_file( File, Args ) :-
     options_append( os_file, Args, Opts ),
-    options( [dir(Dir),dots(Dots),solutions(Sol),stem(Stem),sub(Sub)], Opts ),
-    absolute_file_name( Dir, Abs, [file_type(directory),solutions(first)] ),
-    known( os_lib:os_file_sol(Sol, File, Dir, Abs, Stem, Dots, Sub) ).
+    options( [dir(Dir),dots(Dots),read_link(RLnk),solutions(Sol),stem(Stem),sub(Sub)], Opts ),
+    absolute_file_name( Dir, Here, [file_type(directory),solutions(first)] ),
+    known( os_lib:os_file_sol(Sol, File, Dir, Here, RLnk, Stem, Dots, Sub) ).
 
-os_file_sol( single, File, Dir, Abs, Stem, Dots, Sub ) :-
-    os_file( File, '', Dir, Abs, Stem, Dots, Sub ).
-os_file_sol( findall, Files, Dir, Abs, Stem, Dots, Sub ) :-
-    findall( File, os_file(File,'',Dir,Abs,Stem,Dots,Sub), Files ).
+os_file_sol( single, File, Dir, Here, RLnk, Stem, Dots, Sub ) :-
+    os_file( File, '', Dir, Here, RLnk, Stem, Dots, Sub ).
+os_file_sol( findall, Files, Dir, Here, RLnk, Stem, Dots, Sub ) :-
+    findall( File, os_file(File,'',Dir,Here,RLnk,Stem,Dots,Sub), Files ).
 
-os_file( File, Rel, Dir, Abs, Stem, Dots, Sub ) :-
+os_file( File, Rel, Dir, Here, RLnk, Stem, Dots, Sub ) :-
     os_cast( Dir, +SysDir ),
     directory_files( SysDir, EntriesUno ),
     sort( EntriesUno, Entries ),
@@ -98,30 +104,47 @@ os_file( File, Rel, Dir, Abs, Stem, Dots, Sub ) :-
     os_file_dot( Dots, Entry ),
     os_path( Dir, Entry, Desc ),
     os_path( Rel, Entry, RelDesc ),
-    os_file_obj( Desc, RelDesc, Entry, File, Dir, Abs, Stem, Dots, Sub ).
+    os_file_obj( Desc, RelDesc, Entry, File, Dir, Here, RLnk, Stem, Dots, Sub ).
 
 os_file_dot( true, _Os ).
 os_file_dot( false, Os ) :- 
     \+ atom_concat( '.', _, Os ).
 
-os_file_obj( Desc, Rel, Entry, File, _Dir, Abs, Stem, _Dots, _Sub ) :-
+os_file_obj( Desc, Rel, Entry, File, _Dir, Here, RLnk, Stem, _Dots, _Sub ) :-
     os_exists( Desc, [type(flink),err(test)] ),
     !,
-    ( Stem == false ->
-       os_cast( Entry, File )
-        ;
-        ( Stem == abs ->
-            os_path( Abs, Entry, Path ),
-            os_cast( Path, File )
-            ; % defaulty for all other stem values
-            % os_path( Rel, Entry, Path )
-            os_cast( Rel, File )
-        )
-    ).
-os_file_obj( Desc, Rel, Entry, File, _Dir, Abs, Stem, Dots, true ) :-
+    os_file_obj_return( RLnk, Stem, Rel, Entry, Here, File ),
+    !.
+os_file_obj( Desc, Rel, Entry, File, _Dir, Here, RLnk, Stem, Dots, true ) :-
     os_exists( Desc, type(dlink) ),
-    os_path( Abs, Entry, Rbs ),
-    os_file( File, Rel, Desc, Rbs, Stem, Dots, true ).
+    os_path( Here, Entry, There ),
+    os_file( File, Rel, Desc, There, RLnk, Stem, Dots, true ).
+
+os_file_obj_return( false, false, _Rel, Entry, _Here, File ) :-
+     os_cast( Entry, File ).
+os_file_obj_return( false, abs, _Rel, Entry, Here, File ) :-
+     os_path( Here, Entry, Path ),
+     os_cast( Path, File ).
+os_file_obj_return( false, rel, Rel, _Entry, _Here, File ) :-
+    os_cast( Rel, File ).
+os_file_obj_return( true, Stem, Rel, Entry, Here, File ) :-
+     ( os_exists(Entry,[type(link),err(test)]) ->
+          os_file_obj_return_link( Stem, Rel, Entry, Here, File )
+          ;
+          % then re-use code for when RLnk is false
+          os_file_obj_return( false, Stem, Rel, Entry, Here, File )
+     ).
+
+os_file_obj_return_link( false, _Rel, Entry, _Here, File ) :-
+     read_link( Entry, _, Target ),
+     % fixme: untested, makes little sense, but warning has been given at docs of Opts
+     os_path( Target, _, File ).
+os_file_obj_return_link( abs, _Rel, Entry, Here, File ) :-
+     read_link( Entry, _, Target ),
+     os_path( Here, Target, Path ),
+     os_cast( Path, File ).
+os_file_obj_return_link( rel, Rel, _Entry, _Here, File ) :-
+    os_cast( Rel, File ).
 
 os_files_defaults( [dir('.'),sub(false)] ).
 
