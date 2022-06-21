@@ -80,7 +80,7 @@ lib_mkdoc_stream( (:- lib(Pn/Pa) ), In, Out ) :-
     read( In, Next ),
     lib_mkdoc_stream( Next, In, Out ).
 lib_mkdoc_stream( _Other, In, Out ) :-
-    read( In, Next ),
+    catch( read( In, Next ), _, Next = errored ),
     lib_mkdoc_stream( Next, In, Out ).
     
 lib_mkdoc_file( RelF, _Out ) :-
