@@ -26,6 +26,7 @@ lib_index(get_date, 1, any, user, 'date_time/get_date').
 lib_index(get_date_time, 1, any, user, 'date_time/get_date_time').
 lib_index(has_at_least, 3, any, user, 'list/has_at_least').
 lib_index(has_at_most, 3, any, user, 'list/has_at_most').
+lib_index(has_cased, 3, any, user, 'codes/has_cased').
 lib_index(has_length, 2, any, user, 'term/has_length').
 lib_index(has_length, 3, any, user, 'term/has_length').
 lib_index(has_length, 4, any, user, 'term/has_length').

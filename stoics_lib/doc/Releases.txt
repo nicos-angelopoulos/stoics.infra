@@ -2,7 +2,8 @@
 --------------------
 
 1.3
-     22.10.15   IFACE:  lexi/2, convert between text representations
+     22.10.15   IFACE:  codes:lexi/2, convert between text representations
+                IFACE:  codes:has_cased/3, pick text that is of a specific type
      22.03.13   FIXED:  known/3 when token exists and call fails, also fail the meta-call
      22.02.13   IFACE:  known/3, allows multi solution calls
      22.02.05   DOC:    known/3, improvements + 1 more example

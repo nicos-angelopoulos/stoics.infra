@@ -9,6 +9,7 @@
               sub_atom/2,sub_atom/4,   % +Full[, ?Pre, ?Post], Sub
             % codes
               codes_n_digits/3,        % -InCodes, +N, -Codes
+              has_cased/3,             % +Obj, +Case, -Cased
               n_digits_integer_codes/3,% +N, +Numb, -Codes
               lexi/2,                  % ?Lexi, ?CodeOr
             % date_time/
@@ -227,5 +228,6 @@
 :- lib(call_morph/4).
 :- lib(io_streams/3).
 :- lib(lexi/2).
+:- lib(has_cased/3).
 
 :- lib( end(stoics_lib) ).
