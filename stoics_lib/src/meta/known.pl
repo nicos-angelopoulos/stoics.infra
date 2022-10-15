@@ -32,8 +32,7 @@ If Tkn is missing is taken to be the first arg of Goal.
 
 If Cat is missing it is taken to be values().
 
-Goal is called deterministically (ie a cut is placed right after is called),
-it can thus only succeed once.
+Goal used to be called deterministically, but as of version 0.3 this has changed.
 
 ==
 ?- [user].
