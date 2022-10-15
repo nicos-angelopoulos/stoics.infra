@@ -9,7 +9,8 @@
               sub_atom/2,sub_atom/4,   % +Full[, ?Pre, ?Post], Sub
             % codes
               codes_n_digits/3,        % -InCodes, +N, -Codes
-              n_digits_integer_codes/3,%( +N, +Numb, -Codes ).
+              n_digits_integer_codes/3,% +N, +Numb, -Codes
+              lexi/2,                  % ?Lexi, ?CodeOr
             % date_time/
               datime_readable/1,       % +Ratom
               datime_readable/2,       % +Datime, -Ratom
@@ -225,5 +226,6 @@
 :- lib(url_file/2).
 :- lib(call_morph/4).
 :- lib(io_streams/3).
+:- lib(lexi/2).
 
 :- lib( end(stoics_lib) ).

@@ -58,6 +58,7 @@ lib_index(kv_vs, 2, any, user, 'kv/kv_vs').
 lib_index(kvo_k_memberchk, 3, any, user, 'kv/kvo_k_memberchk').
 lib_index(kvs_k_memberchk, 3, any, user, 'kv/kvs_k_memberchk').
 lib_index(letter_strings, 3, any, user, 'string/letter_strings').
+lib_index(lexi, 2, any, user, 'codes/lexi').
 lib_index(list_frequency, 2, any, user, 'list/list_frequency').
 lib_index(list_frequency, 3, any, user, 'list/list_frequency').
 lib_index(list_proportions, 2, any, user, 'list/list_proportions').
