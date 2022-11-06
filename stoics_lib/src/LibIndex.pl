@@ -10,7 +10,6 @@ lib_index(atom_sub, 2, any, user, 'atom/atom_sub').
 lib_index(break_on_list, 4, any, user, 'list/break_on_list').
 lib_index(break_nth, 4, any, user, 'list/break_nth').
 lib_index(call_morph, 4, any, user, 'meta/call_morph').
-lib_index(codes_n_digits, 3, any, user, 'codes/codes_n_digits').
 lib_index(compound, 3, any, user, 'term/compound').
 lib_index(compare, 4, any, user, 'term/compare').
 lib_index(compare_arithmetic, 3, any, user, 'number/compare_arithmetic').
@@ -60,6 +59,7 @@ lib_index(kvo_k_memberchk, 3, any, user, 'kv/kvo_k_memberchk').
 lib_index(kvs_k_memberchk, 3, any, user, 'kv/kvs_k_memberchk').
 lib_index(letter_strings, 3, any, user, 'string/letter_strings').
 lib_index(lexi, 2, any, user, 'codes/lexi').
+lib_index(lexi_n, 4, any, user, 'codes/lexi_n').
 lib_index(list_frequency, 2, any, user, 'list/list_frequency').
 lib_index(list_frequency, 3, any, user, 'list/list_frequency').
 lib_index(list_proportions, 2, any, user, 'list/list_proportions').

@@ -8,10 +8,10 @@
               prefix_atom/2,prefix_atom/3,  % +Prefix, +Atom[, -Postfix]
               sub_atom/2,sub_atom/4,   % +Full[, ?Pre, ?Post], Sub
             % codes
-              codes_n_digits/3,        % -InCodes, +N, -Codes
               has_cased/3,             % +Obj, +Case, -Cased
               n_digits_integer_codes/3,% +N, +Numb, -Codes
               lexi/2,                  % ?Lexi, ?CodeOr
+              lexi_n/4,                % -InCodes, +N, +PadC, -Codes
             % date_time/
               datime_readable/1,       % +Ratom
               datime_readable/2,       % +Datime, -Ratom
@@ -125,7 +125,6 @@
 :- lib(atom_sub/2).
 :- lib(prefix_atom/2).
 :- lib(sub_atom/2).
-:- lib(codes_n_digits/3).
 :- lib(n_digits_integer_codes/3).
 :- lib(datime_readable/1).
 :- lib(datime_readable/2).
@@ -229,5 +228,6 @@
 :- lib(io_streams/3).
 :- lib(lexi/2).
 :- lib(has_cased/3).
+:- lib(lexi_n/4).
 
 :- lib( end(stoics_lib) ).
