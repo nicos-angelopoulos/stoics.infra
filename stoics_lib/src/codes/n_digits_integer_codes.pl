@@ -20,4 +20,4 @@ Atom = '02'.
 n_digits_integer_codes( N, Int, Codes ) :-
 	integer( Int ),
 	number_codes( Int, ICodes ),
-	codes_n( ICodes, N, 0'0, Codes ).
+	lexi_n( ICodes, N, 0'0, Codes ).
