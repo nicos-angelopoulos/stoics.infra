@@ -110,14 +110,15 @@ known_not( _, Vals, _Gmod, _G, _Gspc, Tkn ) :-
 known_not( values(), Vals, Gmod, _G, Gspc, Tkn ) :-
     term_to_atom( Vals, Vatm ),
     atom_concat( 'value in ', Vatm, ErrCat ),
-    throw( pack_error(wrong_token(Tkn,ErrCat), Gmod:Gspc) ).
+    % throw( pack_error(wrong_token(Tkn,ErrCat), Gmod:Gspc) ).
+    throw( pack_error(wrong_token(Tkn,ErrCat), Gspc) ).
 known_not( values(Cat), Vals, Gmod, _G, Gspc, Tkn ) :-
     term_to_atom( Vals, Vatm ),
     atomic_list_concat( [Cat,' (values: ',Vatm,')'], ErrCat ),
-    throw( pack_error(wrong_token(Tkn,ErrCat),Gmod:Gspc) ).
+    throw( pack_error(wrong_token(Tkn,ErrCat),Gspc) ).
 known_not( ErrCat, _Vals, Gmod, _G, Gspc, Tkn ) :-
     % fixme: can incorporate Vals to message:
-    throw( pack_error(wrong_token(Tkn,ErrCat), Gmod:Gspc) ).
+    throw( pack_error(wrong_token(Tkn,ErrCat), Gspc) ).
 
 known_goal_values( G, Gmod, Vals ) :-
     functor( G, Pname, Parity ),
