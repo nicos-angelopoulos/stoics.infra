@@ -30,7 +30,7 @@ Atom = '    text'.
 @author nicos angelopoulos
 @version  0.1 2014/03/17
 @version  0.2 2022/11/06, this used to be codes_n_digits/3.
-@lexi/2
+@see lexi/2
 
 */
 lexi_n( ILexi, N, PadC, OLexi ) :-
