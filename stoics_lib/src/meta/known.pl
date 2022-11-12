@@ -5,6 +5,7 @@
 :- lib(imported_from/2).
 
 :- dynamic(known_call_succ/1).
+
 /** known( +Goal ).
     known( +Goal, +Cat ).
     known( +Goal, +Tkn, +Cat ).
@@ -114,7 +115,8 @@ known_not( values(Cat), Vals, Gmod, _G, Gspc, Tkn ) :-
     term_to_atom( Vals, Vatm ),
     atomic_list_concat( [Cat,' (values: ',Vatm,')'], ErrCat ),
     throw( pack_error(wrong_token(Tkn,ErrCat),Gmod:Gspc) ).
-known_not( ErrCat, Gmod, _G, Gspc, Tkn ) :-
+known_not( ErrCat, _Vals, Gmod, _G, Gspc, Tkn ) :-
+    % fixme: can incorporate Vals to message:
     throw( pack_error(wrong_token(Tkn,ErrCat), Gmod:Gspc) ).
 
 known_goal_values( G, Gmod, Vals ) :-
