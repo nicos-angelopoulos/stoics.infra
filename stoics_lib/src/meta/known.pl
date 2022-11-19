@@ -2,7 +2,6 @@
 :- lib(suggests(pack_errors)).
 
 :- lib(mod_goal/2).
-:- lib(imported_from/2).
 
 :- dynamic(known_call_succ/1).
 
