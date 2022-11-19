@@ -75,7 +75,7 @@ ERROR: Trail: [caller:id/3]
 */
 mod_goal( Goal, Moal ) :-
     ( Goal = _:G -> true; G = Goal ),
-    ( imported_from( G, Gmod ) -> true; Gmod = user ),
+    ( imported_from(G,Gmod) -> true; predicate_property(Gmod:G,visible) ),
     mod_goal( Gmod, Goal, Moal, [] ).
 mod_goal( Mod, Goal, Moal ) :-
     mod_goal( Mod, Goal, Moal, [] ).
