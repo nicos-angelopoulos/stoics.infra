@@ -1,7 +1,7 @@
 
 :- use_module(library(lists)).  % append/3, is_list/1, memberchk/2.
 
-:- lib(stoics_lib:imported_from/2).
+:- lib(imported_from/2).
 
 :- lib(suggests(pack_errors)).
 
