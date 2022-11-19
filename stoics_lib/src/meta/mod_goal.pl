@@ -71,6 +71,7 @@ ERROR: Trail: [caller:id/3]
 @version 0.2   2017/9/25,  default value for Override changed to false, added mod_goal/2
 @version 0.3   2018/10/11, update error + options version, pushes trails to errorrs
 @version 0.4   2022/02/05, use imported_from/2 for locating default Mod
+@version 0.5   2022/11/19, when imported_from/2 fails, try predicate_property/2, currently with visible
 
 */
 mod_goal( Goal, Moal ) :-
