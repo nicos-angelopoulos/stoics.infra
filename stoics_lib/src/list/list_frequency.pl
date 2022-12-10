@@ -4,7 +4,8 @@
 :- lib(mod_goal/2).
 
 list_frequency_defaults( Defs ) :- 
-     Defs = [ order(false),
+     Defs = [ bins(false),
+              order(false),
               transpose(false),
               variant(true),
               zero(false)  ].
