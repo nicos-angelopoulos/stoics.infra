@@ -2,6 +2,7 @@
 --------------------
 
 1.3
+     22.12.10   FIXED:  mod_goal/2 locate asserted-at-prompt predicates
      22.11.19   CHANGE: imported_from/2 fails now when Clauser is not imported (returned user previously)
                 CHANGE: mod_goal/2 tries predicate_property/2 when imported_from/2 fails (see above) 
      22.11.12   FIXED:  known/2,3 for given category

@@ -77,9 +77,28 @@ ERROR: Trail: [caller:id/3]
 
 */
 mod_goal( Goal, Moal ) :-
-    ( Goal = _:G -> true; G = Goal ),
-    ( imported_from(G,Gmod) -> true; predicate_property(Gmod:G,visible) ),
-    mod_goal( Gmod, Goal, Moal, [] ).
+     \+ var(Goal),
+     Goal = _:_G,
+     !,
+     Moal = Goal.
+mod_goal( Goal, Moal ) :-
+     imported_from(Goal,Gmod),
+     !,
+     mod_goal( Gmod, Goal, Moal, [] ).
+mod_goal( Goal, Moal ) :-
+     predicate_property( Gmod:Goal, visible ),
+     !,
+     mod_goal( Gmod, Goal, Moal, [] ).
+mod_goal( Goal, Moal ) :-
+    functor( Goal, Pname, _Art ),
+    current_predicate( Pname/_ ),  % fixme, add opt for +args (used in meta calls)
+    !,
+    mod_goal( user, Goal, Moal, [] ).
+mod_goal( Goal, _Moal ) :-
+     Fmt = 'Can not locate definition for goal: ~w',
+     message_report( Fmt, [Goal], error ),
+     fail.
+
 mod_goal( Mod, Goal, Moal ) :-
     mod_goal( Mod, Goal, Moal, [] ).
 mod_goal( Mod, Goal, Moal, Args ) :-

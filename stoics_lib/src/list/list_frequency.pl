@@ -1,12 +1,13 @@
 
 :- ensure_loaded( library(terms) ).
 :- lib(en_list/2).
+:- lib(mod_goal/2).
 
 list_frequency_defaults( Defs ) :- 
-	Defs = [ order(false),
-		    transpose(false),
-		    variant(true),
-	         zero(false)  ].
+     Defs = [ order(false),
+              transpose(false),
+              variant(true),
+              zero(false)  ].
 
 /** list_frequency( +List, -Frequencies ).
     list_frequency( +List, -Frequencies, +Opts ).
@@ -15,6 +16,9 @@ Frequencies is a list of Term-Freq -pairs with Freq being the number of times ea
 appear in the List.
 
 Opts
+  * bins(Bins=false)
+    if a list of values, List elements are placed in (=<) bins, if non =|false|= atom,\br
+    it should be predicate name that produces a bin name for the element
   * order(Ord=false)
      order of results: true sorts by element, freq sorts by frequency, and false for no sorting 
   * transpose(T=false)
@@ -45,6 +49,14 @@ Freqs = [a(X)-1, b(Y)-1, a(Z)-1].
 
 ?- list_frequency( [a(X),b(Y),a(Z),a(X)], Freqs, variant(false) ).
 Freqs = [a(X)-2, b(Y)-1, a(Z)-1].
+
+?- list_frequency( [1,2,10,11,12,21,22], Freqs, bins([10,20]) ).
+Freqs = [1-3, 2-2, 3-2].
+
+?- assert( (let_num(Let,Num) :- atom_codes(Let,[Code]),Num is Code-64) ).
+
+?- list_frequency( [a,b,c,c,b,a,d], Freqs, bins(let_num) ).
+
 ==
 
 NOTE: arguments changed bewteen 0.2 and 0.3.
@@ -57,74 +69,98 @@ NOTE: arguments changed bewteen 0.2 and 0.3.
 
 
 list_frequency( List, Freqs ) :-
-	list_frequency( List, Freqs, [] ).
+     list_frequency( List, Freqs, [] ).
 
 list_frequency( List, Freqs, ArgS ) :-
-    en_list( ArgS, Args ),
-    list_frequency_defaults( Defs ),
-    append( Args, Defs, Opts ),
-    memberchk( order(Ord), Opts ),
-    memberchk( transpose(T), Opts ),
-    memberchk( variant(Vnt), Opts ),
-    memberchk( zero(Zero), Opts ),
-	list_frequency_initial_counts( Zero, Ord, T, Iounts, Bero ),
-	list_frequency( List, T, Ord, Vnt, Bero, Iounts, Freqs ).
+     en_list( ArgS, Args ),
+     list_frequency_defaults( Defs ),
+     append( Args, Defs, Opts ),
+     options( order(Ord), Opts ),
+     options( transpose(T), Opts ),
+     options( variant(Vnt), Opts ),
+     options( zero(Zero), Opts ),
+     options( bins(Bins), Opts ),
+     list_frequency_initial_counts( Zero, Ord, T, Iounts, Bero ),
+     list_frequency_bin_goal( Bins, Gins ),
+     list_frequency( List, Gins, T, Ord, Vnt, Bero, Iounts, Freqs ).
 
 /*
  
 */
-list_frequency( [], _T, _Ord, _Vnt, _Bero, Freqs, Freqs ).
-list_frequency( [H|Tail], T, Ord, Vnt, Bero, Iounts, Freqs ) :-
-	list_frequency_elem( Ord, T, Vnt, Bero, H, Iounts, Nounts ),
-	list_frequency( Tail, T, Ord, Vnt, Bero, Nounts, Freqs ).
+list_frequency( [], _Bins, _T, _Ord, _Vnt, _Bero, Freqs, Freqs ).
+list_frequency( [H|Tail], Bins, T, Ord, Vnt, Bero, Iounts, Freqs ) :-
+     list_frequency_bin( Bins, H, Bin ),
+     % list_frequency_elem( Ord, T, Vnt, Bero, H, Iounts, Nounts ),
+     list_frequency_elem( Ord, T, Vnt, Bero, Bin, Iounts, Nounts ),
+     list_frequency( Tail, Bins, T, Ord, Vnt, Bero, Nounts, Freqs ).
+
+list_frequency_bin( false, H, Bin ) :-
+     !,
+     Bin = H.
+list_frequency_bin( [B|Ns], H, Bin ) :-
+     !,
+     list_frequency_nth_bin( [B|Ns], H, 1, Bin ).
+list_frequency_bin( Goal, H, Bin ) :-
+     write( calling(Goal,H,Bin) ), nl,
+     call( Goal, H, Bin ).
+
+list_frequency_nth_bin( [], _H, I, Bin ) :-
+     Bin is I.
+list_frequency_nth_bin( [B|_Ns], H, I, Bin ) :-
+     H =< B,
+     !,
+     Bin is I.
+list_frequency_nth_bin( [_B|Ns], H, I, Bin ) :-
+     J is I + 1,
+     list_frequency_nth_bin( Ns, H, J, Bin ).
 
 list_frequency_elem( true, T, Vnt, Bero, H, Iounts, Nounts ) :-
-	list_frequency_elem_ord( Iounts, H, T, Vnt, Bero, Nounts ).
+     list_frequency_elem_ord( Iounts, H, T, Vnt, Bero, Nounts ).
 list_frequency_elem( false, T, Vnt, Bero, H, Iounts, Nounts ) :-
-	list_frequency_elem_nat( Iounts, H, T, Vnt, Bero, Nounts ).
+     list_frequency_elem_nat( Iounts, H, T, Vnt, Bero, Nounts ).
 
 list_frequency_elem_ord( [], Elem, T, _Vnt, Bero, Counts ) :- 
-	( Bero == false -> list_frequency_pair( T, Elem, 1, Pair ), Counts = [Pair] ; Counts = [] ).
+     ( Bero == false -> list_frequency_pair( T, Elem, 1, Pair ), Counts = [Pair] ; Counts = [] ).
 list_frequency_elem_ord( [H|Tail], Elem, T, Vnt, Bero, Counts ) :- 
-	list_frequency_de_pair( T, H, Kh, Vh ),
-	list_frequency_ord_compare( Vnt, Kh, Elem, Op ),
-	list_frequency_elem_ord_op( Op, H, Kh, Vh, Tail, Elem, T, Vnt, Bero, Counts ).
+     list_frequency_de_pair( T, H, Kh, Vh ),
+     list_frequency_ord_compare( Vnt, Kh, Elem, Op ),
+     list_frequency_elem_ord_op( Op, H, Kh, Vh, Tail, Elem, T, Vnt, Bero, Counts ).
 
 list_frequency_elem_ord_op( =, _H, Kh, Vh, Tail, _Elem, T, _Vnt, _Bero, Counts ) :-
-	list_frequency_pair_increase( T, Kh, Vh, Pair ),
-	Counts = [Pair|Tail].
+     list_frequency_pair_increase( T, Kh, Vh, Pair ),
+     Counts = [Pair|Tail].
 list_frequency_elem_ord_op( <, H, _Kh, _Vh, Tail, Elem, T, Vnt, Bero, Counts ) :-
-	Counts = [H|TCounts],
-	list_frequency_elem_ord( Tail, Elem, T, Vnt, Bero, TCounts ).
+     Counts = [H|TCounts],
+     list_frequency_elem_ord( Tail, Elem, T, Vnt, Bero, TCounts ).
 list_frequency_elem_ord_op( >, H, _Kh, _Vh, Tail, Elem, T, _Vnt, Bero, Counts ) :-
-	( Bero == false -> list_frequency_pair( T, Elem, 1, Pair ), Counts = [Pair,H|Tail]; Counts = [H|Tail] ).
+     ( Bero == false -> list_frequency_pair( T, Elem, 1, Pair ), Counts = [Pair,H|Tail]; Counts = [H|Tail] ).
 
 list_frequency_elem_nat( [], Elem, T, _Vnt, Bero, Counts ) :-
-	( Bero == false -> list_frequency_pair( T, Elem, 1, Pair ), Counts = [Pair] ; Counts = [] ).
+     ( Bero == false -> list_frequency_pair( T, Elem, 1, Pair ), Counts = [Pair] ; Counts = [] ).
 list_frequency_elem_nat( [H|Tail], Elem, T, Vnt, Bero, Counts ) :-
-	list_frequency_de_pair( T, H, Kh, Vh ),
-	list_frequency_nat_eq( Vnt, Kh, Elem, Eq ),
-	list_frequency_elem_nat_eq( Eq, H, Kh, Vh, Tail, Elem, T, Vnt, Bero, Counts ).
-		
+     list_frequency_de_pair( T, H, Kh, Vh ),
+     list_frequency_nat_eq( Vnt, Kh, Elem, Eq ),
+     list_frequency_elem_nat_eq( Eq, H, Kh, Vh, Tail, Elem, T, Vnt, Bero, Counts ).
+          
 list_frequency_elem_nat_eq( =, _H, Kh, Vh, Tail, _Elem, T, _Vnt, _Bero, Counts ) :-
-	list_frequency_pair_increase( T, Kh, Vh, Pair ),
-	Counts = [Pair|Tail].
+     list_frequency_pair_increase( T, Kh, Vh, Pair ),
+     Counts = [Pair|Tail].
 list_frequency_elem_nat_eq( <>, H, _Kh, _Vh, Tail, Elem, T, Vnt, Bero, Counts ) :-
-	Counts = [H|Tounts],
-	list_frequency_elem_nat( Tail, Elem, T, Vnt, Bero, Tounts ).
+     Counts = [H|Tounts],
+     list_frequency_elem_nat( Tail, Elem, T, Vnt, Bero, Tounts ).
 
 list_frequency_ord_compare( true, H, Elem, Op ) :-
-	( variant(H,Elem) -> Op = (=) ; compare( Op, H, Elem ) ).
+     ( variant(H,Elem) -> Op = (=) ; compare( Op, H, Elem ) ).
 
 list_frequency_nat_eq( true, Seen, Elem, Eq ) :-
-	( variant(Seen,Elem) -> Eq = (=) ; Eq = (<>) ).
+     ( variant(Seen,Elem) -> Eq = (=) ; Eq = (<>) ).
 list_frequency_nat_eq( false, Seen, Elem, Eq ) :-
-	( Seen == Elem -> Eq = (=); Eq = (<>) ).
-	
+     ( Seen == Elem -> Eq = (=); Eq = (<>) ).
+     
 list_frequency_pair_increase( true, Kh, Vh, Vi-Kh ) :-
-	Vi is Vh + 1.
+     Vi is Vh + 1.
 list_frequency_pair_increase( false, Kh, Vh, Kh-Vi ) :-
-	Vi is Vh + 1.
+     Vi is Vh + 1.
 
 list_frequency_de_pair( true, Times-Elem, Elem, Times ).
 list_frequency_de_pair( false, Elem-Times, Elem, Times ).
@@ -134,29 +170,37 @@ list_frequency_pair( false, Elem, Times, Elem-Times ).
 
 list_frequency_initial_counts( false, _Ord, _T, [], false ) :- !.
 list_frequency_initial_counts( List, Ord, T, Counts, true ) :-
-	is_list( List ), ground( List ),
-	findall( KV,  (member(Elem,List), list_frequency_pair(T,Elem,0,KV)), CountsPrv ),
-	list_freqency_order( Ord, T, CountsPrv, Counts ).
+     is_list( List ), ground( List ),
+     findall( KV,  (member(Elem,List), list_frequency_pair(T,Elem,0,KV)), CountsPrv ),
+     list_freqency_order( Ord, T, CountsPrv, Counts ).
 
 list_freqency_order( false, _T, Freqs, Freqs ).
 list_freqency_order( true, T, CountsPrv, Counts ) :- 
-	list_frequency_order_elem( T, CountsPrv, Counts ).
+     list_frequency_order_elem( T, CountsPrv, Counts ).
 list_freqency_order( freq, T, CountsPrv, Counts ) :-
-	list_frequency_order_freq( T, CountsPrv, Counts ).
+     list_frequency_order_freq( T, CountsPrv, Counts ).
 
 list_frequency_order_elem( true, Prv, Freqs ) :-
-	kv_transpose( Prv, ElemFreqPrs ),
-	sort( ElemFreqPrs, TFreqs ),
-	kv_transpose( TFreqs, Freqs ).
+     kv_transpose( Prv, ElemFreqPrs ),
+     sort( ElemFreqPrs, TFreqs ),
+     kv_transpose( TFreqs, Freqs ).
 list_frequency_order_elem( false, Prv, Freqs ) :-
-	sort( Prv, Freqs ).
+     sort( Prv, Freqs ).
 
 list_frequency_order_freq( true, Prv, Freqs ) :-
-	sort( Prv, Freqs ).
+     sort( Prv, Freqs ).
 list_frequency_order_freq( false, Prv, Freqs ) :-
-	kv_transpose( Prv, FreqElemPrs ),
-	sort( FreqElemPrs, TFreqs ),
-	kv_transpose( TFreqs, Freqs ).
+     kv_transpose( Prv, FreqElemPrs ),
+     sort( FreqElemPrs, TFreqs ),
+     kv_transpose( TFreqs, Freqs ).
+
+list_frequency_bin_goal( [B|Ns], Gins ) :-
+     !,
+     Gins = [B|Ns].
+list_frequency_bin_goal( Goal, Moal ) :-
+    trace,
+    mod_goal( Goal, Moal ).
+     
 
 /*
 list_frequency( [H|T], [H-HTimes|CountedT] ) :-
@@ -174,19 +218,19 @@ list_frequency_1( [H|T], El, Acc, Count, [H|RedT] ) :-
 list_frequency_1( [], _El, Acc, Acc, [] ).
 
 list_frequency( List, Expct, Freqs ) :-
-	findall( Elem-0, member(Elem,Expct), Counters ),
-	list_frequency_expected( List, Counters, Freqs ).
+     findall( Elem-0, member(Elem,Expct), Counters ),
+     list_frequency_expected( List, Counters, Freqs ).
 
 list_frequency_expected( [], Freqs, Freqs ).
 list_frequency_expected( [H|T], Counters, Freqs ) :-
-	list_frequency_expected_increase_counter( Counters, H, Next ),
-	list_frequency_expected( T, Next, Freqs ).
+     list_frequency_expected_increase_counter( Counters, H, Next ),
+     list_frequency_expected( T, Next, Freqs ).
 
 list_frequency_expected_increase_counter( [], Elem, _Next ) :-
-	throw( no_counter_for(Elem) ).
+     throw( no_counter_for(Elem) ).
 list_frequency_expected_increase_counter( [Elem-Curr|T], Elem, [Elem-Next|T] ) :-
-	!,
-	Next is Curr + 1.
+     !,
+     Next is Curr + 1.
 list_frequency_expected_increase_counter( [H|T], Elem, [H|Next] ) :-
-	list_frequency_expected_increase_counter( T, Elem, Next ).
-	*/
+     list_frequency_expected_increase_counter( T, Elem, Next ).
+     */
