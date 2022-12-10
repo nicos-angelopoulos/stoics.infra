@@ -18,7 +18,9 @@ appear in the List.
 Opts
   * bins(Bins=false)
     if a list of values, List elements are placed in (=<) bins, if non =|false|= atom,\br
-    it should be predicate name that produces a bin name for the element
+    it should be predicate name that produces a bin name for the element.<br>
+    Can also be a pairlist of label-break.value elements, in which case,<br>
+    the last bin should also be given with something like Bin-inf.
   * order(Ord=false)
      order of results: true sorts by element, freq sorts by frequency, and false for no sorting 
   * transpose(T=false)
@@ -53,6 +55,8 @@ Freqs = [a(X)-2, b(Y)-1, a(Z)-1].
 ?- list_frequency( [1,2,10,11,12,21,22], Freqs, bins([10,20]) ).
 Freqs = [1-3, 2-2, 3-2].
 
+?- list_frequency( [1,2,10,11,12,21,22], Freqs, bins([bin_1-10,bin_2-20,bin_3-inf]) ).
+
 ?- assert( (let_num(Let,Num) :- atom_codes(Let,[Code]),Num is Code-96) ).
 
 ?- list_frequency( [a,b,c,c,b,a,d], Freqs, bins(let_num) ).
@@ -60,7 +64,7 @@ Freqs = [1-2, 2-2, 3-2, 4-1].
 
 ==
 
-NOTE: arguments changed bewteen 0.2 and 0.3.
+NOTE: arguments changed between 0.2 and 0.3.
 
 @author nicos angelopoulos
 @version  0.2 2015/11/25, added /3 version where wnd is Expected and examples
@@ -107,8 +111,17 @@ list_frequency_bin( Goal, H, Bin ) :-
 
 list_frequency_nth_bin( [], _H, I, Bin ) :-
      Bin is I.
+list_frequency_nth_bin( [Bin-Coff|_Ns], H, _I, OBin ) :-
+     H =< Coff,
+     !,
+     OBin = Bin.
 list_frequency_nth_bin( [B|_Ns], H, I, Bin ) :-
-     H =< B,
+     ( Bin-Coff = B -> 
+          true
+          ;
+          Coff = B
+     ),
+     H =< Coff,
      !,
      Bin is I.
 list_frequency_nth_bin( [_B|Ns], H, I, Bin ) :-
