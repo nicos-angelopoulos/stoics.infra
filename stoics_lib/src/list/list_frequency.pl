@@ -53,9 +53,10 @@ Freqs = [a(X)-2, b(Y)-1, a(Z)-1].
 ?- list_frequency( [1,2,10,11,12,21,22], Freqs, bins([10,20]) ).
 Freqs = [1-3, 2-2, 3-2].
 
-?- assert( (let_num(Let,Num) :- atom_codes(Let,[Code]),Num is Code-64) ).
+?- assert( (let_num(Let,Num) :- atom_codes(Let,[Code]),Num is Code-96) ).
 
 ?- list_frequency( [a,b,c,c,b,a,d], Freqs, bins(let_num) ).
+Freqs = [1-2, 2-2, 3-2, 4-1].
 
 ==
 
@@ -64,6 +65,7 @@ NOTE: arguments changed bewteen 0.2 and 0.3.
 @author nicos angelopoulos
 @version  0.2 2015/11/25, added /3 version where wnd is Expected and examples
 @version  0.3 2016/12/16, changed /3 version to 3rd being the options. added options
+@version  0.4 2022/12/10, option bins(Bins)
 
 */
 
@@ -101,7 +103,6 @@ list_frequency_bin( [B|Ns], H, Bin ) :-
      !,
      list_frequency_nth_bin( [B|Ns], H, 1, Bin ).
 list_frequency_bin( Goal, H, Bin ) :-
-     write( calling(Goal,H,Bin) ), nl,
      call( Goal, H, Bin ).
 
 list_frequency_nth_bin( [], _H, I, Bin ) :-
@@ -198,7 +199,6 @@ list_frequency_bin_goal( [B|Ns], Gins ) :-
      !,
      Gins = [B|Ns].
 list_frequency_bin_goal( Goal, Moal ) :-
-    trace,
     mod_goal( Goal, Moal ).
      
 
