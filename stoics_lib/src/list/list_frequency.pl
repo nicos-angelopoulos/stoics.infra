@@ -57,6 +57,7 @@ Freqs = [a(X)-2, b(Y)-1, a(Z)-1].
 Freqs = [1-3, 2-2, 3-2].
 
 ?- list_frequency( [1,2,10,11,12,21,22], Freqs, bins([bin_1-10,bin_2-20,bin_3-inf]) ).
+Freqs = [bin_1-3, bin_2-2, bin_3-2].
 
 ?- assert( (let_num(Let,Num) :- atom_codes(Let,[Code]),Num is Code-96) ).
 
@@ -209,6 +210,9 @@ list_frequency_order_freq( false, Prv, Freqs ) :-
      sort( FreqElemPrs, TFreqs ),
      kv_transpose( TFreqs, Freqs ).
 
+list_frequency_bin_goal( false, Moal ) :-
+     !,
+     Moal = false.
 list_frequency_bin_goal( [B|Ns], Gins ) :-
      !,
      Gins = [B|Ns].
