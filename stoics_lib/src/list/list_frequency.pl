@@ -65,7 +65,7 @@ Freqs = [bin_1-3, bin_2-2, bin_3-2].
 Freqs = [1-2, 2-2, 3-2, 4-1].
 
 ?- list_frequency( [1,2,10,11,12,21,22], Freqs, bins(0-5) ).
-
+Freqs = ['(0-5]'-2, '(5-10]'-1, '(10-15]'-2, '(20-25]'-2].
 ==
 
 NOTE: arguments changed between 0.2 and 0.3.
