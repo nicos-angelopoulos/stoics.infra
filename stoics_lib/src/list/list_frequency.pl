@@ -64,6 +64,8 @@ Freqs = [bin_1-3, bin_2-2, bin_3-2].
 ?- list_frequency( [a,b,c,c,b,a,d], Freqs, bins(let_num) ).
 Freqs = [1-2, 2-2, 3-2, 4-1].
 
+?- list_frequency( [1,2,10,11,12,21,22], Freqs, bins(0-5) ).
+
 ==
 
 NOTE: arguments changed between 0.2 and 0.3.
@@ -89,7 +91,7 @@ list_frequency( List, Freqs, ArgS ) :-
      options( zero(Zero), Opts ),
      options( bins(Bins), Opts ),
      list_frequency_initial_counts( Zero, Ord, T, Iounts, Bero ),
-     list_frequency_bin_goal( Bins, Gins ),
+     list_frequency_bin_goal( Bins, List, Gins ),
      list_frequency( List, Gins, T, Ord, Vnt, Bero, Iounts, Freqs ).
 
 /*
@@ -210,15 +212,35 @@ list_frequency_order_freq( false, Prv, Freqs ) :-
      sort( FreqElemPrs, TFreqs ),
      kv_transpose( TFreqs, Freqs ).
 
-list_frequency_bin_goal( false, Moal ) :-
+list_frequency_bin_goal( false, _List, Moal ) :-
      !,
      Moal = false.
-list_frequency_bin_goal( [B|Ns], Gins ) :-
+list_frequency_bin_goal( [B|Ns], _List, Gins ) :-
      !,
      Gins = [B|Ns].
-list_frequency_bin_goal( Goal, Moal ) :-
+list_frequency_bin_goal( Start-Step, List, Gins ) :-
+     !,
+     max_list( List, Max ),
+     % First = Start + Step,
+     Start =< Max,
+     list_frequency_bin_breaks( Start, Max, Step, Gins ).
+list_frequency_bin_goal( Goal, _List, Moal ) :-
     mod_goal( Goal, Moal ).
-     
+
+list_frequency_bin_breaks( Curr, Max, Step, Gins ) :-
+     Cutoff is Curr + Step,
+     Curr > Max,
+     !,
+     atomic_list_concat( ['(',Curr,'-',Cutoff,']'], '',  Bin ),
+     Gins = [Bin-Cutoff].
+list_frequency_bin_breaks( Curr, Max, Step, Gins ) :-
+     Cutoff is Curr + Step,
+     atomic_list_concat(['(',Curr,'-',Cutoff,']'], '',  Bin ),
+     Gins = [Bin-Cutoff|Tins],
+     list_frequency_bin_breaks( Cutoff, Max, Step, Tins ).
+% list_frequency_bin_breaks( Curr, Max, Step, Gins ) :-
+     % list_frequency_bin_breaks( Cutoff, Max, Step, Tins ).
+
 
 /*
 list_frequency( [H|T], [H-HTimes|CountedT] ) :-
