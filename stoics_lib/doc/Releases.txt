@@ -2,6 +2,7 @@
 --------------------
 
 1.3
+     22.12.16   IFACE:  added latex_colour/4 and colour_hex/2 in new dir src/colour
      22.12.10   FIXED:  mod_goal/2 locate asserted-at-prompt predicates
                 IFACE:  list_frequency/3, new option bins(), list and pairlist
      22.11.19   CHANGE: imported_from/2 fails now when Clauser is not imported (returned user previously)

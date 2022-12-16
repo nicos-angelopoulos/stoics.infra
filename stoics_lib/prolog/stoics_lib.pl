@@ -12,6 +12,9 @@
               n_digits_integer_codes/3,% +N, +Numb, -Codes
               lexi/2,                  % ?Lexi, ?CodeOr
               lexi_n/4,                % -InCodes, +N, +PadC, -Codes
+            % colour
+              latex_colour/4,          % ?FullName, -HexValue, ?CodingName, -RGBterm
+              colour_hex/2,            % +Clr, -HexString
             % date_time/
               datime_readable/1,       % +Ratom
               datime_readable/2,       % +Datime, -Ratom
@@ -228,6 +231,8 @@
 :- lib(io_streams/3).
 :- lib(lexi/2).
 :- lib(has_cased/3).
+:- lib(latex_colour/4).
+:- lib(colour_hex/2).
 :- lib(lexi_n/4).
 
 :- lib( end(stoics_lib) ).
