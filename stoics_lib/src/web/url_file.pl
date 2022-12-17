@@ -3,10 +3,11 @@
 :- use_module(library(http/http_open)). % fixme: doit dynamically
 :- use_module(library(listing)).       % portray_clause/2.
 
+:- lib(at_con/3).
 :- lib(get_datetime/1).
 :- lib(suggests(options)).
 
-url_file_defaults( [overwrite(error),dnt(false)] ).
+url_file_defaults( [overwrite(error),dnt(false),iface(prolog)] ).
 
 %% url_file( +Url, ?File ).
 %% url_file( +Url, ?File, +Opts ).
@@ -20,10 +21,12 @@ url_file_defaults( [overwrite(error),dnt(false)] ).
 % The main download code is a copy-paste from SWI's library(prolog_pack) file.
 % 
 % Opts 
-% * overwrite(Ow=error)
-%   default throws an error if file exists, fail or false for failure and anything else for business as usual (overwrite local)
 % * dnt(Dnt=false)
 %   if true, create a File.dnt with the start and end datime/6 stamps.
+% * iface(Iface=prolog)
+%   or =|wget|=
+% * overwrite(Ow=error)
+%   default throws an error if file exists, fail or false for failure and anything else for business as usual (overwrite local)
 %
 %==
 % ?- file_search_path( downloads, Dnloads ).
@@ -72,25 +75,32 @@ url_file( Url, RemB, Opts ) :-
 url_file( Url, Local, Args ) :-
 	options_append( url_file, Args, Opts ),
 	options( overwrite(Ow), Opts ),
-	url_file_ow( Ow, Url, Local, Opts ).
+     options( iface(Iface), Opts ),
+	url_file_ow( Ow, Iface, Url, Local, Opts ).
 
-url_file_ow( false, Url, Local, _Opts ) :- 
+url_file_ow( false, _Iface, Url, Local, _Opts ) :- 
 	exists_file( Local ),
 	!,
 	debug( url_file, 'Local file exists: ~p, not downloading it again from: ~p.', [Local,Url] ),
     fail.
-url_file_ow( fail, Url, Local, _Opts ) :- 
+url_file_ow( fail, _Iface, Url, Local, _Opts ) :- 
 	exists_file( Local ),
 	!,
 	debug( url_file, 'Local file exists: ~p, not downloading it again from: ~p.', [Local,Url] ),
     fail.
-url_file_ow( error, Url, Local, _Opts ) :-
+url_file_ow( error, _Iface, Url, Local, _Opts ) :-
 	exists_file( Local ),
 	!,
 	throw( refusing_to_download_url_to_existing_file(Local,Url) ).
-url_file_ow( _, Url, Local, Opts ) :- % fixme, add error value for ow() ?
-	debug( url_file, 'Downloading URL: ~p, onto file: ~p', [Url,Local] ),
+url_file_ow( _, Iface, Url, Local, Opts ) :- % fixme, add error value for ow() ?
+	debug( url_file, 'Downloading URL: ~p, onto file: ~p, with interface: ~w', [Url,Local,Iface] ),
 	get_datetime( StartDt ),
+     url_file_dnload( Iface, Url, Local ),
+	get_datetime( EndDt ),
+	options( dnt(Dnt), Opts ),
+	url_file_dnt( Dnt, Local, StartDt, EndDt ).
+
+url_file_dnload( prolog, Url, Local ) :-
 	setup_call_cleanup(
 	    http_open(Url, In,
 		      [ % cert_verify_hook(ssl_verify) % checkme:
@@ -100,10 +110,11 @@ url_file_ow( _, Url, Local, Opts ) :- % fixme, add error value for ow() ?
 	    copy_stream_data(In, Out),
 	    close(Out)),
 	    close(In)
-	),
-	get_datetime( EndDt ),
-	options( dnt(Dnt), Opts ),
-	url_file_dnt( Dnt, Local, StartDt, EndDt ).
+	).
+url_file_dnload( wget, Url, Local ) :-
+     at_con( ['wget -O',Local,Url], ' ', Wget ),
+     write( wget(Wget) ), nl,
+     shell( Wget ).
 
 url_file_dnt( true, Local, StartDt, EndDt ) :-
 	file_name_extension( Local, dnt, DntF ),
