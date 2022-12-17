@@ -113,7 +113,6 @@ url_file_dnload( prolog, Url, Local ) :-
 	).
 url_file_dnload( wget, Url, Local ) :-
      at_con( ['wget -O',Local,Url], ' ', Wget ),
-     write( wget(Wget) ), nl,
      shell( Wget ).
 
 url_file_dnt( true, Local, StartDt, EndDt ) :-
