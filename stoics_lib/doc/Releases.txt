@@ -3,6 +3,7 @@
 
 1.3
      22.12.28   DEPS:   dependcy of dateim_readable/2 to library(lists)
+     22.12.21   IFACE:  arg_add/4, Arg can be a list now and Nin a var + examples
      22.12.16   IFACE:  added latex_colour/4 and colour_hex/2 in new dir src/colour
                 OPTS:   new iface(prolog/wget), and new fetch via wget
      22.12.10   FIXED:  mod_goal/2 locate asserted-at-prompt predicates

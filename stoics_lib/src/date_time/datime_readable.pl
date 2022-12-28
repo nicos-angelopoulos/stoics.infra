@@ -1,5 +1,4 @@
 
-:- use_module(library(lists)).  % nth1/3
 :- lib(int_trailer/2).
 :- lib(day_trailer/2).
 :- lib(get_date_time/1).
