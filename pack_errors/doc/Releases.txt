@@ -1,7 +1,7 @@
 ---   Releases   ----
 ---------------------
 
-2.2
+2.2         @   22.12.29
      22.02.06   IFACE:     input_file_missing(Os) added
      20.08.17   DEPS       explicit loading of autoload SWI libs
 

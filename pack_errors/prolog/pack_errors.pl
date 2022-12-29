@@ -209,6 +209,7 @@ Pack defined errors selection: (see pack('pack_errors/prolog/pack_errors.pl') fo
 @version 0.3 2017/03/06
 @version 2.0 2018/10/01
 @version 2.1 2019/4/22
+@version 2.2 2022/12/29
 @license MIT
 @see     http://stoics.org.uk/~nicos/sware/pack_errors
 
@@ -926,13 +927,15 @@ pack_message_options_augment( Opts, Apts ) :-
 Current version and release date for the library.
 
 ==
-V = 2:1:0,
-D = date(2019, 4, 22).
+V = 2:2:0,
+D = date(2022, 12, 29).
 ==
+
 @author nicos angelopoulos
-@version  2:1 2019/4/22
+@version  2:2 2022/12/29
+
 */
-pack_errors_version( 2:1:0, date(2019,4,22) ).
+pack_errors_version( 2:2:0, date(2022,12,29) ).
 
 prolog:message(unhandled_exception(true)) --> [].
 prolog:message(unhandled_exception(pack_error(Message))) -->
