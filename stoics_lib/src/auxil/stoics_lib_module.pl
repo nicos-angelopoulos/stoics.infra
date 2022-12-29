@@ -132,8 +132,8 @@ Version, term of the from Mj:Mn:Fx and Date is date(Year,Month,Day)
 
 ==
 ?- stoics_lib_version( -V, -D ).
-D = 1:4:0,
-V = date(2019,9,18).
+D = 1:5:0,
+V = date(2022,12,29).
 ==
 */
-stoics_lib_version( 1:4:0, date(2020,9,18) ).
+stoics_lib_version( 1:5:0, date(2022,12,29) ).

@@ -138,7 +138,7 @@ spuds_srv_basename( spudsd ).
 %% spuds_version( -Version, -Date ).
 %
 %  Version and release Date (date(Y,M,D) term).
-spuds_version( 1:1:0, date(2020,3,19) ).
+spuds_version( 1:2:0, date(2022,12,29) ).
 
 %% spuds_pid( -Pid ).
 % 
