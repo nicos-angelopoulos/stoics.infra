@@ -106,6 +106,7 @@ missing curly brackets in the errors DCG (2016/11/14).
 @version  1.2   2019/4/18
 @version  1.3   2020/9/18
 @version  1.4   2021/1/22
+@version  1.5   2022/12/29
 @see http://www.stoics.org.uk/~nicos/sware/options
 
 */
@@ -142,13 +143,12 @@ Current version and release date for the library.
 Currently:
 ==
 ?- options_version( Vers, Date ).
-Date = date(2021,1,22),
-Vers = 1:4:0.
+Date = date(2022,12,29),
+Vers = 1:5:0.
 ==
 */
 % options_version( 0:4:0, date(2016,2,29) ).
-% options_version( 1:3:0, date(2020,9,18) ).
-options_version( 1:4:0, date(2021,1,22) ).
+options_version( 1:5:0, date(2022,12,29) ).
 
 % options_defaults( [rem_opts(_),en_list(false),ground(false)] ).
 options_defaults( [en_list(false),ground(false)] ).
