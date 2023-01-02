@@ -5,9 +5,15 @@
 
 :- dynamic(known_call_succ/1).
 
+known_defaults( Args, Defs ) :-
+     memberchk( arg1(Arg1), Args ),
+     Defs = [  category(values()),
+               solutions(first),
+               token(Arg1),
+               options_types([solutions-oneof([all,first])])
+     ].
 /** known( +Goal ).
-    known( +Goal, +Cat ).
-    known( +Goal, +Tkn, +Cat ).
+    known( +Goal, +Opts ).
 
 If call(Goal) fails, then an error is thrown (via pack_errors)
 saying that Tkn (usually the first arg of Goal) is not 
@@ -20,19 +26,22 @@ This meta-predicate
   1.  provides a uniform way of dealing with failure on ground 1st argument clauses
   2.  avoids the creation of an intermediate predicate
 
-Cat should be of the form
-  * values(Cat) 
-     error shows Cat as the name, and the values of the first arg of Goal as the accepted values
-  * 'values()'
-     values of the first Tkn arg of Goal are 
-  * arbitrary_term
-     in which case is taken to be the category name
+Opts
+  * category(Cat=values())
+    Cat should be of the form
+    * values(Cat) 
+       error shows Cat as the name, and the values of the first arg of Goal as the accepted values
+    * 'values()'
+      values of the first Tkn arg of Goal are 
+    * arbitrary_term
+      in which case is taken to be the category name
+  * solutions(first)
+    set to =|all|= for backtracking
+  * token(Tkn)
+    defaults to the first argument of Goal
 
-If Tkn is missing is taken to be the first arg of Goal.
-
-If Cat is missing it is taken to be values().
-
-Goal used to be called deterministically, but as of version 0.3 this has changed.
+Goal used to be called deterministically, version 0.3 made this non-det and 0.4 added an option
+to control this.
 
 ==
 ?- [user].
@@ -48,46 +57,49 @@ ERROR: user:theme_background/2: Token: wrong, is not a recognisable: value in [c
 ?- known(theme_background(wrong,Clr), colour_theme).
 ERROR: user:theme_background/2: Token: wrong, is not a recognisable: colour_theme
 
-?- known(theme_background(wrong,Clr), values(colour_theme)).
-ERROR: user:theme_background/2: Token: wrong, is not a recognisable: colour_theme (values: [colour,monochromoe])
+?- known(theme_background(wrong,Clr), category(values(colour_theme))).
+ERROR: user:theme_background/2: Token: wrong, is not a recognisable: colour_theme (values: [colour,monochrome])
 
-?- known(theme_background(wrong,Clr), ex_token, values()).
-ERROR: user:theme_background/2: Token: wrong, is not a recognisable: colour_theme (values: [colour,monochromoe])
-
-?- lib(os_lib).
-
-?- cd(pack('stoics_lib/src/meta')).
-
-?- os_file( Os ).
-Os = call_morph.pl ;
-...
-
-?- os_file( Os, solutions(all) ).
-ERROR: os_lib:os_lib:os_file_sol/7: Token: all, is not a recognisable: value in [single,findall]
+?- known(theme_background(wrong,Clr), token(ex_token) ).
+ERROR: user:theme_background/2: Token: ex_token, is not a recognisable: value in [colour,monochrome]
 ==
 
 @author nicos angelopoulos
 @version  0.1 2017/2/22
 @version  0.2 2019/7/25,  Goal is now passed through mod_goal/2
 @version  0.3 2022/2/13,  Allow module prepended Goal. Allow multi solution Goals (see os_file examples).
+@version  0.4 2023/1/02,  interface change to /2 with options and solutions controlled via solutions(Sol)
 
 */
 
 known( G ) :-
-    known( G, values() ).
+    known( G, [] ).
 
-known( G, Cat ) :-
+known( G, Args ) :-
     ( G = _:Goal -> true; Goal = G ),
-    arg( 1, Goal, Tkn ),
-    known( G, Tkn, Cat ).
-
-known( G, Tkn, Cat ) :-
+    arg( 1, Goal, Arg1 ),
+    Self = known,
+    options_append( Self, Args, Opts, extra_arg(arg1(Arg1)) ),
+    options( token(Tkn), Opts ),
+    options( category(Cat), Opts ),
+    options( solutions(Sol), Opts ),
     mod_goal( G, MG ),
     MG = Mod:Goal,
     functor( Goal, Pn, Pa ),  % stoics_lib:use arity/3 if you get problems with non () functor calls
     MGi = Mod:Pn/Pa,
     retractall( known_call_succ(MGi) ),
-    known( MG, Tkn, Cat, MGi ).
+    known( Sol, MG, Tkn, Cat, MGi ).
+
+known( first, MG, _Tkn, _Cat, _MGi ) :-
+     call( MG ),
+     !.
+known( first, MG, Tkn, Cat, MGi ) :-
+    MG = Gmod:Goal,
+    known_goal_values( Goal, Gmod, Vals ),
+    known_not( Cat, Vals, Gmod, Goal, MGi, Tkn ),
+    !.
+known( all, MG, Tkn, Cat, MGi ) :-
+     known( MG, Tkn, Cat, MGi ).
 
 known( MG, _Tkn, _Cat, MGi ) :-
     call( MG ),

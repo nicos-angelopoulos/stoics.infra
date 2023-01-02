@@ -71,8 +71,7 @@
               goal_spec/2,             % +ModG, -ModSpec
               holds/2,                 %  +Goal, -Holds
               imported_from/2,         %  +Clauser, ?Mod
-              known/1,known/2,         %
-              known/3,                 % +Goal[, +Tkn], +Cat]
+              known/1,known/2,         %  +Goal[, Opts]
               maparg/2,maparg/3,       % +Pname, ?Term1[, ?Term2]
               maparg/4,                % +PName, +Npos ?Term1, ?Term2
               map_list_options/3,      % +Goal, +InList, +Opts
