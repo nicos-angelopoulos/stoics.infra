@@ -1,6 +1,9 @@
 ---   Releases   ---
 --------------------
 
+1.6         
+     23.01.02   IFACE:  allow PadC in lexi_n/4 to be versatile and docs
+                DOC:    fixed tabs in lexi/2 list
 1.5         @   22.12.29
      22.12.28   DEPS:   dependcy of datetime_readable/2 to library(lists)
      22.12.21   IFACE:  arg_add/4, Arg can be a list now and Nin a var + examples

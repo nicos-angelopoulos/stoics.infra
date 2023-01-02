@@ -139,6 +139,7 @@ V = date(2023,1,2).
 
 @author nicos angelopoulos
 @version 1:5:0, 2022/12/29
+@version 1:6:0, 2023/01/02
 
 */
-stoics_lib_version( 1:5:1, date(2023,1,2) ).
+stoics_lib_version( 1:6:0, date(2023,1,2) ).
