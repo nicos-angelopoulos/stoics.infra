@@ -1,10 +1,8 @@
-:- lib(stoics_lib:known/1).
-
 os_file_defaults( Defs ) :-
     Defs = [ dir('.'), dots(false),
              read_link(false),
              solutions(single), stem(rel), sub(false), 
-             version(0:0:4),
+             version(0:0:6),
              % type checking
              options_types([read_link-boolean,solutions-oneof([single,findall]),stem-oneof([abs,false,rel])])
              ].
@@ -70,11 +68,12 @@ os_file_defaults( Defs ) :-
 % File = 'doc/html/multi-bg.png'...
 %==
 % @author nicos angelopoulos 
-% @version  0.1 2016/1/31, this version without ref to lib(os_sub)
-% @version  0.2 2018/7/23, added options, dir(Dir) and sub(true)
-% @version  0.3 2018/10/1, added option dots(Dots)
-% @version  0.4 2018/11/4, added option solutions(Sol)
-% @version  0.5 2022/02/5, pass Sol through known/1
+% @version  0.1 2016/01/31, this version without ref to lib(os_sub)
+% @version  0.2 2018/07/23, added options, dir(Dir) and sub(true)
+% @version  0.3 2018/10/01, added option dots(Dots)
+% @version  0.4 2018/11/04, added option solutions(Sol)
+% @version  0.5 2022/02/05, pass Sol through known/1
+% @version  0.6 2023/01/02, reverted passing solutions through known. solutions has types, which catches unknown values.
 % 
 os_file( File ) :-
     os_file( File, [] ).
@@ -88,7 +87,7 @@ os_file( File, Args ) :-
     options_append( os_file, Args, Opts ),
     options( [dir(Dir),dots(Dots),read_link(RLnk),solutions(Sol),stem(Stem),sub(Sub)], Opts ),
     absolute_file_name( Dir, Here, [file_type(directory),solutions(first)] ),
-    known( os_lib:os_file_sol(Sol, File, Dir, Here, Here, RLnk, Stem, Dots, Sub) ).
+    os_lib:os_file_sol(Sol, File, Dir, Here, Here, RLnk, Stem, Dots, Sub).
 
 os_file_sol( single, File, Dir, Top, Here, RLnk, Stem, Dots, Sub ) :-
     os_file( File, '', Dir, Top, Here, RLnk, Stem, Dots, Sub ).

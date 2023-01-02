@@ -2,8 +2,9 @@
 %fixme: should merge with os_file_defaults...
 os_dir_defaults( Defs ) :-
     % ( (memberchk(dir(InDir),Args),\+ InDir == '.') -> Stem = rel ; Stem = false),
-    Defs = [ dir('.'), stem(rel), sub(false),dots(false),solutions(single),
-             version(0:0:4)
+    Defs = [ dir('.'), stem(rel), sub(false),dots(false),solutions(single), version(0:0:4),
+             options_types([solutions-oneof([single,findall]),stem-oneof([abs,false,rel])])
+
     ].
 
 %% os_dir( ?OsDir ).
@@ -20,10 +21,9 @@ os_dir_defaults( Defs ) :-
 %      note that '.' and '..' are never returned
 %   * solutions(Sol=single)
 %     or findall for returning a list for solutions
-%   * stem(Stem=false)
+%   * stem(Stem=rel)
 %      what stem to add to returned files, 
 %      rel: relative (default), abs: absolute, false: none
-%      note, the default 
 %   * sub(Sub=false)
 %      find OsDir within sub directories when true
 %==

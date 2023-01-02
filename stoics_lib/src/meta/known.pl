@@ -86,6 +86,7 @@ known( G, Tkn, Cat ) :-
     MG = Mod:Goal,
     functor( Goal, Pn, Pa ),  % stoics_lib:use arity/3 if you get problems with non () functor calls
     MGi = Mod:Pn/Pa,
+    retractall( known_call_succ(MGi) ),
     known( MG, Tkn, Cat, MGi ).
 
 known( MG, _Tkn, _Cat, MGi ) :-
