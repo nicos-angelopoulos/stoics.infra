@@ -7,14 +7,14 @@ Convert any Lexi-cographical object to codes or other shaped form.
 If CodeOr is a variable then Lexi is casted to codes.
 
 Casts- mostly for Lexi, but work on CodesOr, if you are so inclined.
- * +(Lex) 
-   casts to atoms
- * &(Lex)
-   casts to strings
- * -(Lex) 
-   casts to codes
- * #(Lex)
-   casts to number
+  * +(Lex)
+    casts to atoms
+  * &(Lex)
+    casts to strings
+  * -(Lex)
+    casts to codes
+  * #(Lex)
+    casts to number
 
 This is a subset to os_lib casts, although here we also use code lists
 (something that should be propagated to os_lib).
@@ -58,6 +58,7 @@ String = "Bone Marrow".
 
 @author nicos angelopoulos
 @version  0.1 2022/10/15
+@see lexi_n/4
 @see has_cased/3
 
 */

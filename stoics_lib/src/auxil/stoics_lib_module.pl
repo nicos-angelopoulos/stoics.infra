@@ -130,10 +130,15 @@ stoics_lib.
 
 Version, term of the from Mj:Mn:Fx and Date is date(Year,Month,Day)
 
+stoics_lib_version( 1:5:0, date(2022,12,29) ).
 ==
 ?- stoics_lib_version( -V, -D ).
-D = 1:5:0,
-V = date(2022,12,29).
+D = 1:5:1,
+V = date(2023,1,2).
 ==
+
+@author nicos angelopoulos
+@version 1:5:0, 2022/12/29
+
 */
-stoics_lib_version( 1:5:0, date(2022,12,29) ).
+stoics_lib_version( 1:5:1, date(2023,1,2) ).

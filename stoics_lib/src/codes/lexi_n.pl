@@ -6,9 +6,9 @@
 
 /** lexi_n( +InLexi, +N, +PadC, -Lexi ).
 
-Lexi is of length N lexical object containing either the last N digits of InLexi
+Lexi is of length N lexical object containing either the last N codes of InLexi
 or all of InLexi left-padded by PadCs, to make its codes representation
-up to N (see n_digits_integer_codes/3). By derault Lexi
+up to length N. By default Lexi is returned as a list of codes.
 
 ==
 ?- lexi_n( `2`, 3, 0'0, Codes ), atom_codes( Atom, Codes ).
@@ -31,6 +31,7 @@ Atom = '    text'.
 @version  0.1 2014/03/17
 @version  0.2 2022/11/06, this used to be codes_n_digits/3.
 @see lexi/2
+@see n_digits_integer_codes/3
 
 */
 lexi_n( ILexi, N, PadC, OLexi ) :-
