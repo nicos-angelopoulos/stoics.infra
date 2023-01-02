@@ -57,6 +57,9 @@ Ns = [1, 2, 3].
 @version   1.2 2020/9/18
 @version   1.3 2020/9/18
 @version   1.4 2020/9/18
+@version   1.5 2022/12/29
+@version   1.6 2023/1/2
+@version   1.7 2023/1/2
 @see http://www.stoics.org.uk/~nicos/sware/stoics_lib
 
 */
@@ -138,7 +141,8 @@ V = date(2023,1,2).
 
 @author nicos angelopoulos
 @version 1:5:0, 2022/12/29
-@version 1:6:0, 2023/01/02
+@version 1:6:0, 2023/01/02, improvements to arg_arg/4, list_frequency/4, new: latex_colour/4, colour_hex/2
+@version 1:7:0, 2023/01/02, known/2 optionised
 
 */
 stoics_lib_version( 1:6:0, date(2023,1,2) ).
