@@ -2,6 +2,7 @@
 os_unique_defaults( Defs ) :- 
      Defs = [ 
                 by(date([ye,mo,da,[ho,mi],[se]]) ),
+                check(true),
                 create(true),
                 dir('.'),
                 ext(csv),
@@ -32,24 +33,28 @@ os_unique_by_date_test :-
 %% os_unique( +TokenS, -Os ).
 %% os_unique( +TokenS, -Os, +Opts ).
 %  
-% Create a unique file or directory named Os, in Dir, by using date elements
-% and a Token or list of Tokens. Token can be a list in which case the Separator option will
+% Create a unique file or directory named Os by using date or version elements and a Token.
+% 
+% TokenS can be an atomic Token, or a list of Tokens in which case the Separator option will
 % also apply within the token parts.
 %  
 % The predicate does not only provide the name of Os, it also, by default, creates it. 
 %
 % Opts: 
 %   * by(By=date([ye,mo,da,[ho,mi],[se]])) 
-%     how to group: either by date with the default taking
-%     YeMoDa first, then adds HoMi and on the thrid attempt adds Seconds.
-%     For alterative ways to do dates give the respective date/3 term (date/0 is shorthand for default date pattern). 
-%     For building unique via version give  version(Pfx,Compon,Type,Whc) (version/0 is short for version(v,'',1,int,1))
+%     how to group: either by date with the default taking YeMoDa first, then  adds HoMi and on  the
+%     third attempt adds Seconds. For alterative ways to do dates give the respective date/3 term
+%     (date/0 is shorthand for default date pattern). For building unique via version give
+%     version(Pfx,Compon,Type,Whc) (version/0 is short for version(v,'',1,int,1)).
+%   * check(Check=true)
+%     when =|false|=, do not make uniqueness check. A =|false|= value makes this predicate a misnomer, however
+%     is useful for geting the Os value in say results directory. See examples.
 %   * create(Create=true)
-%     by default the file is created
+%     by default, Os is created
 %   * dir(Dir='.')
 %     parent directory
 %   * ext(Ext=csv)
-%     extension to add to OsEntry iff type is file
+%     extension to add to Os iff type is file
 %   * max_length(Dp=ye,Ye=2) 
 %     max length of date Id (_ye_,_mo_,_da_) if using By=date/n or integer if using By=version/n (Nth component), and an integer
 %   * min_length(Id='',Len) 
@@ -126,12 +131,31 @@ os_unique_by_date_test :-
 % Dname = 'res-v04'.
 % ==
 %
+% To force a restriction of say uniqueness at the date level:
+% ==
+% ?- os_unique( res, Here, by(date([ye,mo,da])) ).
+% Here = 'res-23.06.01'.
+% ?- os_unique( res, Here, by(date([ye,mo,da])) ).
+% fail.
+% ==
+%
+% As of version 0.6, you can instead do the above with an error
+% ==
+% ?- os_unique( res1, Here, check(false) ).
+% ?- ls.
+% bigs.pl           data/             res1-23.06.01/    
+% ?- os_unique( res1, Here, check(false) ).
+% ERROR: directory `'res1-23.06.01'' does not exist (File exists)
+% ...
+% ==
+%
 % Used to be unique_entry_by_date/n, then unique_by_date/n.
 %
 % @author nicos angelopoulos
 % @version  0.3 2016/2/23
 % @version  0.4 2016/9/2   changed name from os_unique_by_date, now it also does versioning
 % @version  0.5 2021/2/15  added option dir()
+% @version  0.6 2023/6/1   added option check()
 %
 os_unique( Tkn, Bname ) :-
     os_unique( Tkn, Bname, [] ).
@@ -143,23 +167,24 @@ os_unique( Tkn, Bname, InOpts ) :-
      atomic_list_concat( Tkns, TSep, TknConc ),
      options( type(Type), Opts ),
      options( dir(Dir), Opts ),
-     os_unique_by( By, TknConc, Type, Dir, BnamePrv, Opts ),
+     options( check(Check), Opts ),
+     os_unique_by( By, TknConc, Type, Dir, Check, BnamePrv, Opts ),
      options( create(Create), Opts ),
      os_path( Dir, BnamePrv, +(AbsOs) ),
      os_unique_create( Create, Type, AbsOs ),
      os_cast( BnamePrv, Bname ).
 
-os_unique_by( date, TConc, Type, Dir, Bname, Opts ) :-
+os_unique_by( date, TConc, Type, Dir, Check, Bname, Opts ) :-
      !,
      ByTerm = [ye,mo,da,[ho,mi],[se]],
-     construct_unique_base_name_by_date( ByTerm, TConc, Opts, Type, Dir, Bname ).
-os_unique_by( date(ByTerm), TConc, Type, Dir, Bname, Opts ) :-
+     construct_unique_base_name_by_date( ByTerm, TConc, Opts, Type, Dir, Check, Bname ).
+os_unique_by( date(ByTerm), TConc, Type, Dir, Check, Bname, Opts ) :-
     !,
-     construct_unique_base_name_by_date( ByTerm, TConc, Opts, Type, Dir, Bname ).
-os_unique_by( version, TConc, UType, Dir, Bname, Opts ) :-
+     construct_unique_base_name_by_date( ByTerm, TConc, Opts, Type, Dir, Check, Bname ).
+os_unique_by( version, TConc, UType, Dir, Check, Bname, Opts ) :-
     !,
-    os_unique_by( version(v,[],int,1), TConc, UType, Dir, Bname, Opts ).
-os_unique_by( version(Pfx,Comps,VType,Whc), TConc, UType, Dir, Bname, Opts ) :-
+    os_unique_by( version(v,[],int,1), TConc, UType, Dir, Check, Bname, Opts ).
+os_unique_by( version(Pfx,Comps,VType,Whc), TConc, UType, Dir, Check, Bname, Opts ) :-
     options( ext(Ext), Opts ),
     options( sep_sub(SSep), Opts ),
     options( sep_parts(PSep), Opts ),
@@ -174,7 +199,7 @@ os_unique_by( version(Pfx,Comps,VType,Whc), TConc, UType, Dir, Bname, Opts ) :-
     at_con( [Pfx,CandVers], '', CandPfxd ),
     os_unique_concat( PlcTkn, TConc, PSep, CandPfxd, CandStem ),
     type_ext_full( UType, Ext, CandStem, Bname ),
-    \+ os_exists( Bname, dir(Dir) ),
+    ( Check==false; \+ os_exists( Bname, dir(Dir) )),
     !.
 
 os_unique_by_version_candidate_component( int, Min, Atom ) :-
@@ -183,7 +208,7 @@ os_unique_by_version_candidate_component( int, Min, Atom ) :-
 % fixme: implement:  Atom = a, b, ..., z, aa, ab, ..., az, .... , zz^n
 % os_unique_by_version_candidate_component( atom, Min, Atom ).
 
-construct_unique_base_name_by_date( By, TConc, Opts, Type, Dir, Bname ) :-
+construct_unique_base_name_by_date( By, TConc, Opts, Type, Dir, Check, Bname ) :-
      partition( atom, By, ByAtoms, ByLists ),
      get_date_time( Datime ),
      findall( max(Key,Len), (member(max_length(KeyIn,Len),Opts),expand_date_key(KeyIn,Datime,Key)), XLengths ),
@@ -197,7 +222,7 @@ construct_unique_base_name_by_date( By, TConc, Opts, Type, Dir, Bname ) :-
      options( sep_parts(PSep), Opts ),
      os_unique_concat( PlcTkn, TConc, PSep, DateBit, CurrStem ),
      type_ext_full( Type, Ext, CurrStem, Current ),
-     keep_to_unique_base_name_by_date( Current, ByLists, Lengths, PlcTkn, PSep, DSep, Type, Dir, Ext, Bname ).
+     keep_to_unique_base_name_by_date( Current, ByLists, Lengths, PlcTkn, PSep, DSep, Type, Dir, Check, Ext, Bname ).
 
 os_unique_create( false, _Type, _Os ).
 os_unique_create( true, Type, Os ) :-
@@ -224,9 +249,9 @@ os_unique_concat( before, Tkn, Sep, Date, Conc ) :-
 os_unique_concat( after, Tkn, Sep, Date, Conc ) :-
     atomic_list_concat( [Date,Tkn], Sep, Conc ).
 
-keep_to_unique_base_name_by_date( Current, _ByLists, _Lengths, _Plc, _TSep, _DSep, Type, Dir, _Ext, Bname ) :-
+keep_to_unique_base_name_by_date( Current, _ByLists, _Lengths, _Plc, _TSep, _DSep, Type, Dir, Check, _Ext, Bname ) :-
     % fixme: Type -> map to something more generic for os_exists/2 ?
-    \+ os_exists( Current, [type(Type),dir(Dir)] ),
+    (Check == false; \+ os_exists( Current, [type(Type),dir(Dir)] )),
     % fixme:
      % \+ exists_file( Current ),
      % \+ exists_directory( Current ),
