@@ -1,6 +1,7 @@
 ---   Releases   ---
 --------------------
   
+1.8  23.06.08           some minor changes on doc since last version (del.me)
 1.7         @   23.01.02
      23.01.02   FIXED:  known/3 retractall success housekeeping pred (in case anything was left from previous calls)
                 IFACE:  known/2,3 interface change to /2 with options and solutions controlled via solutions(Sol)
