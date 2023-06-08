@@ -12,8 +12,9 @@ known_defaults( Args, Defs ) :-
                token(Arg1),
                options_types([solutions-oneof([all,first])])
      ].
-/** known( +Goal ).
-    known( +Goal, +Opts ).
+
+/** known(+Goal).
+    known(+Goal, +Opts).
 
 If call(Goal) fails, then an error is thrown (via pack_errors)
 saying that Tkn (usually the first arg of Goal) is not 
