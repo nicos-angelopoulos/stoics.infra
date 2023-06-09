@@ -10,7 +10,7 @@ map_list_options_defaults( Defs ) :-
                 call_options([]),
                 failed(_),
                 on_fail(skip),
-                options_types([on_fail-oneof([skip,fail]),add_options-boolean])
+                options_types([on_fail-oneof([error,fail,skip]),add_options-boolean])
     ].
 
 /** map_list_options( +Goal, ?InList, ?OutList, +Opts ).
