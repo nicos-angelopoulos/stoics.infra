@@ -1,10 +1,12 @@
 
+:- use_module(library(apply)).
 :- use_module(library(lib)).
 :- lib(os_lib).
 :- lib(by_unix).
 :- lib(options).
+:- lib(debug_call).
 
-:- debug(by_unix).
+:- debuc(by_unix).
 
 mk_vis_defaults( who(go) ).
 
