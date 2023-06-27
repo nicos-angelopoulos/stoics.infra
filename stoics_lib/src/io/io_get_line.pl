@@ -21,7 +21,7 @@ io_get_line( Stream, Cs ) :-
                               ; io_get_line(C, Stream,Cs)
      ).
 
-io_get_line( -1, _Stream, Cs ) :- !, Cs = []
+io_get_line( -1, _Stream, Cs ) :- !, Cs = [].
 io_get_line( 0'\n, _Stream, Cs ) :- !, Cs = [].
 io_get_line( C, Stream, [C|Cs] ) :-
 	get_code( Stream, NxC ),
