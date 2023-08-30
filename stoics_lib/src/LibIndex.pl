@@ -55,6 +55,7 @@ lib_index(kv_compose, 3, any, user, 'kv/kv_compose').
 lib_index(kv_compose, 4, any, user, 'kv/kv_compose').
 lib_index(kv_decompose, 3, any, user, 'kv/kv_decompose').
 lib_index(kv_ks, 2, any, user, 'kv/kv_ks').
+lib_index(kv_transpose, 2, any, user, 'kv/kv_transpose').
 lib_index(kv_vs, 2, any, user, 'kv/kv_vs').
 lib_index(kvo_k_memberchk, 3, any, user, 'kv/kvo_k_memberchk').
 lib_index(kvs_k_memberchk, 3, any, user, 'kv/kvs_k_memberchk').

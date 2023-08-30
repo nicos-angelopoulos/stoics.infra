@@ -44,6 +44,7 @@
               kv_compose/4,            % +List1, +List2, -KVsCont, -Tkvs
               kv_decompose/3,          % +Pairs, -Ks, -Vs
               kv_ks/2,                 % +KVs, -Ks
+              kv_transpose/2,          % +KVs, -VKs
               kv_vs/2,                 % +KVs, -Vs
               kvo_k_memberchk/3,       % +K, +KVs, -V
               kvs_k_memberchk/3,       % +K, +KVs, -V
@@ -149,6 +150,7 @@
 :- lib(kv_compose/4).
 :- lib(kv_decompose/3).
 :- lib(kv_ks/2).
+:- lib(kv_transpose/2).
 :- lib(kv_vs/2).
 :- lib(kvo_k_memberchk/3).
 :- lib(kvs_k_memberchk/3).

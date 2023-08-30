@@ -2,6 +2,7 @@
 :- ensure_loaded( library(terms) ).
 :- lib(en_list/2).
 :- lib(mod_goal/2).
+:- lib(kv_transpose/2).
 
 list_frequency_defaults( Defs ) :- 
      Defs = [ bins(false),
@@ -32,11 +33,11 @@ Opts
      whether to include zero counter elements (Zero should be the list of expected elements)
 
 ==
-?- list_frequency( [c,a,b,a,b,c], Freqs ).
-Freqs = [c-2, a-2, b-2].
+?- list_frequency( [c,a,b,b,a,b,c,d], Freqs ).
+Freqs = [c-2, a-2, b-3, d-1].
 
-?- list_frequency( [c,a,b,a,b,c], Freqs, order(true) ).
-Freqs = [a-2, b-2, c-2].
+?- list_frequency( [c,a,a,b,a,b,c,d], Freqs, order(true) ).
+Freqs = [a-3, b-2, c-2, d-1].
 
 ?- list_frequency( [c,a,b,a,b,c], Freqs, transpose(true) ).
 Freqs = [2-c, 2-a, 2-b].
@@ -90,10 +91,24 @@ list_frequency( List, Freqs, ArgS ) :-
      options( variant(Vnt), Opts ),
      options( zero(Zero), Opts ),
      options( bins(Bins), Opts ),
-     list_frequency_initial_counts( Zero, Ord, T, Iounts, Bero ),
+     ( Ord == false -> Cord = false; Cord = true ),
+     list_frequency_initial_counts( Zero, Cord, T, Iounts, Bero ),
      list_frequency_bin_goal( Bins, List, Gins ),
-     list_frequency( List, Gins, T, Ord, Vnt, Bero, Iounts, Freqs ).
+     list_frequency( List, Gins, T, Ord, Vnt, Bero, Iounts, FreqsPrv ),
+     list_frequency_ord_freq( Ord, T, FreqsPrv, Freqs ).
 
+list_frequency_ord_freq( false, _T, Prov, Freqs ) :-
+     Prov = Freqs.
+list_frequency_ord_freq( freq, T, Prov, Freqs ) :-
+     ( T == true -> 
+          sort( 1, @>=, Prov, Freqs )
+          ;
+          kv_transpose( Prov, Trans ),
+          sort( 1, @>=, Trans, Sort ),
+          kv_transpose( Sort, Freqs )
+     ).
+list_frequency_ord_freq( true, _T, Prov, Freqs ) :-
+     Prov = Freqs.
 /*
  
 */
