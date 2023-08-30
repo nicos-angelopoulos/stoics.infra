@@ -2,7 +2,8 @@
 --------------------
   
 1.8  
-     23.08.30   IFACE:  added kv_transpose/2.
+     23.08.30   IFACE:  added kv_transpose/2
+                FIXED:  broken option order(freq)- (and better examples)
      23.06.27   CHANGE: files that end without EOL should not return end_of_file as last element of last list
      23.06.09   FIXED:  missing error token in options_types of on_fail, for map_list_options/4
                 

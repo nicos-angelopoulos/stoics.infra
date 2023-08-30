@@ -36,11 +36,17 @@ Opts
 ?- list_frequency( [c,a,b,b,a,b,c,d], Freqs ).
 Freqs = [c-2, a-2, b-3, d-1].
 
-?- list_frequency( [c,a,a,b,a,b,c,d], Freqs, order(true) ).
-Freqs = [a-3, b-2, c-2, d-1].
+?- list_frequency( [c,a,b,b,a,b,c,d], Freqs, order(true) ).
+[a-2, b-3, c-2, d-1].
 
-?- list_frequency( [c,a,b,a,b,c], Freqs, transpose(true) ).
-Freqs = [2-c, 2-a, 2-b].
+?- list_frequency( [c,a,b,b,a,b,c,d], Freqs, order(freq) ).
+Freqs = [b-3, a-2, c-2, d-1].
+
+?- list_frequency( [c,a,b,b,a,b,c,d], Freqs, [order(freq),transpose(true)] ).
+Freqs = [3-b, 2-a, 2-c, 1-d].
+
+?- list_frequency( [c,a,b,b,a,b,c,d], Freqs, transpose(true) ).
+Freqs = [2-c, 2-a, 3-b, 1-d].
 
 ?- list_frequency( [c,a,b,a,b,c], Freqs, zero([b,a,c,d]) ).
 Freqs = [b-2, a-2, c-2, d-0].
@@ -94,7 +100,7 @@ list_frequency( List, Freqs, ArgS ) :-
      ( Ord == false -> Cord = false; Cord = true ),
      list_frequency_initial_counts( Zero, Cord, T, Iounts, Bero ),
      list_frequency_bin_goal( Bins, List, Gins ),
-     list_frequency( List, Gins, T, Ord, Vnt, Bero, Iounts, FreqsPrv ),
+     list_frequency( List, Gins, T, Cord, Vnt, Bero, Iounts, FreqsPrv ),
      list_frequency_ord_freq( Ord, T, FreqsPrv, Freqs ).
 
 list_frequency_ord_freq( false, _T, Prov, Freqs ) :-
