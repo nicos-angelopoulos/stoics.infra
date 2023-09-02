@@ -70,7 +70,7 @@
 %
 % ?- os_ext( srt, 'a.file', 'a.file.srt' ).
 % true.
-%==
+%
 % ?- os_ext( Old, srt, 'a.file', Afile ).
 % Old = file,
 % Afile = a.srt.
