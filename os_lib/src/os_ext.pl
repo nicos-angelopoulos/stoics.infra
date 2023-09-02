@@ -13,6 +13,19 @@
 %
 %  New is a replacement of Ext in File that produces NewFile.
 %  Contrary to file_name_extension/3, os_ext/3 allows dots in Ext.
+%
+%  Currently Opts is only used to provide a trail of who has called this predicate for error reporting purposes:
+%==
+% ?- os_ext( _, _, _, os_mill/4 ).
+% ERROR: os:os_ext/4: Ground arguments expected in some of the positions: [[1,2],3], but found:[_172,_178,_184]
+% ERROR: Trail: [os_mill/4]
+%
+% ?- os_ext( _, _, _, [os_mill/4,hrsv_fda/1] ).
+% ERROR: os:os_ext/4: Ground arguments expected in some of the positions: [[1,2],3], but found:[_2126,_2132,_2138]
+% ERROR: Trail: [os_mill/4,hrsv_fda/1]
+%==
+%
+% Examples:
 %==
 %  ?- file_name_extension( X, tar.gz, abc.tar.gz ).
 %  false.
@@ -77,6 +90,7 @@
 % 
 % ?- os_ext( txt, Csv, old.txt, New ).
 % ERROR: os:os_ext/4: Ground argument expected at position: 2,  (found: _7644)
+%
 % ?- os_ext( txt, Csv, New ).
 % ERROR: os:os_ext/3: Ground arguments expected in some of the positions: [[1,2],3], but found:[txt,_8390,_8396]
 %==
@@ -93,9 +107,10 @@ os_ext( Ext, File ) :-
 os_ext( Ext, Stem, File ) :-
     os_ext_opts( Ext, Stem, File, [] ).
 
-os_ext( Ext, Stem, File, Opts ) :-
-    ground( Opts ),
+os_ext( Ext, Stem, File, OptsPrv ) :-
+    ground( OptsPrv ),
     !,
+    ( is_list(OptsPrv) -> OptsPrv = Opts; Opts = [OptsPrv] ),
     os_ext_opts( Ext, Stem, File, Opts ).
 os_ext( _Ext, NewExt, _File, _NewFile ) :-
     \+ ground(NewExt),
@@ -124,9 +139,7 @@ os_ext_opts( Ext, Stem, Os, _Opts ) :-
 	os_name( Stem, Type ),
 	os_ext_stem( Type, Stem, Ext, Os ).   % fixme: add Opts
 os_ext_opts( Ext, Stem, Os, Opts ) :-
-	throw( arg_ground_pattern([[1,2],3],[Ext,Stem,Os]), [os:os_ext/3|Opts] ).
-	% throw( pack_error(os,os_ext/3,arg_ground_pattern([[1,2],3],[Ext,Stem,Os])) ).
-	% throw( instantiation_error ).
+	throw( arg_ground_pattern([[1,2],3],[Ext,Stem,Os]), [os:os_ext/4|Opts] ).
 
 os_ext_file( atom, Stem, Ext, Os, _Opts ) :-
 	( ground(Ext) ->
