@@ -2,6 +2,7 @@
 --------------------
   
 1.8  
+     23.09.20   IFACE:  1st arg of arg_add/4 can now be a negative integer
      23.08.31   IFACE:  allow atomic first argument in compound/3
      23.08.30   IFACE:  added kv_transpose/2
                 FIXED:  broken option order(freq)- (and better examples)
