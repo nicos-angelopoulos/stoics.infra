@@ -1,6 +1,6 @@
 /** arg_add( ?N, +Term, +ArgS, -New ).
 
-Add an Arg to the Nth position of Term, resulting in New.
+Add an Arg or list of Args to the Nth position of Term, resulting in New.
 
 N is an arithmetic expression (v.2). N can be a variable (v.3) in which case the
 length + 1 is returned and ArgS are appended at end. 
