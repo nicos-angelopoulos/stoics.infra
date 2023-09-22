@@ -958,7 +958,10 @@ pack_message( Mess, OptsPrv ) -->
     {( is_list(OptsPrv) -> OptsPrv = Opts; Opts = [OptsPrv] )},
     {pack_message_options_augment(Opts,Apts)},
     message_pack( Apts ),
-    pack_errors:message( Mess ),
+    ( pack_errors:message(Mess) -> true
+                                   ;
+                                   pack_errors:message(unhandled(Mess)) 
+    ),
     pack_message_trail( Apts ).
 
 pack_message_trail( Apts ) -->
@@ -1053,5 +1056,7 @@ message( expected_from(true,Pid,From) ) -->
     ['Predicate: ~w is not defined (source apparently available at: ~w; which was loaded).'-[Pid,From]].
 message( input_file_missing(Os) ) -->
     ['Input file: ~w, is missing.'-[Os]].
+message( unhandled(Mess) ) -->
+    ['Unhandled pack error: ~w.'-[Mess]].
 message( true ) -->
     [].
