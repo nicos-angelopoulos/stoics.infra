@@ -2,6 +2,8 @@
 --------------------
 
 
+1.6  23.09.22  IFACE:   new predicate options_rename/5
+
 1.5         @  22.12.29
      21.08.26  DEPS:    explicit loading of library(readutil)
      21.02.15  FIXED:   pass process/1 and version/1 as defs in options_append/4 too
