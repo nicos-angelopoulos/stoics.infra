@@ -958,7 +958,8 @@ pack_message( Mess, OptsPrv ) -->
     {( is_list(OptsPrv) -> OptsPrv = Opts; Opts = [OptsPrv] )},
     {pack_message_options_augment(Opts,Apts)},
     message_pack( Apts ),
-    ( pack_errors:message(Mess) -> true
+    { debug( pack_errors, 'Calling: ~w', [pack_errors:message(Mess)] ) },
+    ( pack_errors:message(Mess) -> {true}
                                    ;
                                    pack_errors:message(unhandled(Mess)) 
     ),
