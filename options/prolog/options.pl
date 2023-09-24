@@ -7,7 +7,7 @@
               options_debug_topic/3,
               options_debug/3, 
               options_propagate/4,
-              options_rename/5,
+              options_rename/4,
               options_restore/2,
               options_return/2,
               options_version/2
@@ -92,7 +92,7 @@ Predicates
   * options/2,3
   * options_append/3,4
   * options_propagate/4
-  * options_rename/5
+  * options_rename/4
   * options_restore/2
   * options_return/2
 
@@ -136,7 +136,7 @@ missing curly brackets in the errors DCG (2016/11/14).
 :- lib(options_call/2).    % and /3.
 :- lib(options_errors/0).
 :- lib(options_debug_topic/3).
-:- lib(options_rename/5).
+:- lib(options_rename/4).
 :- lib(end(options)).
 
 /** options_version( -Version, -Date ).

@@ -1,79 +1,73 @@
 
 :- use_module(library(lists)).     % append/3.
 
-options_rename_defaults([debug(false),rename_all(remove)]).
+options_rename_defaults([debug(false),replace(true)]).
 
-/** options_rename(+OptsL,+OptNm,+NewNm,-Newts,+Opts).
+/** options_rename(+Opts, +RnmPairS, -Newts, +RnmOpts).
 
-Rename option with functor OptNm in Opts to one with functor NewNm resulting in Newts.
+Rename options with new functors in Opts resulting in Newts.
 
-Opts
+RnmPairS is a single or list of pairs of the form OptNm-NewNm.
+
+RnmOpts
   * debug(Dbg=false)
     informational, progress messages
-  * rename_all(Rall=remove)
-    in which case later mentions are removed, 
-    or =true= for renaming all, and =false= for not renaming (faster)
+  * replace(Rplc=true)
+    by default predicate removes options that match New functors
 
 Examples
 ==
 ?- 
-     options_rename([a(1),b(2),c(3),b(4)],b,d,New,true).
-
-New = [a(1), d(2), c(3)].
-
-?-
-     options_rename([a(1),b(2),c(3),b(4)],b,d,New,rename_all(false)).
-
-New = [a(1), d(2), c(3), b(4)].
-
-?-
-     options_rename([a(1),b(2),c(3),b(4)],b,d,New,rename_all(true)).
+     options_rename([a(1),b(2),c(3),b(4)], b-d, New, true).
 
 New = [a(1), d(2), c(3), d(4)].
 
+?-  
+     options_rename([a(1),b(2),c(3)], b-c, New,  true ).
+
+New = [a(1), c(2)].
+
+?-  
+     options_rename([a(1),b(2),c(3)], b-c, New,  replace(false) ).
+
+New = [a(1), c(2), c(3)].
 ==
 
 @author nicos angelopoulos
-@version  0.1 2023/09/22
+@version  0.1 2023/09/24
 
 */
 
-options_rename( OptsIn, NmIn, NmOut, Newts, Args ) :-
+options_rename( OptsIn, PairS, Newts, Args ) :-
      Self = options_rename,
      options_append( Self, Args, Opts ),
-     options( rename_all(Rnm), Opts ),
+     options( replace(Rpc), Opts ),
      options_en_list( OptsIn, OptsL ),
-     options_rename_1( OptsL, NmIn, NmOut, Rnm, Newts ),
+     options_en_list( PairS, Pairs ),
+     options_rename_1( OptsL, Pairs, Rpc, Newts ),
      debug( Self, 'Renamed options: ~w', [Newts] ).
 
-options_rename_1( [], _NmIn, _NmOut, _Rnm, [] ).
-options_rename_1( [Opt|Opts], NmIn, NmOut, Rnm, Newts ) :-
-     ( Opt =.. [NmIn|Orgs] ->
-          Npt =.. [NmOut|Orgs],
-          Newts = [Npt|Mewts],
-          options_rename_continuation( Rnm, Opts, NmIn, NmOut, Mewts, RemOpts, Tewts )
+options_rename_1( [], _Pairs, _Rpc, [] ).
+options_rename_1( [Opt|Opts], Pairs, Rpc, Newts ) :-
+     ( Opt =.. [Onm|Orgs] ->
+          ( memberchk(Onm-Nnm,Pairs) ->
+               Npt =.. [Nnm|Orgs],
+               Newts = [Npt|Tewts]
+               ; 
+               ( memberchk(_-Onm,Pairs) ->
+                    % old flag that matches one of the new namesreplace if flag hasn't changed to false
+                    options_rename_replace( Rpc, Opt, Newts, Tewts )
+                    ;
+                    Newts = [Opt|Tewts]
+               )
+          )
           ;
-          Newts = [Opt|Tewts],
-          Opts = RemOpts
+          % pass through atoms, for instance
+          Newts = [Opt|Tewts]
      ),
-     options_rename_1( RemOpts, NmIn, NmOut, Rnm, Tewts ).
+     options_rename_1( Opts, Pairs, Rpc, Tewts ).
 
-options_rename_continuation( false, Opts, _NmIn, _NmOut, Newts, RemOpts, Tewts ) :-
-     RemOpts = [],
-     append( Opts, Tewts, Newts ).
-options_rename_continuation( remove, Opts, NmIn, _NmOut, Newts, RemOpts, Tewts ) :-
-     RemOpts = [],
-     options_rename_remove( Opts, NmIn, Rpts ),
-     append( Rpts, Tewts, Newts ).
-options_rename_continuation( true, Opts, _NmIn, _NmOut, Newts, RemOpts, Tewts ) :-
-     RemOpts = Opts,
-     Newts = Tewts.
-
-options_rename_remove( [], _Onm, [] ).
-options_rename_remove( [Opt|Opts], Onm, Rpts ) :-
-     ( functor(Opt,Onm,_) -> 
-          Rpts = Tpts
-          ;
-          Rpts = [Opt|Tpts]
-     ),
-     options_rename_remove( Opts, Onm, Tpts ).
+options_rename_replace( false, Opt, Newts, Tewts )  :- 
+     !,
+     Newts = [Opt|Tewts].
+options_rename_replace( _, _Opt, Newts, Newts ).   % defaulty

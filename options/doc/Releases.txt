@@ -2,7 +2,7 @@
 --------------------
 
 
-1.6  23.09.22  IFACE:   new predicate options_rename/5
+1.6  23.09.24  IFACE:   new predicate options_rename/4
 
 1.5         @  22.12.29
      21.08.26  DEPS:    explicit loading of library(readutil)
