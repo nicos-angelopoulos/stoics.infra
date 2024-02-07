@@ -257,14 +257,14 @@ keep_to_unique_base_name_by_date( Current, _ByLists, _Lengths, _Plc, _TSep, _DSe
      % \+ exists_directory( Current ),
      !,
      Bname = Current.
-keep_to_unique_base_name_by_date( Full, [H|T], Lengths, Plc, TSep, DSep, Type, Dir, Ext, Bname ) :-
+keep_to_unique_base_name_by_date( Full, [H|T], Lengths, Plc, TSep, DSep, Type, Dir, Check, Ext, Bname ) :-
      findall_date_components( H, Lengths, Dcomps ),
      type_ext_full( Type, Ext, Current, Full ),
      place_stem_date_fragment( Plc, Current, TSep, DSep, Dcomps, Next ),
      type_ext_full( Type, Ext, Next, NextFull ),
      % atomic_list_concat( [Current|Dcomps], IdSep, Next ),
      % we could introduce another separator here.
-     keep_to_unique_base_name_by_date( NextFull, T, Lengths, Plc, TSep, DSep, Type, Dir, Ext, Bname ).
+     keep_to_unique_base_name_by_date( NextFull, T, Lengths, Plc, TSep, DSep, Type, Dir, Check, Ext, Bname ).
 
 place_stem_date_fragment( before, SoFar, _TSep, DSep, Dcomps, Next ) :-
      atomic_list_concat( [SoFar|Dcomps], DSep, Next ).
