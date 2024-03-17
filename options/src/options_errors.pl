@@ -13,3 +13,6 @@ pack_errors:message( opt_mismatch(Opt,Vals,Opts) ) -->
 	  ( memberchk(Term,Opts) -> true; Val = '$internal_error_at_opt_mismatch' )
 	},
 	['Option: ~w, expects values in: ~w, but found: ~w in options: ~w' - [Opt,Vals,Val,Opts]].
+
+pack_errors:message( only_use_opt_as_ret ) -->
+    ['Only return options for returning results, leave unbound at call time.'-[] ].
