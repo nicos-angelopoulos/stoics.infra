@@ -10,6 +10,7 @@
               options_rename/4,
               options_restore/2,
               options_return/2,
+              options_return/3,
               options_version/2
             ] ).
 

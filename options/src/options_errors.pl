@@ -15,4 +15,4 @@ pack_errors:message( opt_mismatch(Opt,Vals,Opts) ) -->
 	['Option: ~w, expects values in: ~w, but found: ~w in options: ~w' - [Opt,Vals,Val,Opts]].
 
 pack_errors:message( only_use_opt_as_ret ) -->
-    ['Only return options for returning results, leave unbound at call time.'-[] ].
+    ['Only use return options for results- leave unbound at call time.'-[] ].

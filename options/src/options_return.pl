@@ -1,5 +1,5 @@
 %
-options_return_defaults(on_fail(succ)).
+options_return_defaults(on_fail(true)).
 
 %% options_return( +TermS, +OptS ).
 %% options_return( +TermS, +OptS, +ORoptS ).
@@ -17,7 +17,7 @@ options_return_defaults(on_fail(succ)).
 % This predicate can be used to instantiate return options.
 %
 % ORoptS
-%  * on_fail(OnFail=succ)
+%  * on_fail(OnFail=true)
 %    what to do at failure (also: fail, throw).
 %
 % OptS, ORoptS and TermS are passed through options_en_list/2.
@@ -42,9 +42,15 @@ options_return( TermS, OptS, Args ) :-
      options_append( options_return, Args, ORopts ),
 	options_en_list( OptS, Opts ),
 	options_en_list( TermS, Terms ),
-	options_return_lists( Terms, Opts ).
+     options( on_fail(OnFail), ORopts ),
+	options_return_lists( Terms, Opts, OnFail, ORopts ).
 
-options_return_lists( [], _Opts ).
-options_return_lists( [Term|T], Opts ) :-
-	( memberchk( Term, Opts ) -> true; true ),
+options_return_lists( [], _Opts, _OnFail, _ORopts ).
+options_return_lists( [Term|T], Opts, OnFail, ORopts ) :-
+	( memberchk( Term, Opts ) -> true; options_return_fail(OnFail,Term,ORopts) ),
 	options_return_lists( T, Opts ).
+
+options_return_fail( true, _ORopts ).
+% options_return_fail( false, ORopts ) :- % let it fail...
+options_return_fail( throw, Term, ORopts ) :-
+     throw( only_use_opt_as_ret, [option(Term)|ORopts] ).

@@ -998,7 +998,12 @@ message_pack( Opts )  -->
       \+ (Pack=='_Unk', Pred=='_Unk'),
       !
     },
-    {( memberchk(option(OptNm),Opts) -> atomic_list_concat([' @ option(',OptNm,')'],OptTkn); OptTkn = '' )},
+    {( memberchk(option(OptIn),Opts) -> 
+                         term_to_atom(OptIn,OptAtm),
+                         atomic_list_concat([' @ option(',OptAtm,')'],OptTkn)
+                         ; 
+                         OptTkn = '' 
+     )},
     ['~w:~w~w: '-[Pack,Pred,OptTkn] ].
 message_pack( _ )  --> [].
 

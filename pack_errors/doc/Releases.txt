@@ -2,6 +2,7 @@
 ---------------------
 
 2.3
+     24.03.17   CHANGE:    allow terms for OPT in option(OPT) debuc info options
      22.09.22   ADDED:     catch all, unhandled handle and associated message
 
 2.2         @   22.12.29
