@@ -49,10 +49,10 @@ options_return( TermS, OptS, Args ) :-
 
 options_return_lists( [], _Opts, _OnFail, _ORopts ).
 options_return_lists( [Term|T], Opts, OnFail, ORopts ) :-
-	( memberchk( Term, Opts ) -> true; options_return_fail(OnFail,Term,ORopts) ),
-	options_return_lists( T, Opts ).
+	( memberchk(Term,Opts) -> true; options_return_fail(OnFail,Term,ORopts) ),
+	options_return_lists( T, Opts, OnFail, ORopts ).
 
-options_return_fail( true, _ORopts ).
+options_return_fail( true, _, _ORopts ).
 % options_return_fail( false, ORopts ) :- % let it fail...
 options_return_fail( throw, Term, ORopts ) :-
      throw( only_use_opt_as_ret, [option(Term)|ORopts] ).
