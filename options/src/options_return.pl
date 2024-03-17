@@ -33,6 +33,8 @@ options_return_defaults(on_fail(true)).
 % ?-  ORopts = [on_fail(throw),pack(bio_analytics),pred(exp_reac_over/3)],
 %     options_return( gid_to(to), [], ORopts ).
 % 
+% ERROR: bio_analytics:exp_reac_over/3 @ option(gid_to(to)): Only use return options for results- leave unbound at call time.
+%  
 %==
 %
 options_return( TermS, OptS ) :-
