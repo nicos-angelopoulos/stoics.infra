@@ -1,6 +1,7 @@
 ---   Releases   ---
 --------------------
-
+1.8
+     24.03.24   FIXED:    error handling of os_name/2
 1.7         @   24.02.07
      24.02.07   FIXED:    missing argument in 2nd clause of keep_to_unique_base_name_by_date/11
      23.09.02   DOC:      fixed spurious == in os_ext/4, added note and example for Opts argument
