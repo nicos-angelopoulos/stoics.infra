@@ -66,7 +66,7 @@ os_name( Entity, Type ) :-
 	holds( prolog_source:file_alias_path(Alias,_), HasPath ),
 	os_name_alias( HasPath, Entity, Type ).
 os_name( Entity, _Name ) :-
-	throw( pack_error(os,of_unknown_name(Entity)) ).
+	throw( os_unknown_type(Entity), os_lib:os_name/2 ).
 
 os_deco_name( +(_), atom ).
 os_deco_name( \(_), slash ).

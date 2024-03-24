@@ -35,7 +35,7 @@ pack_errors:message( os_type(Os,Needs,Has) ) -->
 pack_errors:message( os_created_not(Milled,From) ) -->
 	['OS milled: ~p  was not created (source was: ~p)'-[Milled,From]].
 
-pack_errors:message( os_unkown_type(Os) ) -->
+pack_errors:message( os_unknown_type(Os) ) -->
 	['OS entity: ~w, is of unknown type'-[Os]].
 
 pack_errors:message( os_plate_cast(Term,Def,Tplate) ) -->
