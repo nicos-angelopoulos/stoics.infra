@@ -57,6 +57,7 @@
               has_at_most/3,           % +N, +X, +List
               list_frequency/2,        % +List, -Freqs
               list_frequency/3,        % +List, -Freqs, +Opts
+              list_is_invariant/1,     % +List
               list_proportions/2,      % +List, -Props
               list_proportions/3,      % +List, -Props, +Opts
               list_transpose/2,        % +List, -Transpose
@@ -235,5 +236,6 @@
 :- lib(latex_colour/4).
 :- lib(colour_hex/2).
 :- lib(lexi_n/4).
+:- lib(list_is_invariant/1).
 
 :- lib( end(stoics_lib) ).
