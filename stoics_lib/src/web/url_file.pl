@@ -7,7 +7,7 @@
 :- lib(get_datetime/1).
 :- lib(suggests(options)).
 
-url_file_defaults( [overwrite(error),dnt(false),iface(prolog)] ).
+url_file_defaults( [overwrite(error),dnt(false),iface(prolog),insecure(false)] ).
 
 %% url_file( +Url, ?File ).
 %% url_file( +Url, ?File, +Opts ).
@@ -25,6 +25,8 @@ url_file_defaults( [overwrite(error),dnt(false),iface(prolog)] ).
 %   if true, create a File.dnt with the start and end datime/6 stamps.
 % * iface(Iface=prolog)
 %   or =|wget|=
+% * insecure(Insec=false)
+%   where to acccept non SSL authenticated connections (as in pack_install/2, 24.04.05)
 % * overwrite(Ow=error)
 %   default throws an error if file exists, fail or false for failure and anything else for business as usual (overwrite local)
 %
@@ -95,24 +97,28 @@ url_file_ow( error, _Iface, Url, Local, _Opts ) :-
 url_file_ow( _, Iface, Url, Local, Opts ) :- % fixme, add error value for ow() ?
 	debug( url_file, 'Downloading URL: ~p, onto file: ~p, with interface: ~w', [Url,Local,Iface] ),
 	get_datetime( StartDt ),
-     url_file_dnload( Iface, Url, Local ),
+     options( insecure(Insec), Opts ),
+     url_file_dnload( Iface, Insec, Url, Local ),
 	get_datetime( EndDt ),
 	options( dnt(Dnt), Opts ),
 	url_file_dnt( Dnt, Local, StartDt, EndDt ).
 
-url_file_dnload( prolog, Url, Local ) :-
+url_file_dnload( prolog, Insec, Url, Local ) :-
+     ( Insec == true -> OpenOpts = [cert_verify_hook(ssl_verify_null)] ; OpenOpts = [] ),
 	setup_call_cleanup(
-	    http_open(Url, In,
-		      [ % cert_verify_hook(ssl_verify) % checkme:
-		      ]),
+	    http_open(Url, In, OpenOpts),
 	    setup_call_cleanup(
 	    open(Local, write, Out, [type(binary)]),
 	    copy_stream_data(In, Out),
 	    close(Out)),
 	    close(In)
 	).
-url_file_dnload( wget, Url, Local ) :-
-     at_con( ['wget -O',Local,Url], ' ', Wget ),
+url_file_dnload( wget, Insec, Url, Local ) :-
+     ( Insec == true -> 
+                    at_con(['wget --no-check-certificate -O',Local,Url], ' ', Wget) 
+                    ; 
+                    at_con(['wget -O',Local,Url], ' ', Wget) 
+     ),
      shell( Wget ).
 
 url_file_dnt( true, Local, StartDt, EndDt ) :-
@@ -123,3 +129,16 @@ url_file_dnt( true, Local, StartDt, EndDt ) :-
 	portray_clause( Out, EndDt ),
 	close( Out ).
 url_file_dnt( false, _Local, _StartDt, _EndDt ).
+
+
+%   ssl_verify_null(+SSL, +ProblemCert, +AllCerts, +FirstCert, +Error)
+%
+%   Copied from system library(prolog_pack.pl).
+%  2024.04.05
+%
+:- public ssl_verify_null/5.
+ssl_verify_null(_SSL,
+           _ProblemCertificate, _AllCertificates, _FirstCertificate,
+           _Error).
+
+
