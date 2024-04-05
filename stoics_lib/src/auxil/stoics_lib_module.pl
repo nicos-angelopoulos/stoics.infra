@@ -135,14 +135,15 @@ Version, term of the from Mj:Mn:Fx and Date is date(Year,Month,Day).
 
 ==
 ?- stoics_lib_version( -V, -D ).
-D = 1:6:0,
-V = date(2023,1,2).
+D = 1:8:0,
+V = date(2024,4,5).
 ==
 
 @author nicos angelopoulos
 @version 1:5:0, 2022/12/29
 @version 1:6:0, 2023/01/02, improvements to arg_arg/4, list_frequency/4, new: latex_colour/4, colour_hex/2
 @version 1:7:0, 2023/01/02, known/2 optionised
+@version 1:8:0, 2024/04/05, added opt(insecure(false)) in url_file/3 + smaller changes
 
 */
-stoics_lib_version( 1:6:0, date(2023,1,2) ).
+stoics_lib_version( 1:8:0, date(2024,4,5) ).
