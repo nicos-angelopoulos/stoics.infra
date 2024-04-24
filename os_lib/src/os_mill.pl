@@ -32,6 +32,8 @@ As of 0.3, when =|Type=dir|= and =|OutsTo|= is a filename, Milled is created
 as to house the file. Goal, should be aware of this- as it might be attempting to 
 create it too.
 
+As of v0.4 Milled returns the path without Dir, the Dir/Milled versioned can be found in option milled(Dilled)
+
 The Goal is called as call( Goal, RelFromOs, Milled, Co ). 
 
 Opts
@@ -48,7 +50,7 @@ Opts
     when Milled is ground the extension is added
   * homonymous(Homon=false)
     use Goal's term name as the stem
-  * milled(MillOs)
+  * milled(Dilled)
     returns the full milled OS name (file or directory)
   * not_created(Created=error)
     check Os was created at exit; if not take action: true, error, fail, debug
@@ -126,10 +128,19 @@ true.
 ?- 
 ==
 
+Test the difference between Milled and Dilled.
+==
+?- os_mill( abc.txt, true, Milled, [not_created(true),postfix(when),milled(Dilled),dir(data)] ).
+args(data/abc.txt,data/abc_when.txt,[])
+Milled = abc_when.txt,
+Dilled = 'data/abc_when.txt'.
+==
+
 @author nicos angelopoulos
 @version  0.1 2014/10/15
 @version  0.2 2016/06/28
 @version  0.3 2020/09/16, added outputs_to() & outputs_as_tty(), with example
+@version  0.4 2024/04/24, changed Milled to path without dir
 @tbd double check non atomic File and Milled 
 
 */
@@ -147,10 +158,10 @@ os_mill( InFile, Goal, Milled, Args ) :-
     os_name( File, Ftype ),
     os_cast( Ftype, DirFile, RelFromOs ),
     memberchk( milled(DMilled), Opts ),
-    ( var(Milled) -> Milled = DMilled; true ),
-    os_mill( Rcr, RelFromOs, Type, Goal, Milled, Opts ).
+    ( var(Milled) -> Nilled = Milled; true ),
+    os_mill( Rcr, RelFromOs, Type, Goal, DMilled, Opts ).
 
-/** os_mill_destination( +Homon, +Goal, +SrcFile, -Milled, -DMilled ).
+/** os_mill_destination( +Homon, ?Milled, +Goal, +SrcFile, -DMilled, +Opts ).
 
 Create Milled and dirpended Milled (DMilled) from either manipulating SrcFile or by taking the term name
 from Goal, depending on Homon Boolean value (true: is homonymous to Goal).
@@ -183,7 +194,8 @@ os_mill_destination( false, Milled, _Goal, File, DMilled, Opts ) :-
         os_stem( Stem, Milled, StemOpts )
     ),
     append( [stem(Stem)|Opts], [ext(Ext)], DSEopts ),
-    os_dir_stem_ext( DMilled, DSEopts ).
+    os_dir_stem_ext( DMilled, DSEopts ),
+    ( var(Milled) -> options(ext(Mlt),DSEopts), os_ext(Mlt,Stem,Milled); true ).
 
 os_mill_destination( true, Milled, Goal, File, DMilled, Opts ) :-
     Self = os_mill/4,
