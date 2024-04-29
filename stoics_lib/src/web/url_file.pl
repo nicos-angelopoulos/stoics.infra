@@ -1,7 +1,8 @@
 
 :- use_module(library(debug)).  % /3.
 :- use_module(library(http/http_open)). % fixme: doit dynamically
-:- use_module(library(listing)).       % portray_clause/2.
+:- use_module(library(listing)).        % portray_clause/2.
+:- use_module(library(socket)).         % gethostname/1
 
 :- lib(at_con/3).
 :- lib(get_datetime/1).
@@ -12,8 +13,9 @@ url_file_defaults( [overwrite(error),dnt(false),iface(prolog),insecure(false)] )
 %% url_file( +Url, ?File ).
 %% url_file( +Url, ?File, +Opts ).
 % 
-% Get the remote file pointed to by Url to local File. <br>
-% When File is an unbound variable, place the download into downloads(Base), if downloads is a known file alias,<br>
+% Get the remote file pointed to by Url to local File.
+% 
+% When File is an unbound variable, place the download into downloads(Base), if downloads is a known file alias,
 % or as Base in local directory, and return the used file in File. Base is taken as the file_base_name/2 of Url.
 % 
 % The predicate's progress can be be looked into, by ?- debug(url_file).
@@ -23,6 +25,7 @@ url_file_defaults( [overwrite(error),dnt(false),iface(prolog),insecure(false)] )
 % Opts 
 % * dnt(Dnt=false)
 %   if true, create a File.dnt with the start and end datime/6 stamps.
+%   From v0.4 also records the Url and the download host.
 % * iface(Iface=prolog)
 %   or =|wget|=
 % * insecure(Insec=false)
@@ -101,7 +104,7 @@ url_file_ow( _, Iface, Url, Local, Opts ) :- % fixme, add error value for ow() ?
      url_file_dnload( Iface, Insec, Url, Local ),
 	get_datetime( EndDt ),
 	options( dnt(Dnt), Opts ),
-	url_file_dnt( Dnt, Local, StartDt, EndDt ).
+	url_file_dnt( Dnt, Local, StartDt, EndDt, Url ).
 
 url_file_dnload( prolog, Insec, Url, Local ) :-
      ( Insec == true -> OpenOpts = [cert_verify_hook(ssl_verify_null)] ; OpenOpts = [] ),
@@ -121,14 +124,17 @@ url_file_dnload( wget, Insec, Url, Local ) :-
      ),
      shell( Wget ).
 
-url_file_dnt( true, Local, StartDt, EndDt ) :-
+url_file_dnt( true, Local, StartDt, EndDt, Url ) :-
 	file_name_extension( Local, dnt, DntF ),
+     gethostname( Hname ),
 	% os_ext( dnt, Local, DntF ),
 	open( DntF, write, Out ),
 	portray_clause( Out, StartDt ),
 	portray_clause( Out, EndDt ),
+     portray_clause( Out, url(Url) ),
+     portray_clause( Out, dnl_host(Hname) ),
 	close( Out ).
-url_file_dnt( false, _Local, _StartDt, _EndDt ).
+url_file_dnt( false, _Local, _StartDt, _EndDt, _Url ).
 
 
 %   ssl_verify_null(+SSL, +ProblemCert, +AllCerts, +FirstCert, +Error)

@@ -1,6 +1,9 @@
 ---   Releases   ---
 --------------------
   
+1.9
+     24.04.29   ADDED:  record Url and hostname in url_file/3
+
 1.8             @ 23.04.05
      24.04.05   OPTS:   added insecure(false) to url_file/3
      24.03.24   IFACE:  added list_is_invariant/1
