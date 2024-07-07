@@ -85,7 +85,7 @@ os_remove_debug( Opts, PrevDbgs ) :-
 	findall( Dbg, ( debugging(os_remove(Dbg)), memberchk(Dbg,Subs),
 				 nodebug(os_remove(Dbg))
 	                ), PrevDbgs ),
-	option( debug(DbgVal), Opts ),
+	options( debug(DbgVal), Opts ),
 	os_remove_debug_on( DbgVal ).
 
 os_remove_debug_on( false ). % do nothing, respect global settings.

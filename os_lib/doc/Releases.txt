@@ -1,6 +1,7 @@
 ---   Releases   ---
 --------------------
 1.8
+     24.07.07   FIXED:    option/2 -> options/2 in os_remove_debug/2
      24.04.24   CHANGED:  os_mill/4, returning 3rd argument does not include Dir
      24.03.24   FIXED:    error handling of os_name/2
 1.7         @   24.02.07
