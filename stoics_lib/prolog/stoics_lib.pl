@@ -126,9 +126,12 @@
 :- lib(stoics_lib/0).
 :- lib(stoics_lib_version/2).
 :- lib(at_con/2).
+:- lib(at_con/3).
 :- lib(atom_sub/2).
 :- lib(prefix_atom/2).
+:- lib(prefix_atom/3).
 :- lib(sub_atom/2).
+:- lib(sub_atom/4).
 :- lib(n_digits_integer_codes/3).
 :- lib(datime_readable/1).
 :- lib(datime_readable/2).
@@ -178,8 +181,9 @@
 :- lib(imported_from/2).
 :- lib(known/1).
 :- lib(known/2).
-:- lib(known/3).
+:- lib(map_list_options/3).
 :- lib(map_list_options/4).
+:- lib(map_succ_list/3).
 :- lib(map_succ_list/4).
 :- lib(mod_goal/2).
 :- lib(mod_goal/3).
@@ -192,6 +196,7 @@
 :- lib(functor_term/2).
 :- lib(compound/3).
 :- lib(en_list/2).
+:- lib(en_list/3).
 :- lib(op_compare/3).
 :- lib(portray_clauses/2).
 :- lib(positions/2).
@@ -229,6 +234,7 @@
 :- lib(term_type/2).
 :- lib(en_append/3).
 :- lib(url_file/2).
+:- lib(url_file/3).
 :- lib(call_morph/4).
 :- lib(io_streams/3).
 :- lib(lexi/2).
