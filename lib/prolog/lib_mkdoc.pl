@@ -47,41 +47,54 @@ lib_mkdoc( DirIn ) :-
     % import( Pack:lib/1 ),
     % spy( lib:lib/1 ),
     % ensure_loaded( AbsPackF ),
-    portray_clause( Out, library_directory(Mkdoc) ),
+    nl( Out ),
+    portray_clause( Out, (:- assert(user:library_directory(Mkdoc))) ),
     directory_file_path( Mkdoc, lib, MkLib ),
     portray_clause( Out, (:- use_module(MkLib)) ),
+    portray_clause( Out, (:- assert(lib:doc_module(Pack))) ),
+    nl( Out ),
     %  :- use_module( '/usr/local/users/nicos/local/git/lib/swipl-7.5.1/pack/lib/prolog/mkdoc/lib' ).
     nl( Out ),
     read( In, Term ),
-    lib_mkdoc_stream( Term, In, Out ),
+    lib_mkdoc_stream( Term, In, Locals ),
+    % lib_mkdoc_stream( Term, In, Out ),
     close( In ),
-    close( Out ),
+    % close( Out ),
 
-    open( DocF, append, OutA ),    % make sure we get the docs in the file too
+    % open( DocF, append, OutA ),    % make sure we get the docs in the file too
     open( AbsPackF, read, InA ),
     read( InA, _ModDfn ),
-    copy_stream_data( InA, OutA ),
+    copy_stream_data( InA, Out ),
     close( InA ),
-    close( OutA ),
+    % close( OutA ),
+    lib_mkdoc_stream_locals( Locals, Out ),
+    nl( Out ), portray_clause( Out, (:- retractall(lib:doc_module(_))) ), nl( Out ),
+    close( Out ),
 
-    ensure_loaded( DocF ),
+    catch( ensure_loaded(DocF), Caught, (write(caught(Caught)),nl) ),
     doc_save( DocF, [doc_root('doc/html')] ),
     %
     working_directory( _, Old ).
 
-lib_mkdoc_stream( end_of_file, _In, _Out ) :- !.
-lib_mkdoc_stream( (:- lib(Pn/Pa) ), In, Out ) :-
+lib_mkdoc_stream( end_of_file, _In, [] ).
+lib_mkdoc_stream( Term, In, Locs ) :-
+     ( Term = (:- lib(Pn/Pa)) -> Locs = [Pn/Pa|Ls] ; Locs = Ls ),
+     catch( read( In, Next ), _, Next = errored ),
+     lib_mkdoc_stream( Next, In, Ls ).
+
+
+lib_mkdoc_stream_locals( [], _Out ).
+lib_mkdoc_stream_locals( [Pn/Pa|T], Out ) :-
     lib_mkdoc:lib_index( Pn, Pa, _, _, File ),
     directory_file_path( src, File, SrcFile ),
     file_name_extension( SrcFile, pl, RelF ),
     exists_file( RelF ),
-    !,
     lib_mkdoc_file( RelF, Out ),
-    read( In, Next ),
-    lib_mkdoc_stream( Next, In, Out ).
-lib_mkdoc_stream( _Other, In, Out ) :-
-    catch( read( In, Next ), _, Next = errored ),
-    lib_mkdoc_stream( Next, In, Out ).
+    !,
+    lib_mkdoc_stream_locals( T, Out ).
+lib_mkdoc_stream_locals( [H|T], Out ) :-
+    write( failed_to_locate_sources_for_local(H) ), nl,
+    lib_mkdoc_stream_locals( T, Out ).
     
 lib_mkdoc_file( RelF, _Out ) :-
     lib_mkdoc:loaded( RelF ),

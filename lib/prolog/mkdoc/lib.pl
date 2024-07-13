@@ -1,10 +1,28 @@
 :- module( lib, [lib/1,lib/2] ).
 
+:- dynamic( lib:doc_module/1 ).
+
 % :- dynamic( lib_mkdoc:lib_index/5 ).
-lib( _, _ ). % fixme
+lib(_A,_B).
+% lib( A, B ) :- write(a(A)-b(B)), nl.
+     % fixme
 
 lib( Lib ) :-
-    catch( use_module(library(Lib)), _, fail ),
+    prolog_load_context( module, Lod ),
+    ( Lib = Pred/Ar -> 
+          ( current_predicate(Lod:Pred/Ar) ->
+                    true
+                    ;
+                    ( lib:doc_module(Lod) ->
+                         true
+                         ;
+                         functor(Goal,Pred,Ar),
+                         Lod:assert(Goal)
+                    )
+          )
+          ;
+          catch( Lod:use_module(library(Lib)), _, fail )
+    ),
     !.
 /*
 lib( Pn/Pa ) :-
