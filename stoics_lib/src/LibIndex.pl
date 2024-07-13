@@ -65,6 +65,7 @@ lib_index(lexi, 2, any, user, 'codes/lexi').
 lib_index(lexi_n, 4, any, user, 'codes/lexi_n').
 lib_index(list_frequency, 2, any, user, 'list/list_frequency').
 lib_index(list_frequency, 3, any, user, 'list/list_frequency').
+lib_index(list_is_invariant, 1, any, user, 'list/list_is_invariant').
 lib_index(list_proportions, 2, any, user, 'list/list_proportions').
 lib_index(list_proportions, 3, any, user, 'list/list_proportions').
 lib_index(list_transpose, 2, any, user, 'list/list_transpose').
