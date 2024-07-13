@@ -54,12 +54,6 @@ false.
 @version 0.2 2018/10/1,    use throw/2
 
 */
-
-os_rm( Os ) :-
-	os_remove( Os, [] ).
-os_rm( Os, Opts ) :-
-	os_remove( Os, Opts ).
-
 os_remove( File ) :-
 	os_remove( File, [] ).
 
