@@ -127,8 +127,8 @@ missing curly brackets in the errors DCG (2016/11/14).
 
 :- lib(pack_errors).
 
-:- lib(options/1).
 :- lib(options/2).
+:- lib(options/3).
 :- lib(options_auxils/0).
 :- lib(options_append/3).
 :- lib(options_append/4).
