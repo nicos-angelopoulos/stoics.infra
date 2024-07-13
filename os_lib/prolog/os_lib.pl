@@ -257,9 +257,9 @@ The library predicates can be split to 4 groups.
 :- lib(os_ext/2).
 :- lib(os_ext/3).
 :- lib(os_ext/4).
+:- lib(os_rm/1).
 :- lib(os_rm/2).
-:- lib(os_rm/3).
-:- lib(os_remove/3).
+:- lib(os_remove/1).
 :- lib(os_remove/2).
 :- lib(os_make_path/1).
 :- lib(os_make_path/2).
