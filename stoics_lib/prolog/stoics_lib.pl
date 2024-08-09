@@ -39,6 +39,7 @@
               io_open/3,               % +FileR, +Mode, -Stream
               io_sections/3,           % +File, -Sections, +Opts
               io_streams/3,            % ?Input, ?Output, ?Error
+              io_url/1,                % +Opts
             % kv/
               kv_compose/3,            % +Ks, +Vs, -KVs
               kv_compose/4,            % +List1, +List2, -KVsCont, -Tkvs
@@ -243,5 +244,6 @@
 :- lib(colour_hex/2).
 :- lib(lexi_n/4).
 :- lib(list_is_invariant/1).
+:- lib(io_url/1).
 
 :- lib( end(stoics_lib) ).

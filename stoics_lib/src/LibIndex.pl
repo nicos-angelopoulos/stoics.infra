@@ -48,6 +48,7 @@ lib_index(io_open, 3, any, user, 'io/io_open').
 lib_index(io_put_line, 2, any, user, 'io/io_put_line').
 lib_index(io_sections, 3, any, user, 'io/io_sections').
 lib_index(io_streams, 3, any, user, 'io/io_streams').
+lib_index(io_url, 1, any, user, 'io/io_url').
 lib_index(known, 1, any, user, 'meta/known').
 lib_index(known, 2, any, user, 'meta/known').
 lib_index(known, 3, any, user, 'meta/known').
