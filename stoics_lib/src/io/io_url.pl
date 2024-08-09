@@ -3,7 +3,7 @@
 :- use_module(library(process)).
 
 :- lib(options).
-:- lib(debuc).
+:- lib(debug_call).
 
 io_url_defaults( Defs ) :-
                     Defs = [
