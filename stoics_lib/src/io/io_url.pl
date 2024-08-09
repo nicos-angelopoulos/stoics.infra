@@ -70,7 +70,7 @@ io_url( Args ) :-
 io_url_file( Ifc, Url, Flg, Tmp, Dbg ) :-
      ( var(Tmp) -> tmp_file_stream(text,Tmp,Stream), close(Stream); true ),
      append( Flg, ['-o',Tmp,Url], Args ),
-     debug( Dbg, '', [process_create(path(Ifc),Args,[])] ),
+     debuc( Dbg, '', [process_create(path(Ifc),Args,[])] ),
      process_create( path(Ifc), Args, [] ).
 
 io_url_call( false, _File ) :- !.
