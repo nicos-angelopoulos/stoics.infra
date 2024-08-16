@@ -192,7 +192,7 @@ debug_call_goal( _Topic, Goal ) :-
 % @see debug_set/2
 %
 debug_chain( Topic, Then ) :-
-    to_list( Then, Thens ),
+    en_list( Then, Thens ),
     maplist( debug_chain(Topic), Thens, _Priors ).
 
 debug_chain( Topic, Then, Prior ) :-
