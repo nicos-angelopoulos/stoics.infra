@@ -65,7 +65,9 @@ true.    % message above is printed in informational colour
 At 15:44:1 on 2nd of Jul 2014 finished task: write on file.
 
 ?- assert( (simple_mess(KVs,Mess,Args):- KVs =[a=A,b=B], atom_concat(A,B,Mess), Args=[]) ).
-?- debug_call( ex, simple_mess([a=1,b=2],
+?- debug_call( ex, simple_mess([a=1,b=2]) ).
+% 12
+true.
 
 ==
 
@@ -180,7 +182,7 @@ debug_call_goal( _Topic, Goal ) :-
 %% debug_chain( +TopicCond, +TopicDep ).
 %% debug_chain( +TopicCond, +TopicDep, -TDprior ).
 %
-% If already debugging TopicCond, then also start debugging TopicDep ).
+% If already debugging TopicCond, then also start debugging TopicDep.
 % TDprior is true if TopicDep was already debugging, else is false.
 % Current implementation sets TDprior to true whenever Topic is not
 % debugged, as it assumes that this value best suit independent fluctuation
