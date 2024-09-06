@@ -27,11 +27,11 @@ url_file_defaults( [overwrite(error),dnt(false),iface(prolog),insecure(false)] )
 %   if true, create a File.dnt with the start and end datime/6 stamps.
 %   From v0.4 also records the Url and the download host.
 % * iface(Iface=prolog)
-%   or =|wget|=
+%   or _wget_
 % * insecure(Insec=false)
 %   where to acccept non SSL authenticated connections (as in pack_install/2, 24.04.05)
 % * overwrite(Ow=error)
-%   default throws an error if file exists, fail or false for failure and anything else for business as usual (overwrite local)
+%   default throws an error if file exists, _fail_ or _false_ for failure and anything else for business as usual (overwrite local)
 %
 %==
 % ?- file_search_path( downloads, Dnloads ).
