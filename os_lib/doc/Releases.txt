@@ -1,5 +1,9 @@
 ---   Releases   ---
 --------------------
+1.9
+     24.09.27   FIXED:    pass options of os_mill/4 to os_postfix/4 so separator can take effect
+          
+          
 1.8  24.07.13   CHANGED:  make sure all preds have own src file and multi-arity interface are singly loaded
      24.07.07   FIXED:    option/2 -> options/2 in os_remove_debug/2
      24.04.24   CHANGED:  os_mill/4, returning 3rd argument does not include Dir
