@@ -1,4 +1,6 @@
 
+:- use_module(library(filesex)).
+
 :- lib( arity/3 ).
 
 /** expand_spec(+FileSpec, -Expanded).
