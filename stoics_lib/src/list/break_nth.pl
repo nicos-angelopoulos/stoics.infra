@@ -32,7 +32,14 @@ Opts
 ?- break_nth( 0, [a,b,c], L, R ).  L=[], R=[a,b,c]
 ?- break_nth( 1, [a,b,c], L, R ).  L=[a], R=[b,c]
 ?- break_nth( 3, [a,b,c], L, R ).  L=[a,b,c], R=[].
-?- break_nth( 4, [a,b,c], L, R ).  error
+
+% when pack_errors is installed.
+?- break_nth( 4, [a,b,c], L, R ).
+ERROR: stoics_lib:break_nth/4: Object of type: list longer than 4, expected but found term: list of length, 3
+
+% when pack_errors not installed.
+?- break_nth( 4, [a,b,c], L, R ).
+ERROR: Unhandled exception: Unknown message: type_error('list longer than 4','list of length, 3')+(stoics_lib:break_nth/4)
 
 ?- break_nth( N, [a,b,c], L, R ).
 N = 1,
@@ -52,7 +59,7 @@ false.
 
 */
 break_nth( N, List, Left, Fourth ) :-
-	Self = break_nth/4,
+	Self = break_nth,
      ( var(Fourth) -> 
           Args = [remainder(Fourth)]
           ;
@@ -60,7 +67,7 @@ break_nth( N, List, Left, Fourth ) :-
      ),
      options_append( Self, Args, Opts ),
      options( at_short(AtShort), Opts ),
-     ErrOpt = stoics_lib:break_nth/4,
+     ErrOpt = stoics_lib:Self/4,
      ( var(N) ->
           break_nth_gen( N, List, Left, Right )
           ;
@@ -77,9 +84,7 @@ break_nth( N, List, Left, Fourth ) :-
 				     Left = List, Right = []
 				     ;
 				     ( Length < N ->
-                              break_nth_err( AtShort, ErrOpt )
-
-					     write( user_error, list_of_insufficient_length(legth(Length),limit(N),Self) ), nl( user_error ), abort
+                              break_nth_err( AtShort, List, Left, Right, N, Length, ErrOpt )
 					     ;
      				     break_nth_1( N, List, Left, Right )
 				     )
@@ -101,10 +106,18 @@ break_nth_gen( N, [X|Xs], [X|Ls], Right ) :-
      break_nth_gen( N1, Xs, Ls, Right ),
      N is N1 + 1.
 
-break_nth_err( throw, _List, _Left, _Right, ErrOpts ) :-
-     stoics_lib_throw( , ErrOpts ).
-break_nth_err( fail, _List, _Left, _Right, _ErrOpts ) :-
-break_nth_err( write, _List, _Left, _Right, _ErrOpts ) :-
-break_nth_err( true, List, Left, Right, _ErrOpt ) :-
+break_nth_err( throw, _List, _Left, _Right, N, Length, ErrOpts ) :-
+     atom_concat( 'list longer than ', N, Arg1 ),
+     atom_concat( 'list of length, ', Length, Arg2 ),
+     stoics_lib_throw( type_error(1,Arg1,Arg2), ErrOpts ).
+     % write( user_error, list_of_insufficient_length(legth(Length),limit(N),Self) ), nl( user_error ), abort
+break_nth_err( fail, _List, _Left, _Right, _N, _Length, _ErrOpts ) :-
+     fail.
+break_nth_err( write, _List, _Left, _Right, N, Length, ErrOpts ) :-
+     Format = 'In ~w. List of longer than: ~d positions expected, the provided had length: ~d',
+     Args = [ErrOpts,N,Length],
+     message_report( Format, Args, error ),
+     fail.
+break_nth_err( true, List, Left, Right, _N, _Length, _ErrOpt ) :-
      Right = [],
      List = Left.

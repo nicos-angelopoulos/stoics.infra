@@ -125,7 +125,7 @@ missing curly brackets in the errors DCG (2016/11/14).
         % "looses" the prolog_load_context( module, _ ) value when 
         % requires/1 is used from auxilary files within the pack
 
-:- lib(pack_errors).
+:- lib(suggests(pack_errors)).
 
 :- lib(options/2).
 :- lib(options/3).
