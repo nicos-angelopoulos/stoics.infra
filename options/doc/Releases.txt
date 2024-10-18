@@ -3,7 +3,7 @@
 
 
 1.6  
-     24.10.18  DEPS:    lib(pack_errors) is now suggested, also vio options_throw/2.
+     24.10.18  DEPS:    lib(pack_errors) is now suggested, also vio options_throw/2
      24.03.17  IFACE:   new arity options_return/3
                ERROR:   new pack_error - associated with return options
      23.09.24  IFACE:   new predicate options_rename/4
