@@ -3,6 +3,7 @@
   
 1.9
      24.10.28   LIB:    internal stoics_lib_throw/2. Makes dependancy to pack_errors a suggestion.
+                OPTS:   4th arg of break_nth/4 can now be an options list, allowing shorter list to pass through if desired
      24.10.17   DEPS:   library(filesex) in expand_spec/2
      24.09.06   OPTS:   url_file/3, added dnt(csv) & true/pl; hash(); extract(); dn_dir()
      24.08.09   IFACE:  io_url/1

@@ -41,6 +41,20 @@ ERROR: stoics_lib:break_nth/4: Object of type: list longer than 4, expected but 
 ?- break_nth( 4, [a,b,c], L, R ).
 ERROR: Unhandled exception: Unknown message: type_error('list longer than 4','list of length, 3')+(stoics_lib:break_nth/4)
 
+?- break_nth( 4, [a,b,c], L, at_short(fail) ).
+false.
+
+?- break_nth( 4, [a,b,c], L, at_short(write) ).
+ERROR: In stoics_lib:break_nth/4. List of longer than: 4 positions expected, the provided had length: 3
+false.
+
+?- break_nth( 4, [a,b,c], L, at_short(true) ).
+L = [a, b, c].
+
+?- break_nth( 4, [a,b,c], L, [at_short(true),remainder(Rem)] ).
+L = [a, b, c],
+Rem = [].
+
 ?- break_nth( N, [a,b,c], L, R ).
 N = 1,
 L = [a],
@@ -95,13 +109,11 @@ break_nth( N, List, Left, Fourth ) :-
      ( memberchk(remainder(Right),Opts) -> true; true ).
 
 break_nth_1( 1, [H|T], [H], T ) :- !.
-% break_nth_for_list_1( 1, [X|Xs], [X], Xs ) :- !.
 break_nth_1( N, [X|Xs], [X|Ls], Right ) :-
      N1 is N - 1,
      break_nth_1( N1, Xs, Ls, Right ).
 
 break_nth_gen( 1, [H|T], [H], T ).
-% break_nth_for_list_1( 1, [X|Xs], [X], Xs ) :- !.
 break_nth_gen( N, [X|Xs], [X|Ls], Right ) :-
      break_nth_gen( N1, Xs, Ls, Right ),
      N is N1 + 1.
@@ -109,7 +121,7 @@ break_nth_gen( N, [X|Xs], [X|Ls], Right ) :-
 break_nth_err( throw, _List, _Left, _Right, N, Length, ErrOpts ) :-
      atom_concat( 'list longer than ', N, Arg1 ),
      atom_concat( 'list of length, ', Length, Arg2 ),
-     stoics_lib_throw( type_error(1,Arg1,Arg2), ErrOpts ).
+     stoics_lib_throw( type_error(2,Arg1,Arg2), ErrOpts ).
      % write( user_error, list_of_insufficient_length(legth(Length),limit(N),Self) ), nl( user_error ), abort
 break_nth_err( fail, _List, _Left, _Right, _N, _Length, _ErrOpts ) :-
      fail.
