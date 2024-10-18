@@ -1037,7 +1037,8 @@ message( arg_ground_pattern(Poss,_Args) ) -->
     ['Ground arguments expected in some of the positions: ~w'-[Poss]].
 message( arg_ground_pattern(Poss,Args) ) -->
     ['Ground arguments expected in some of the positions: ~w, but found:~w'-[Poss,Args]].
-
+message( arg_natural_number(Poss,Arg) ) -->
+    ['A non-negative integer was expects at position: ~w, but found:~w'-[Poss,Arg]].
 message( lengths_mismatch(Tkn1,Tkn2,Len1,Len2) ) -->
     ['Lists for ~w and ~w have mismatching lengths: ~d and ~d respectively'-[Tkn1,Tkn2,Len1,Len2]].
 message( lengths_mismatch(Tkn1,Tkn2,Op,Len1,Len2) ) -->

@@ -1,4 +1,6 @@
 
+:- lib(stoics_lib_throw/2).
+
 break_nth_defaults( [at_short(throw)] ).
 
 /* break_nth( ?N, +List, -Left, -Right ).
@@ -58,16 +60,13 @@ break_nth( N, List, Left, Fourth ) :-
      ),
      options_append( Self, Args, Opts ),
      options( at_short(AtShort), Opts ),
+     ErrOpt = stoics_lib:break_nth/4,
      ( var(N) ->
           break_nth_gen( N, List, Left, Right )
           ;
 	     ( N < 0 ->
                % fixme: use must_be or pack_error
-               break_nth_err( throw, expected_a_natural_number(N,Self) )
-               here(throw()),
-     	     write( user_error, ),
-		     nl( user_error ),
-		     abort
+               stoics_lib_throw( arg_natural_number(N,Self), ErrOpt )
 		     ;
 		     ( N =:= 0 ->
 			     Left = [],
@@ -78,6 +77,8 @@ break_nth( N, List, Left, Fourth ) :-
 				     Left = List, Right = []
 				     ;
 				     ( Length < N ->
+                              break_nth_err( AtShort, ErrOpt )
+
 					     write( user_error, list_of_insufficient_length(legth(Length),limit(N),Self) ), nl( user_error ), abort
 					     ;
      				     break_nth_1( N, List, Left, Right )
@@ -99,3 +100,11 @@ break_nth_gen( 1, [H|T], [H], T ).
 break_nth_gen( N, [X|Xs], [X|Ls], Right ) :-
      break_nth_gen( N1, Xs, Ls, Right ),
      N is N1 + 1.
+
+break_nth_err( throw, _List, _Left, _Right, ErrOpts ) :-
+     stoics_lib_throw( , ErrOpts ).
+break_nth_err( fail, _List, _Left, _Right, _ErrOpts ) :-
+break_nth_err( write, _List, _Left, _Right, _ErrOpts ) :-
+break_nth_err( true, List, Left, Right, _ErrOpt ) :-
+     Right = [],
+     List = Left.

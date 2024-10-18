@@ -107,7 +107,7 @@ lib_index(select_all, 4, any, user, 'list/select_all').
 lib_index(select_first, 3, any, user, 'list/select_first').
 lib_index(skim, 3, any, user, 'list/skim').
 lib_index(stoics_lib, 0, any, user, 'auxil/stoics_lib_module').
-lib_index(stoics_lib_throw, 2, any, user, 'error/stocis_lib_throw').
+lib_index(stoics_lib_throw, 2, any, user, 'error/stoics_lib_throw').
 lib_index(stoics_lib_version, 2, any, user, 'auxil/stoics_lib_module').
 lib_index(sub_atom, 2, any, user, 'atom/sub_atom').
 lib_index(sub_atom, 4, any, user, 'atom/sub_atom').

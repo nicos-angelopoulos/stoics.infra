@@ -2,6 +2,7 @@
 ---------------------
 
 2.3
+     24.10.18   ERROR:     arg_natural_number/2
      24.03.17   CHANGE:    allow terms for OPT in option(OPT) debuc info options
      22.09.22   ADDED:     catch all, unhandled handle and associated message
 
