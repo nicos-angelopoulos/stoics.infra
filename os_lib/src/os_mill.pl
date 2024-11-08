@@ -188,7 +188,7 @@ os_mill_destination( false, Milled, _Goal, File, DMilled, Opts ) :-
     % os_stem( Stem, Milled, [from(File)|Opts] ),
     ( var(Milled) -> 
         options( postfix(Psfx), Opts ),
-        os_postfix( Psfx, File, Posted, Opts ),
+        os_postfix( Psfx, File, Posted, [ext(Ext)|Opts] ),
         os_stem( Stem, Posted, Opts )
         ;
         os_stem( Stem, Milled, StemOpts )
