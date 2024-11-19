@@ -54,11 +54,23 @@ lib_bioc( Rlib, Opts ) :-
     lib_r( Rlib, [bioc(true)|Opts] ).
 
 lib_r( Rlib, Opts ) :-
+     ( functor(Rlib,c,_) ->
+          Rlib =.. [c|Rlibs]   
+          ;
+          ( is_list(Rlib) -> 
+               Rlibs = Rlib
+               ;
+               Rlibs = [Rlib]
+          )
+     ),
+     maplist( lib_r_opts(Opts), Rlibs ).
+
+lib_r_opts( Opts, Rlib ) :-
      string( Rlib ),
      !,
      atom_string( RlibAtm, Rlib ),
      lib_r( RlibAtm, Opts ).
-lib_r( Rlib, _Opts ) :-
+lib_r_opts( _Opts, Rlib ) :-
      getenv( 'R_LIB_REAL', RlibRealPath ),
      atomic_list_concat( RlibDirs, ':', RlibRealPath ),
      member( Rdir, RlibDirs ),
@@ -68,7 +80,7 @@ lib_r( Rlib, _Opts ) :-
      exists_file( Rfile ),
      !,
      r_call( source(+Rfile), [] ).
-lib_r( Rlib, Opts ) :-
+lib_r_opts( Opts, Rlib ) :-
     memberchk( suggest(Sugg), Opts ),
     current_prolog_flag( lib_suggests_warns, SuggFlag ),
     (Sugg == true ; SuggFlag == debug; SuggFlag == install),
@@ -117,7 +129,7 @@ lib_r( Rlib, Opts ) :-
         Mess1 = 'You need to install SWI-Prolog lib Real before you can lib/1-load R library: ~w',
         lib_message_report( Mess1, [Rlib], informational )
     ).
-lib_r( Rlib, _Opts ) :-
+lib_r_opts( _Opts, Rlib ) :-
     r_lib_sys( Rlib ).
 
 r_lib_sys( Rlib ) :-
@@ -375,6 +387,31 @@ attaches the indices but not the file locators.
 Since all code from directory-libs load to a single module (_user_), loading 
 code has either access to all such code, or to none.
 
+---+++ Loading R and bioconductor libraries
+
+Lib also knows how to install R (r()) and bioconductor (bioc()) libraries. As of version of 2:11 
+these can be c() terms or lists. The library names can be given as atoms or strings.
+Both r() and bioc() will load the libraries if they are installed (bioconductor libs are R libs, but they
+are installed differently). If the libraries need to be intalled the correct term should be used.
+
+As per Prolog, the user will be asked to install these libraries if they are not found on the system.
+
+==
+?- lib(r(gridExtra)).
+?- lib(bioc("ALL")).
+
+?- lib(r(c('data.table',"Matrix"))).
+% Loading installed R library: data.table
+% Loading installed R library: Matrix
+true.
+
+?- lib(r(["reticulate",ggplot2])).
+% Loading installed R library: reticulate
+% Loading installed R library: ggplot2
+true.
+==
+
+
 ---+++ Conventions
 
 Packs are expected to have matching top directories and main files. The main file
@@ -437,7 +474,7 @@ Listens to =|debug(lib)|=.
 @version  2.7 2020/3/8,   compatibility with pack changes in SWI-8.2, fixed layout breaking tags
 @version  2.8 2020/9/18,  minor changes, library(lists) explicit loading + info messages
 @version  2.9 2021/1/23,  honour developer suggests_warns(false), logic needs further work
-@version 2.10 2022/12/29  bring up to date for bio_db 4:0
+@versio  2.10 2022/12/29  bring up to date for bio_db 4:0
 @see http://stoics.org.uk/~nicos/sware/lib
 
 */
@@ -620,7 +657,8 @@ lib( end(Src), _Cxt, Opts ) :-
     % lib_alias( Alias, Cxt, Opts ).
 lib( version(V,D), _, _Args ) :-
     !,
-    V = 2:10:0, D = date(2022,12,29).
+    % V = 2:10:0, D = date(2022,12,29).
+    V = 2:10:1, D = date(2024,11,19).
 lib( suggests(Lib), _, _Args ) :- 
     !,
     lib_suggests( Lib ).
