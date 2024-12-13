@@ -17,12 +17,14 @@ os_postfix_defaults( Args, Defs ) :-
 %% os_postfix( +Postfix, +Opts, ?Fname, ?Posted ).
 %
 % Append a Postfix atom (or list of postfix atoms) to a filename without touching its file type extension.
+% 
 % Also works for removing a postfix.
 % If Postfix is compound of arity/1 is taken to be an aliased path, in which case the innermost path is extended.
 %
 % Second argument is allowed to be the options (recognised as such when input is a list)
 % so that it can be used in meta-calls.
 %
+% Empty atom _''_ is a special postfix where no separator and postfix are added. If you really want the empty postfix, use _['']_ (see examples).
 % Opts 
 %  * ext(Ext)
 %    if Ext is ground is assumed to be the strippable part of Fname. When Ext is a variable
@@ -47,38 +49,70 @@ os_postfix_defaults( Args, Defs ) :-
 %    shortened separator() separator for stem-file parts (see os_sep/2)
 %
 %==
-% ?- os_postfix( abc, library(x.txt), T ).
+% ?- os_postfix(abc, library(x.txt), T).
 % T = library(x_abc.txt).
-% ?- os_postfix( abc, library(x.txt), T, [separator(-)] ).
+% ?- os_postfix(abc, library(x.txt), T, [separator(-)]).
 % T = library('x-abc.txt').
-% ?- os_postfix( abc, x.txt, T, sep(.) ).
+% ?- os_postfix(abc, x.txt, T, sep(.)).
 % T = x.abc.txt.
-% ?- os_postfix( v1, graph_layout.csv, T, [ignore_post(layout)] ).
+% ?- os_postfix(v1, graph_layout.csv, T, [ignore_post(layout)]).
 % T = graph_v1_layout.csv.
-% ?- os_postfix( v1, graph_lay_out.csv, T, [ignore_post(layout)] ).
+% ?- os_postfix(v1, graph_lay_out.csv, T, [ignore_post(layout)]).
 % T = graph_lay_out_v1.csv.
-% ?- os_postfix( v1, graph_lay_out.csv, T, ignore_post([lay,out]) ).
+% ?- os_postfix(v1, graph_lay_out.csv, T, ignore_post([lay,out])).
 % T = graph_v1_lay_out.csv.
-% ?- os_postfix( v1, graph_lay_out.csv, T, [ignore_post([out]),replace(true)] ).
+% ?- os_postfix(v1, graph_lay_out.csv, T, [ignore_post([out]),replace(true)]).
 % T = graph_v1_out.csv
-% ?- maplist( os_postfix(v1,[sep(-)]),[a.csv,b.csv], AB ).
+% ?- maplist(os_postfix(v1,[sep(-)]),[a.csv,b.csv], AB).
 % AB = ['a-v1.csv', 'b-v1.csv'].
-% ?- os_postfix( _, library(x.txt), T, postfix(abc) ).
+% ?- os_postfix(_, library(x.txt), T, postfix(abc)).
 % T = library(x_abc.txt).
 % ?- os_postfix( _, "x.txt", T, postfix(abc) ).
 % T = "x_abc.txt".
-% ?- os_postfix( Psf, abc_def.txt ).
+% ?- os_postfix(Psf, abc_def.txt).
 % Psf = def.
-% ?- os_postfix( bit, by.csv, ByBit, with_ext(txt) ).
+% ?- os_postfix(bit, by.csv, ByBit, with_ext(txt)).
 % ByBit = by_bit.txt.
-% ?- os_postfix( [by,bit], bit.csv, ByBit, with_ext(txt) ).
+% ?- os_postfix([by,bit], bit.csv, ByBit, with_ext(txt)).
 % ByBit = bit_by_bit.txt.
+% ?- os_postfix(by_bit, bit.csv, ByBit, with_ext(txt)).
+% ByBit = bit_by_bit.txt.
+% ?- os_postfix('', bit.csv, Sfxd).
+% Sfxd = bit.csv
+% ?- os_postfix('', bit.csv, Sfxd).
+% Sfxd = bit.csv.
+%==
+%
+% As of v0.5
+%==
+% ?- os_postfix([''], bit.csv, Sfxd).
+% Sfxd = bit_.csv.
+%
+% ?- os_postfix(abc, A, B).
+% ERROR: os_lib:os_postfix/4: Ground argument expected in one of the positions : [2,3], but found: [_29228,_29234]
+% 
+% ?- set_prolog_flag(pack_errors_arg, false).
+% ?- os_postfix(abc, A, B).
+% ERROR: os_lib:os_postfix/4: Ground argument expected in one of the positions: [2,3]
+% 
+% ?- os_postfix('', Stem, bit.csv).
+% Stem = bit.csv.
+% 
+% ?- os_postfix('', Stem, 'bit_.csv').
+% Stem = bit.csv.
+% 
+% ?- os_postfix([''], Stem, 'bit_.csv').
+% Stem = bit.csv.
+% 
+% ?- os_postfix([''], Stem, 'bit.csv').
+% false.
 %==
 %
 % @author nicos angelopoulos
 % @version  0.2 2014/7/8   changed order of 1&2 make it more suitable to meta calls
 % @version  0.3 2014/7/28  added aliased paths and example
 % @version  0.4 2014/12/2  added options (separator/1,ignore_post/1,replace/1)
+% @version  0.5 2024/12/13 changed fail to ground error, deconstruct '', examples of these + couple on standards
 %
 os_postfix( Psfx, Posted ) :-
     os_postfix( Psfx, _Fname, Posted, [] ).
@@ -116,6 +150,8 @@ os_postfix_1( Psfx, Fname, Posted, Opts ) :-
     !,
     at_con( Withouts, Sep, Fstem ),
     os_dir_stem_ext( Dir, Fstem, Ext, Fname ).
+os_postfix_1( _Psfx, Fname, Posted, _Opts ) :-
+     throw( arg_ground_in_one_of([2,3],[Fname,Posted]), os_lib:os_postfix/4 ).
 
 os_postfix( atom, Psfx, File, Posted, Opts ) :-
     os_postfix_atom( File, Psfx, Pile, Opts ),
@@ -136,7 +172,13 @@ os_postfix( alias, Psfx, Fname, Posted, Opts ) :-
 os_postfix_parts( Psfx, Sep, PsfxParts ) :-
     ground( Psfx ),
     !,
-    at_con( PsfxParts, Sep, Psfx ).    %  postfix might itself contain Sep
+    ( Psfx == '' -> PsfxParts = []
+                  ; 
+                  ( is_list(Psfx) -> 
+                                    Psfx = PsfxParts
+                                  ; at_con( PsfxParts, Sep, Psfx )
+                  )
+    ).    %  postfix might itself contain Sep
 os_postfix_parts( Psfx, _Sep, [Psfx] ). % when non-ground
 
 os_postfix_reorder( _Psfx, Fname, _Posted, Opts ) :-
@@ -156,7 +198,15 @@ os_postfix_atom( File, PostfixPrv, Pile, Opts ) :-
     ( is_list(PostfixPrv) -> atomic_list_concat(PostfixPrv,Sep,Postfix) ; PostfixPrv = Postfix ),
     os_postfix_stem( Stem, Sep, Rep, Prefix, Suffix, Opts ),
     os_postfix_ground( Postfix, Opts ),
-    at_con( [Prefix,Postfix,Suffix], Sep, PoStem ),
+    ( PostfixPrv==[''] -> 
+          ( Suffix=='' -> 
+               atomic_list_concat( [Prefix,Postfix], Sep, PoStem )
+               ;
+               atomic_list_concat( [Prefix,Postfix,Suffix], Sep, PoStem )
+          )
+          ;
+          at_con( [Prefix,Postfix,Suffix], Sep, PoStem )
+    ),
     file_name_extension( PoStem, Ext, Xile ),
     os_postfix_with_ext( Xile, Pile, Opts ).
 
