@@ -1,4 +1,6 @@
 
+:- lib(suggests(options)).
+
 :- lib(stoics_lib_throw/2).
 
 break_nth_defaults( [at_short(throw)] ).
