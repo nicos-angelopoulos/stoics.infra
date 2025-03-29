@@ -1086,6 +1086,7 @@ lib_term_dir( DirIn, Top, _Main, _Dir ) :-
 
 % import all predicates that are defined by RelCell into module defined by pack Main.
 lib_export_cell( Main, RelCell, Cxt ) :-
+    % fixme: need to doc this predicate better
     lib_pack_module( Main, Cxt, Mod ),
     lib_cell_module( Mod, RelCell, Cod ),
     findall( Pid, (
@@ -1100,8 +1101,8 @@ lib_export_cell( Main, RelCell, Cxt ) :-
                         functor( Pid, Pnm, Par ),
                         % export(Mod:Pid),
                         % Cxt:import(Mod:Pid)
-                        Cxt:import(Cod:Pnm/Par),
-                        Cxt:export(Cxt:Pnm/Par)
+                        Cxt:export(Cxt:Pnm/Par),
+                        Cxt:import(Cod:Pnm/Par)
                   ), Pids ),
     debug( lib, 'lib imported in context: ~w, from mod: ~w, having cell, ~w, the predicates: ~w', [Cxt,Main,RelCell,Pids] ).
 
