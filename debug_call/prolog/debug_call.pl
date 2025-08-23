@@ -388,7 +388,7 @@ debug_portray( _Topic, _Term ).
 % 
 %Goal in:
 %  * call(Goal)
-%    call Goal before printing debugging message debug( Topic, Mess, Args).  (Goal is called in non-deterministic context).
+%    call Goal before printing debugging message debug(Topic, Mess, Arg).  (Goal is called in non-deterministic context.)
 %  * dims
 %    prints the dimensions of matrix, see mtx_dims/3
 %  * end
