@@ -670,7 +670,7 @@ debug_call_topic( list, _Pfx, InArg, Topic ) :-
     debug_call_topic_list_delim( Ftr, Topic, Pfx, 'Ended listing of list: ~w' ).
 debug_call_topic( odir, Pfx, Odir, Topic ) :-
     ( exists_directory(Odir) ->
-        Mess = 'Ouput in directory: ~w'
+        Mess = 'Output in directory: ~w'
         ;
         Mess = 'Output (claimed) in (non-existing) directory: ~w'
     ),
