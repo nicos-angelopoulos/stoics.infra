@@ -392,7 +392,7 @@ debug_portray( _Topic, _Term ).
 %  * dims
 %    prints the dimensions of matrix, see mtx_dims/3
 %  * end
-%    translates to finishing ~Arg or starting ~Topic if Arg == true
+%    translates to finishing ~Arg or finishing ~Topic if Arg == true
 %  * enum
 %    print lists and deconstructed terms, where each item is prefixed with an index number
 %  * goal
