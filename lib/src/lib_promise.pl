@@ -107,14 +107,14 @@ lib_load_promised( Load, Cxt, Goal ) :-
 
 lib_r_promised( Function ) :-
      atom_string( Function, Fstring ),
-     r_call( exists(Fstring), [rvar(Rex)] ),
+     real:r_call( exists(Fstring), [rvar(Rex)] ),
      Rex == true,
-     r_call( 'is.function'(Function), [rvar(Rfu)] ),
+     real:r_call( 'is.function'(Function), [rvar(Rfu)] ),
      Rfu == true,
      !.
 lib_r_promised( Function ) :-
      ( lib_tables:lib_promise_r(Function,Library) ->
-          r_library(Library)
+          real:r_library(Library)
           ;
           throw( dont_know_what_to_load_for_r_promised(Function) )
      ).
