@@ -20,28 +20,42 @@
 @version 0:2 2025/09/27
 
 */
-lib_promise( Pids, Dep, Cxt, Load ) :-
+lib_promise( Pids, Cxt, Load ) :-
     is_list( Pids ),
     !,
-    maplist( lib_promise_pid(Load,Cxt,Dep), Pids ).
-lib_promise( Pid, Dep, Cxt, Load ) :-
-    lib_promise_pid( Load, Cxt, Dep, Pid ).
+    maplist( lib_promise_pid(Load,Cxt), Pids ).
+lib_promise( Pid, Cxt, Load ) :-
+    lib_promise_pid( Load, Cxt, Pid ).
 
-lib_promise_pid( _Load, _Cxt, _Dep, Promised ) :-
+lib_promise_pid( Load, _Cxt, r(Function) ) :-
+    !,
+    lib_promise_pid_r( Load, Function ).
+lib_promise_pid( _Load, _Cxt, Promised ) :-
     current_predicate( Promised ),
     !.  % fixme: need to check from where ? and Cxt ?
-lib_promise_pid( Load, Cxt, _Dep, Promised ) :-
+lib_promise_pid( Load, Cxt, Promised ) :-
     lib_tables:lib_promise( Load, Cxt:Promised ),
     !.
-lib_promise_pid( Load, Cxt, _Dep, Promised ) :-
+lib_promise_pid( Load, Cxt, Promised ) :-
     lib_tables:lib_promise( Other, Cxt:Promised ),
     Other \== Load,
     !,
     throw( lib(already_promised_from_elsewhere(Promised,Other,Load)) ). % fixme: ... message
-lib_promise_pid( Load, Cxt, _Dep, Pname/Parity ) :-
+lib_promise_pid( Load, Cxt, Pname/Parity ) :-
     functor( Head, Pname, Parity ),
     assert( (Cxt:Head :- lib:lib_load_promised(Load,Cxt,Head)) ),
     assert( lib_tables:lib_promise(Load,Cxt:Pname/Parity) ).
+
+lib_promise_pid_r( Load, Function ) :-
+    lib_tables:lib_promise_r( Load, Function ),
+    !.
+lib_promise_pid_r( Load, Function ) :-
+    lib_tables:lib_promise_r( Else, Function ),
+    !,
+    Else \== Load,
+    throw( lib(r_already_promised_from_elsewhere(Function,Else,Load)) ). % fixme: ... message
+lib_promise_pid_r( Load, Function ) :-
+    assert( lib_tables:lib_promise_r(Load,Function) ).
 
 /** lib_load_promised( +Load, +Cxt, +Goal ).
 
@@ -71,14 +85,11 @@ true.
 @version  0.2 2025/9/27
 
 */
-lib_load_promised( Load, Cxt, _Goal ) :-
+lib_load_promised( Load, Cxt, Goal ) :-
     forall( lib_tables:lib_promise(Load,Cxt:Pid),
                     (
                         retract(lib_tables:lib_promise(Load,Cxt:Pid)),
-                        abolish(Cxt:Pid),
-                        Pid = Fun/Ari,
-                        functor(Fact,Fun,Ari),
-                        assert(Cxt:Fact)
+                        abolish(Cxt:Pid)
                     )
           ),
     % call(_) was lib(_): changed 19.4.22
@@ -91,4 +102,19 @@ lib_load_promised( Load, Cxt, _Goal ) :-
             lib_defaults(pack,PackDefs),
             With = lib(Load,Cxt,PackDefs),
             catch(lib(Load,Cxt,PackDefs),_,Rep1)
-    ).
+    ),
+    call( Cxt:Goal ).
+
+lib_r_promised( Function ) :-
+     atom_string( Function, Fstring ),
+     r_call( exists(Fstring), [rvar(Rex)] ),
+     Rex == true,
+     r_call( 'is.function'(Function), [rvar(Rfu)] ),
+     Rfu == true,
+     !.
+lib_r_promised( Function ) :-
+     ( lib_tables:lib_promise_r(Function,Library) ->
+          r_library(Library)
+          ;
+          throw( dont_know_what_to_load_for_r_promised(Function) )
+     ).

@@ -1,6 +1,7 @@
 :- module( lib, [
                     op( 200, fy, & ),
-                    lib/1, lib/2   % +Repo[, +Opts]
+                    lib/1, lib/2,   % +Repo[, +Opts]
+                    lib_r_promised/1
         ] ).
                      % lib_suggests/1,  % fixme: feature()
                      % lib_promise/2,
@@ -30,7 +31,8 @@
 :- dynamic(lib_tables:lib_repo_homonyms/2).    % +Repo, +SrcDir
 :- dynamic(lib_tables:lib_context/2).          % +Ctx, +Root
 :- dynamic(lib_tables:lib_index/4).            % +Pa, +Pn, +Repo, +File. records loaded indices
-:- dynamic(lib_tables:lib_promise/2).          % +Pids, +Cxt, +Load. hot swap Pid with loading Load
+:- dynamic(lib_tables:lib_promise/2).          % +Load, +(Cxt:Promised). hot swap Pid with loading Load
+:- dynamic(lib_tables:lib_promise_r/2).        % +Load, +Function
 :- dynamic(lib_tables:lib_homonym/3).          % +Stem, +Repo, +File. record loaded homonym
 :- dynamic(lib_tables:lib_loaded_index/2).     % +Repo, +File. tracks loaded index files
 :- dynamic(lib_tables:lib_loaded_homonyms/2).  % 
@@ -505,13 +507,14 @@ When Repo =|homonym(Repository)|= then only the homonims of local dir
        it is likely you need Lib for full functionalilty. If Lib is a known library it is loaded other wise nothing is loaded.<br>
        This is useful for fringe functionalities that depend on external libraries, where we do not want the average user to do anything
        if library (Lib) is not there. See lib_suggests/2 for details of how to enable warning messages.
-    * promise(DepPID,TriggerPID,Load)
-       DepPID is a predicate id for predicate that depends on code provided by Load.
-       TriggerPID is called from within PredID (normally =|arity = 0|=) with no functionality other than 
-       and when called for the first time Load will be loaded. 
+    * promise(DepPID,Load)
+       DepPID is a predicate id for predicate that is provided by library Load.
+       When DepPID called for the first time Load will be loaded. 
        This is a mechanism to avoid loading into memory Load at laoding time, and only do so if that bit of code is reached.
-       Load can be a loadable term, or a callable of the form =|call(G)|=, where =|Cxt:call(G)|= is called.
-       Use =|r(Lib)=Load|= for promising R libraries. See lib_promise/4.
+       Load can be a loadable library name, or a callable of the form =|call(G)|=, where =|Cxt:call(G)|= is called.
+       Use =|DepPID = r(RFunction) |= for promising R libraries. See lib_promise/3.
+       Note, that for R functions/libraries, you also need to inject lib_r_promised(Function) in your code.
+       See b_real:mtx_pheatmap/2 for an example.
     * expects(Pid,Mess)
     * expects(Pid,Mess,Call)
        complains if Pid is not defined at loading time. Mess should be a debug style message
@@ -675,9 +678,9 @@ lib( suggests(Lib,SgOptS), _, _Args ) :-
     !,
     lib_en_list( SgOptS, SgOpts ),
     lib_suggests( Lib, SgOpts ).
-lib( promise(Dep,Pid,Load), Cxt, _Args ) :-
+lib( promise(Pid,Load), Cxt, _Args ) :-
     !,
-    lib_promise( Pid, Dep, Cxt, Load ).
+    lib_promise( Pid, Cxt, Load ).
 lib( expects(Lib,Mess), _, _Opts ) :-
     !,
     lib_expects( Lib, Mess ).
