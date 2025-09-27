@@ -494,7 +494,6 @@ When Repo =|homonym(Repository)|= then only the homonims of local dir
 
 
   * Operand
-    One of 
     * homonyms(From)
        attach homonyms From pack
     * init(Lib)
