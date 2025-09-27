@@ -512,7 +512,7 @@ When Repo =|homonym(Repository)|= then only the homonims of local dir
        and when called for the first time Load will be loaded. 
        This is a mechanism to avoid loading into memory Load at laoding time, and only do so if that bit of code is reached.
        Load can be a loadable term, or a callable of the form =|call(G)|=, where =|Cxt:call(G)|= is called.
-       Use =|r(Lib)=Load|= for promising R libraries. Seel lib_promise/3.
+       Use =|r(Lib)=Load|= for promising R libraries. Seel lib_promise/4.
     * expects(Pid,Mess)
     * expects(Pid,Mess,Call)
        complains if Pid is not defined at loading time. Mess should be a debug style message
