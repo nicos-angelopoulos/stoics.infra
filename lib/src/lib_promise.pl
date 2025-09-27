@@ -48,6 +48,8 @@ lib_promise_pid( Load, Cxt, _Dep, Pname/Parity ) :-
 Fullfills the loading of promised predicate and calls goal.<br>
 This is the internal called from the dynamically asserted, holding, hot-swapped code.
 
+The predicate will only call each unique Cxt:Gid, where Gid is Goal's PredID, once.
+
 file test_promise.pl 
 ==
 
@@ -66,13 +68,17 @@ true.
 ==
 @author nicos angelopoulos
 @version  0.1 2018/1/5
+@version  0.2 2025/9/27
 
 */
-lib_load_promised( Load, Cxt, Goal ) :-
+lib_load_promised( Load, Cxt, _Goal ) :-
     forall( lib_tables:lib_promise(Load,Cxt:Pid),
                     (
                         retract(lib_tables:lib_promise(Load,Cxt:Pid)),
-                        abolish(Cxt:Pid)
+                        abolish(Cxt:Pid),
+                        Pid = Fun/Ari,
+                        functor(Fact,Fun,Ari),
+                        assert(Cxt:Fact)
                     )
           ),
     % call(_) was lib(_): changed 19.4.22
@@ -85,5 +91,4 @@ lib_load_promised( Load, Cxt, Goal ) :-
             lib_defaults(pack,PackDefs),
             With = lib(Load,Cxt,PackDefs),
             catch(lib(Load,Cxt,PackDefs),_,Rep1)
-    ),
-    assert(Cxt:Goal).
+    ).
