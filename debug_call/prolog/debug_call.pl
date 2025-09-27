@@ -76,7 +76,7 @@ true.
 This library avoids the messy way in which package(debug) deals with variable debug topics. 
 That is, their term expansion and subsequent pattern matching mishandles goals of the form
 debugging/1 and debug/3 that have an unbound variable in the 1st argument.
-debug_calls uses dynamic -.. 
+debug_calls uses dynamic =..  .
 
 
 ---+++ Pack info 
@@ -133,10 +133,10 @@ debuc( Topic ) :-
     debug( Topic ).
 debuc( Topic, Goal ) :-
     debug_call( Topic, Goal ).
-debuc( Topic, Goal, Args ) :-
-    debug_call( Topic, Goal, Args ).
-debuc( Topic, Goal, Pfx, Args ) :-
-    debug_call( Topic, Goal, Pfx, Args ).
+debuc( Topic, Goal, Arg ) :-
+    debug_call( Topic, Goal, Arg ).
+debuc( Topic, Goal, Arg, Opts ) :-
+    debug_call( Topic, Goal, Arg, Opts ).
 
 %% debug_call( +Topic, +Goal ).
 %
@@ -377,16 +377,22 @@ debug_portray( Topic, Term ) :-
 debug_portray( _Topic, _Term ).
 
 %% debug_call( +Topic, +Goal, +Arg ).
-%% debug_call( +Topic, +Goal, +Pfx, +Arg ).
+%% debug_call( +Topic, +Goal, +Arg, +Opts ).
 %
-% Automates often used debug calls. When Pfx is missing it is assumed to be ''. Predicate can also be used 
-% to call arbitrary Goal and then print a message after it has successfull completed. As of 1.2 it can also
-% work as a replacement to debug/3. With 1.3 the debuc/3 shorthand was introduced.
-%  
-%  When Goal is a known abbreviation, then Arg usually qualifies the output generated.
-%  When Goal is of the form call(Goal), Arg will be passed to debug(Topic,Mess,Arg). 
+% Automates often used debug calls with emphasis on avoiding calling things that will not be reported.
 % 
-%Goal in:
+% Predicate can be used to call arbitrary Goal and then print a message after it has successfull completed. <br>
+%  When Goal is a known abbreviation from those shown below, the Arg usually qualifies the output generated.
+%  When Goal is of the form call(Goal), Arg will be passed to debug(Topic,Mess,Arg). 
+%
+%  As of v1.6 the last two arguments of the /4 version of the predicate where switched from _Pfx_ and Arg
+%  to Arg and Opts. Opts pass arbitary things to Goal, each abbreviation Goal can demand different options, 
+%  some of them can take =prefix(Pfx)= which corresponds to Pfx in the old /4 verison. 
+% 
+% As of v1.2 it can work as a replacement to debug/3. <br>
+% With v1.3 the debuc/3 shorthand was introduced.
+% 
+% Goal in:
 %  * call(Goal)
 %    call Goal before printing debugging message debug(Topic, Mess, Arg).  (Goal is called in non-deterministic context.)
 %  * dims
@@ -498,21 +504,22 @@ debug_portray( _Topic, _Term ).
 % @version  1.1 2018/03/20  prefer +2 arity in debug_call/2
 % @version  1.2 2020/03/07  now can be used as a replacement for debug/3 (but with old 3rd arg behaviour, allowing eg 'true').
 % @version  1.3 2020/09/14  added canned calls info and enum, debuc/2,3,4
+% @version  1.6 2025/08/23  changed last two arguments
 % @see debuc/3 (shorthand for debug_call/3).
 %
-debug_call( Topic, Goal, Args ) :-
-    debug_call( Topic, Goal, '', Args ).
+debug_call( Topic, Goal, Arg ) :-
+    debug_call( Topic, Goal, Arg, [] ).
 
-debug_call( Topic, Goal, Pfx, Args ) :-
+debug_call( Topic, Goal, Arg, Opts ) :-
     debugging_topic( Topic ),
     !,
-    debugging_call( Topic, Goal, Pfx, Args ).
-debug_call( _Topic, _Goal, _Mess, _Args ).
+    debugging_call( Topic, Goal, Arg, Opts ).
+debug_call( _Topic, _Goal, _Arg, _Opts ).
 
-debugging_call( Topic, Goal, Mess, Args ) :-
-    debug_call_topic( Goal, Mess, Args, Topic ),
+debugging_call( Topic, Goal, Arg, Opts ) :- 
+    debug_call_topic( Goal, Arg, Opts, Topic ),
     !.
-debugging_call( Topic, call(Goal), Mess, Args ) :-
+debugging_call( Topic, call(Goal), Args ) :-
     !,
     call( Goal ),
     debug_message( Topic, Mess, Args ).

@@ -506,8 +506,13 @@ When Repo =|homonym(Repository)|= then only the homonims of local dir
        it is likely you need Lib for full functionalilty. If Lib is a known library it is loaded other wise nothing is loaded.<br>
        This is useful for fringe functionalities that depend on external libraries, where we do not want the average user to do anything
        if library (Lib) is not there. See lib_suggests/2 for details of how to enable warning messages.
-    * promise(Pred,Load)
-       Pred is needed for functionality and it can be found by loading Load, but it will only happen at Pred's first call.
+    * promise(DepPID,TriggerPID,Load)
+       DepPID is a predicate id for predicate that depends on code provided by Load.
+       TriggerPID is called from within PredID (normally =|arity = 0|=) with no functionality other than 
+       and when called for the first time Load will be loaded. 
+       This is a mechanism to avoid loading into memory Load at laoding time, and only do so if that bit of code is reached.
+       Load can be a loadable term, or a callable of the form =|call(G)|=, where =|Cxt:call(G)|= is called.
+       Use =|r(Lib)=Load|= for promising R libraries. Seel lib_promise/3.
     * expects(Pid,Mess)
     * expects(Pid,Mess,Call)
        complains if Pid is not defined at loading time. Mess should be a debug style message
@@ -515,7 +520,11 @@ When Repo =|homonym(Repository)|= then only the homonims of local dir
        If call is present, is called after the printing of the message.
     * version(Vers,Date)
        return version and publication date
-    
+
+The predicate can be used in combination with Real to also load R libaries.
+To load R libraries, use 
+
+
 Opts
   * index(Idx)
      whether to load indices
@@ -667,9 +676,9 @@ lib( suggests(Lib,SgOptS), _, _Args ) :-
     !,
     lib_en_list( SgOptS, SgOpts ),
     lib_suggests( Lib, SgOpts ).
-lib( promise(PidS,Load), Cxt, _Args ) :-
+lib( promise(Dep,Pid,Load), Cxt, _Args ) :-
     !,
-    lib_promise( PidS, Cxt, Load ).
+    lib_promise( Pid, Dep, Cxt, Load ).
 lib( expects(Lib,Mess), _, _Opts ) :-
     !,
     lib_expects( Lib, Mess ).
