@@ -735,10 +735,10 @@ debug_call_topic( pwd, Pfx, Stage, Topic ) :-
     ),
     debug_message_prefixed( Pfx, Mess, Prefixed ),
     debug_message( Topic, Prefixed, Args ).
-debug_call_topic( option, Pfx, Arg, Opts ) :-
-    Mess = 'Option goal, with pfx: ~w, arg: ~w, and Opts: ~w',
+debug_call_topic( option, Pfx, Arg, Topic ) :-
+    Mess = 'Option goal, with pfx: ~w, arg: ~w, and Topic: ~w',
     debug_message_prefixed( Pfx, Mess, Prefixed ),
-    debug_message( Topic, Prefixed, [Pfx,Arg,Opts] ).
+    debug_message( Topic, Prefixed, [Pfx,Arg,Topic] ).
 debug_call_topic( ns_sel, Pfx, Term, Topic ) :-
     % ( Term = [Fst,Sec] -> true; arg(1,Term,Fst),arg(2,Term,Sec) ),
     arg( 1, Term, Fst ), 
