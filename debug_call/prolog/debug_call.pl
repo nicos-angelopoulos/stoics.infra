@@ -25,19 +25,21 @@ user:message_property( Dbg, Property ) :-
 
 /** <module> Debugging with calls.
 
-Avoids running goals to produce output that is only
-relevant while debugging. Includes pre-canned, often used calls.
+Avoids running goals to produce output that is only relevant while debugging.
+Includes pre-canned, often used calls that print informative messages for common debugging tasks.
+
+See file examples/exo.pl for a full pallette of examples. 
 
 ---+++ Examples
 
 ==
 
 ?- debug( ex ).
-?- debug_call( ex, length, '', list1/[x,y,z] ).
+?- debug_call( ex, length, list1/[x,y,z] ).
 % Length for list, list1: 3
 
-?- debug_call( ex, length, 'some prefix', [list1,list2]/[[x,y,z],[a,b,c]] ).
-% some prefix lengths for lists, list1: 3, list2: 3
+?- debug_call( ex, length, [list1,list2]/[[x,y,z],[a,b,c]], prefix('Some prefix') ).
+% Some prefix lengths for lists, list1: 3, list2: 3
 
 ?- debug_call( ex, dims, [m1,m2]/[[a(x),a(y),a(z)],[xy(a,b),xy(c,d),xy(e,f)]] ).
 %  Dimensions for matrices,  (m1) nR: 3, nC: 1. (m2) nR: 3, nC: 2.
@@ -52,23 +54,23 @@ true.
 
 ?- debug_call( ex, info, 'My message is ~w.'/long ).
 % My message is long.
-true.    % message above is printed in informational colour
+true.    
+   % message above is printed in informational colour
 
-?- debug_call( ex, wrote, loc(file,csv) ).
+?- debuc( ex, wrote, loc(file,csv) ).
 % Could not locate wrote on file specified by: file, and extensions: csv
 ?- csv_write_file( 'file.csv', [] ).
 
-?- debug_call( ex, wrote, loc(file,csv) ).
-% Wrote on file: '/home/nicos/pl/lib/src/trace/file.csv'
+?- debuc( ex, wrote, loc(file,csv) ).
+% Wrote on file: 'file.csv'
 
-?- debug_call( ex, task(stop), 'write on file' ).
-At 15:44:1 on 2nd of Jul 2014 finished task: write on file.
+?- debuc( ex, task(stop), 'write on file' ).
+At 15:44:1 on 2nd of Jul 2024 finished task: write on file.
 
 ?- assert( (simple_mess(KVs,Mess,Args):- KVs =[a=A,b=B], atom_concat(A,B,Mess), Args=[]) ).
-?- debug_call( ex, simple_mess([a=1,b=2]) ).
+?- debuc( ex, simple_mess([a=1,b=2]) ).
 % 12
 true.
-
 ==
 
 ---+++ Variable topics 
@@ -93,6 +95,8 @@ debug_calls uses dynamic =..  .
 @version 1.3 2020/3/7
 @version 1.4 2020/9/18
 @version 1.5 2022/12/29
+@version 2.0 2025/10/7
+@see debug_call/4 for version information
 
 */
 
