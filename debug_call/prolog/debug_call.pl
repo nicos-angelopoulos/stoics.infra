@@ -508,6 +508,7 @@ debug_portray( _Topic, _Term ).
 % @see debuc/3 (shorthand for debug_call/3).
 %
 debug_call( Topic, Goal, Arg ) :-
+    trace,
     debug_call( Topic, Goal, Arg, [] ).
 
 debug_call( Topic, Goal, Arg, Opts ) :-
@@ -529,11 +530,11 @@ debugging_call( Topic, Goal, Mess, Args ) :-
     !,
     debug_message( Topic, Mess, Args ).
 % 20.03.07: this makes debug_call/3 a replacement for debug/3...
-debugging_call( Topic, Mess, '', DbgCallArgs ) :-
+debugging_call( Topic, Mess, ArgsPrv, _DbgCallArgs ) :-
     % as of SWI-Prolog 8.?.? there is an error thrown when true is used instead of [] as 3rd arg of debug/3
     atomic( Mess ),
     !,
-    ( DbgCallArgs == true -> Args = []; DbgCallArgs = Args ),
+    ( ArgsPrv == true -> Args = []; en_list(ArgsPrv,Args) ),
     debug( Topic, Mess, Args ).
 debugging_call( Topic, Goal, Mess, Args ) :-
     Called = debug_call(Topic,Goal,Mess,Args),
