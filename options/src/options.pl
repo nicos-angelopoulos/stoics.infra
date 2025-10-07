@@ -4,7 +4,7 @@ options_defaults( [en_list(false),ground(false)] ).
 %% options( +Required, +Opts ).
 %% options( +Required, +Opts, +OptionsOpts ).
 %
-% This should more naturally be option/2 but as this might cause confusion with
+% This should more naturally be option/2 but this might cause confusion with
 % Swi's own option library.
 % Required can be a single or list of terms. 
 %
