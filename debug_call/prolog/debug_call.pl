@@ -721,9 +721,10 @@ debug_call_topic( start, Pfx, Arg, Topic ) :-
     debug_message_prefixed( Pfx, Mess, Prefixed ),
     ( Arg == true -> Rep = Topic; Rep = Arg ),
     debug_message( Topic, Prefixed, [Rep] ).
-debug_call_topic( end, Pfx, Arg, Topic ) :-
+% 25.10.07, use this as an example of how to have back compatibility to the new args order.
+debug_call_topic( end, Arg, Bog, Topic ) :-
     Mess = 'Finished: ~w',
-    debug_message_prefixed( Pfx, Mess, Prefixed ),
+    ( Bog == [] -> Mess = Prefixed ; debug_message_prefixed(Bog, Mess, Prefixed) ),
     ( Arg == true -> Rep = Topic; Rep = Arg ),
     debug_message( Topic, Prefixed, [Rep] ).
 debug_call_topic( pwd, Pfx, Stage, Topic ) :-
@@ -735,6 +736,7 @@ debug_call_topic( pwd, Pfx, Stage, Topic ) :-
     ),
     debug_message_prefixed( Pfx, Mess, Prefixed ),
     debug_message( Topic, Prefixed, Args ).
+% 25.10.07, use this as example for new debug goals
 debug_call_topic( option, Opt, Bog, Topic ) :-
     en_list( Bog, Bogs ),
     ( memberchk(pred(Pid),Bogs) ->
