@@ -6,7 +6,8 @@ TBD
 ---
 
 1.6
-     25.08.23  changed last two arguments, to Arg and Opts
+     25.10.07  IFACE:    new 'option' debug call
+     25.08.23  CHANGE:   changed last two arguments, to Arg and Opts
 
 1.5         @  22.12.29
      22.01.14  IFACE:    arg can be a term now, when token is task/1

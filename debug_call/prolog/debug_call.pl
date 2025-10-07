@@ -504,7 +504,7 @@ debug_portray( _Topic, _Term ).
 % @version  1.1 2018/03/20  prefer +2 arity in debug_call/2
 % @version  1.2 2020/03/07  now can be used as a replacement for debug/3 (but with old 3rd arg behaviour, allowing eg 'true').
 % @version  1.3 2020/09/14  added canned calls info and enum, debuc/2,3,4
-% @version  1.6 2025/08/23  changed last two arguments
+% @version  1.6 2025/10/23  changed last two arguments, new option goal recogniser
 % @see debuc/3 (shorthand for debug_call/3).
 %
 debug_call( Topic, Goal, Arg ) :-
@@ -735,10 +735,16 @@ debug_call_topic( pwd, Pfx, Stage, Topic ) :-
     ),
     debug_message_prefixed( Pfx, Mess, Prefixed ),
     debug_message( Topic, Prefixed, Args ).
-debug_call_topic( option, Pfx, Arg, Topic ) :-
-    Mess = 'Option goal, with pfx: ~w, arg: ~w, and Topic: ~w',
-    debug_message_prefixed( Pfx, Mess, Prefixed ),
-    debug_message( Topic, Prefixed, [Pfx,Arg,Topic] ).
+debug_call_topic( option, Opt, Bog, Topic ) :-
+    en_list( Bog, Bogs ),
+    ( memberchk(pred(Pid),Bogs) ->
+          Mess = 'Predicate: ~w, option selected: ~w.',
+          Mrgs = [Pid,Opt]
+          ;
+          Mess = 'Option selected: ~w.',
+          Mrgs = [Opt]
+    ),
+    debug_message( Topic, Mess, Mrgs ).
 debug_call_topic( ns_sel, Pfx, Term, Topic ) :-
     % ( Term = [Fst,Sec] -> true; arg(1,Term,Fst),arg(2,Term,Sec) ),
     arg( 1, Term, Fst ), 
