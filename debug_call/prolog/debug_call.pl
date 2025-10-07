@@ -486,7 +486,7 @@ debug_portray( _Topic, _Term ).
 %
 % ?- debuc(ex, wrote, loc(file,csv), path(abs)).
 % % Wrote on file: '/home/nicos/pl/lib/src/trace/file.csv'
-
+%
 % ?- debuc(ex, task(stop), 'write on file').
 % % At 15:44:1 on 2nd of Jul 2014 finished task: write on file.
 %    
