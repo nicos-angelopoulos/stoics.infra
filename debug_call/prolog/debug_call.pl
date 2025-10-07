@@ -124,9 +124,10 @@ debug_call_version( 1:5:0, date(2022,12,29) ).
 :- lib(stoics_lib:datime_readable/1).
 :- lib(end(debug_call) ).
 
-%% debuc( +Topic, +Goal ).
-%% debuc( +Topic, +Goal, +Args ).
-%% debuc( +Topic, +Goal, +Pfx, +Args ).
+%% debuc(+Topic).
+%% debuc(+Topic, +Goal).
+%% debuc(+Topic, +Goal, +Args).
+%% debuc(+Topic, +Goal, +Pfx, +Args).
 % 
 % Shorthands for debug_call/2,3,4 and debug/1.
 % 
@@ -209,15 +210,11 @@ debug_chain( Topic, Then, Prior ) :-
 debug_chain( _Topic, _Then, true ). 
     % setting 3rd to true is a bit presumptious of its uses later on
 
-/** debug_message( +Topic, +Mess, +Args ).
+/** debug_message(+Topic, +Mess, +Args).
 
 A wrap around debug/3 that calls it by constructing the term on-the-fly. 
 So that lib(debug) does not create a record by inspecting the term (via expansion).
 Particularly useful in sending uninstantiated Topics.
-
-==
-
-==
 
 @author nicos angelopoulos
 @version  0.1 2016/11/1
@@ -232,10 +229,6 @@ debug_message( Topic, Mess, Args ) :-
 A wrap around debugging/1 that calls it by constructing the term on-the-fly. 
 So that lib(debug) does not create a record by inspecting the term (via expansion).
 Particularly useful in sending uninstantiated Topics.
-
-==
-
-==
 
 @author nicos angelopoulos
 @version  0.1 2016/11/1
