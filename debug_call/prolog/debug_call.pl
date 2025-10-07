@@ -519,7 +519,7 @@ debug_call( _Topic, _Goal, _Arg, _Opts ).
 debugging_call( Topic, Goal, Arg, Opts ) :- 
     debug_call_topic( Goal, Arg, Opts, Topic ),
     !.
-debugging_call( Topic, call(Goal), Args ) :-
+debugging_call( Topic, call(Goal), Mess, Args ) :-
     !,
     call( Goal ),
     debug_message( Topic, Mess, Args ).
@@ -735,6 +735,10 @@ debug_call_topic( pwd, Pfx, Stage, Topic ) :-
     ),
     debug_message_prefixed( Pfx, Mess, Prefixed ),
     debug_message( Topic, Prefixed, Args ).
+debug_call_topic( option, Pfx, Arg, Opts ) :-
+    Mess = 'Option goal, with pfx: ~w, arg: ~w, and Opts: ~w',
+    debug_message_prefixed( Pfx, Mess, Prefixed ),
+    debug_message( Topic, Prefixed, [Pfx,Arg,Opts] ).
 debug_call_topic( ns_sel, Pfx, Term, Topic ) :-
     % ( Term = [Fst,Sec] -> true; arg(1,Term,Fst),arg(2,Term,Sec) ),
     arg( 1, Term, Fst ), 
