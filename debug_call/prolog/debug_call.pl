@@ -463,6 +463,7 @@ debug_portray( _Topic, _Term ).
 %    As of v2.0 the default is to print the basename, use path(abs) in Opts.
 %
 % See file examples/exo.pl for a test suit including at least one example from each shorthand call.
+%
 %==
 % ?- debug(ex).
 % 
