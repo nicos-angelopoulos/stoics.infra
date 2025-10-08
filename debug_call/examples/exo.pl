@@ -40,17 +40,17 @@ Examples
 % fixme dimensions for matrix,  (mtxo) nR: 4, nC: 3.
 % Output (claimed) in (non-existing) directory: res
 % After mkdir output in directory: res
-% pfx1 finished: exo
-% Could not locate input file specified by: file.txt, and extensions: 
-% Could not locate write file specified by: file.txt, and extensions: 
+% Input from file: '/home/nicos/pl/packs/src/debug_call/examples/a_file.txt'
+% RNA expression input from file: rna.tsv
+% Wrote on file: '/home/nicos/pl/packs/src/debug_call/examples/a_file.txt'
 % Could not locate write file specified by: nonX_file.txt, and extensions: 
-% At 18:24:40 on 7th of Oct 2025 stop task: write on file.
-% At 18:24:40 on 7th of Oct 2025 unk task: write on file.
+% At 10:5:57 on 8th of Oct 2025 stop task: write on file.
+% At 10:5:57 on 8th of Oct 2025 unk task: write on file.
 % Starting: my_run
 % Pwd at, my_run, is: '/home/nicos/pl/packs/src/debug_call/examples/'
 % Continuing with: suv file, as: suv-17.09.26.txg, from non singleton list: [suv-17.09.26.txg,suv-17.09.21.txg]
+% pfx1 finished: exo
 % Finished: exo
-true.
 true.
 ==
 
@@ -88,11 +88,16 @@ exo( Args ) :-
      shell( 'mkdir res' ),
      debuc( Self, odir, res, prefix('After mkdir') ),
      shell( 'rmdir res' ),
-     debuc( Self, end, true, prefix(pfx1) ),
-     File = 'file.txt',
+     File = 'a_file.txt',
+     shell( 'touch a_file.txt' ),
      debuc( Self, input, File, path(abs) ),
+     RnaF = 'rna.tsv',
+     shell( 'touch rna.tsv' ),
+     debuc( Self, input, RnaF, prefix('RNA expression') ),
+     shell( 'rm rna.tsv' ),
      debuc( Self, wrote, File, path(abs) ),
      NoxFile = 'nonX_file.txt',
+     shell( 'rm a_file.txt' ),
      debuc( Self, wrote, NoxFile ),
      debuc( Self, task(stop), 'write on file' ),
      debuc( Self, task(unk), 'write on file' ),
@@ -100,4 +105,5 @@ exo( Args ) :-
      debuc( Self, pwd, my_run ),
      Etcs = ['suv-17.09.26.txg','suv-17.09.21.txg'], Etc = 'suv-17.09.26.txg',
      debug_call( Self, ns_sel, c(Etc,Etcs,'suv file',true) ),
+     debuc( Self, end, true, prefix(pfx1) ),
      debuc( Self, end, true ).
