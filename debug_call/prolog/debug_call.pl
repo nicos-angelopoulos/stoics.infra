@@ -402,10 +402,8 @@ debug_portray( _Topic, _Term ).
 % A simple message in a bottle.
 % ==
 % 
-%
 % The predicate can be used to call arbitrary Goal and then print a message after it has successfull completed.<br>
-%  When Goal is a known abbreviation from those shown below, the Arg usually qualifies the output generated.
-%  When Goal is of the form call(Goal), Arg will be passed to debug(Topic,Mess,Arg). Mess is constructed from 
+% When Goal is a known abbreviation from those shown below, the Arg usually qualifies the output generated.
 %
 %  As of v2 the last two arguments of the /4 version of the predicate where switched from _Pfx_ and Arg
 %  to Arg and Opts. Opts pass arbitary things to Goal, each abbreviation Goal can demand different options. 
@@ -417,6 +415,8 @@ debug_portray( _Topic, _Term ).
 %  * call(Goal)
 %    call Goal before printing debugging message debug(Topic, Mess, MArgS).  Goal is called in deterministic context.
 %    Goal is called with extra arguments +Arg, -Mess and -MArgS.
+%  * call(Goal,Opts) 
+%    as above, but Opts are passed as an extra, last argument in the call
 %  * dims
 %    prints the dimensions of matrix, see mtx_dims/3
 %  * end
@@ -462,7 +462,7 @@ debug_portray( _Topic, _Term ).
 %  * task(Wch)  
 %    time of start/stop (Wch) of a task. Other values for Wch are allowed but printed as they come. Arg can be a term (as of Version 1.5).
 %  * term
-%    simply spew the input term
+%    Report the input term. The term can be named via option term_name(Tnm).
 %  * var
 %    reports variable name (arg(1)) and its current instantiation (arg(2))
 %  * wrote 
@@ -470,7 +470,9 @@ debug_portray( _Topic, _Term ).
 %    Either loc(File,Exts) or simply File in which case Exts = ''.
 %    As of v2.0 the default is to print the basename, use path(abs) in Opts.
 %
-% See file examples/exo.pl for a test suit including at least one example from each shorthand call.
+% As of v2.1 all debuc Goals work with options prefix(Pfx) and pred(Ar,Fn) (also synonymed to pred(Pid)).
+% 
+% See file examples/exo.pl for a test suit including at least one example from each debuc Goal.
 %
 %==
 % ?- debug(ex).
@@ -565,6 +567,7 @@ debug_call( _Topic, _Goal, _Arg, _Opts ).
 debugging_call( Topic, call(Goal), Arg, Opts) :-
     !,
     call( Goal, Arg, Gess, Grgs ),
+    !,
     debug_call_message_opts( Gess, Grgs, Mess, Args, Opts ),
     debug_message( Topic, Mess, Args ).
 debugging_call( Topic, call_opts(Goal), Arg, Opts ) :-
@@ -657,64 +660,63 @@ debug_consec_color( Topic, Clr, Mess, Args ) :-
     retractall( debug_call_message_property(debug(_),color(_)) ).
 
 debug_call_topic( info, Arg, Bogs, _Topic ) :-
-    ( (\+ var(Arg),Arg = Mess/Args) ->
-        true
-        ;
-        % fixme: not sure what to do here ?
-        Mess = Arg,
-        Args = []
-    ),
-    % lib_message_report( Format, Args, Kind ) :-
-     debug_message_prefixed( Bogs, Mess, Prefixed ),
-	phrase('$messages':translate_message(debug(Prefixed,Args)), Lines),
+     ( (\+ var(Arg),Arg = Mess/Args) ->
+          true
+          ;
+          % fixme: not sure what to do here ?
+          Mess = Arg,
+          Args = []
+     ),
+     % lib_message_report( Format, Args, Kind ) :-
+     debug_call_message_opts( Mess, Args, Prefixed, Prgs, Bogs ),
+	phrase('$messages':translate_message(debug(Prefixed,Prgs)), Lines),
 	print_message_lines(current_output, kind(informational), Lines).
 debug_call_topic( dims, NamesPrv/MtxsPrv, Bogs, Topic ) :-
     ( is_list(NamesPrv) -> Names=NamesPrv, MtxsPrv=Mtxs, With = 'Dimensions for matrices, '
                            ; [NamesPrv] = Names, [MtxsPrv]=Mtxs, With = 'Dimensions for matrix, ' 
     ),
-    debug_message_prefixed( Bogs, With, Prefixed ),
     maplist( debug_mtx_dims, Mtxs, NRows, NCols ),
-    findall( PartM, (member(_,Names),PartM=' (~w) nR: ~d, nC: ~d.'), MParts ),
+    findall( PartM, (member(_,Names),PartM='~w: nR: ~d, nC: ~d.'), MParts ),
     atomic_list_concat( MParts, '', Right ),
     findall( [Name,NRow,NCol], (nth1(N,Names,Name),nth1(N,NRows,NRow),nth1(N,NCols,NCol)), NNest ),
-    flatten( NNest, Vars ),
-    atom_concat( Prefixed, Right, Message ),
-    debug_message( Topic, Message, Vars ). % do the messaging !
+    flatten( NNest, Vargs ),
+    atom_concat( With, Right, Vess ),
+    debug_call_message_opts( Vess, Vargs, Message, Args, Bogs ),
+    debug_message( Topic, Message, Args ).
 debug_call_topic( enum, InArg, Bogs, Topic ) :-
-    ( memberchk(prefix(Pfx),Bogs) -> true; Pfx = '' ),
     ground( InArg ),
     ( InArg = Left/Term -> true; Left = unnamed, Term = InArg ),
     ( is_list(Term) ->
         length( Term, Len ),
         number_codes( Len, LenCs ),
         length( LenCs, SpcLen ),
-        debug_call_topic_list_delim( Left, Topic, prefix(Pfx), 'Starting enumeration of list: ~w' ),
+        debug_call_topic_list_delim( Left, Topic, 'Starting enumeration of list: ~w', Bogs ),
         debug_call_topic_enum( Term, 1, SpcLen, Topic ),
-        debug_call_topic_list_delim( Left, Topic, prefix(Pfx), 'Ended enumeration of list: ~w' )
+        debug_call_topic_list_delim( Left, Topic, 'Ended enumeration of list: ~w', Bogs )
         ;
         Term =.. Args,
         length( Args, Len ),
         number_codes( Len, LenCs ),
         length( LenCs, SpcLen ),
-        debug_call_topic_list_delim( Left, Topic, prefix(Pfx), 'Starting enumeration of list: ~w' ),
+        debug_call_topic_list_delim( Left, Topic, 'Starting enumeration of list: ~w', Bogs ),
         debug_call_topic_enum( Args, 1, SpcLen, Topic ),
-        debug_call_topic_list_delim( Left, Topic, prefix(Pfx), 'Ended enumeration of list: ~w' )
+        debug_call_topic_list_delim( Left, Topic, 'Ended enumeration of list: ~w', Bogs )
     ).
 debug_call_topic( length, NamesPrv/ListsPrv, Bogs, Topic ) :-
     ( is_list(NamesPrv) -> Names=NamesPrv, ListsPrv=Lists, With = 'Lengths for lists, '
                            ; [NamesPrv] = Names, [ListsPrv]=Lists, With = 'Length for list, ' 
     ),
-    debug_message_prefixed( Bogs, With, Prefixed ),
     maplist( length, Lists, Lengths ),
     findall( ['~w: ~w',', '], member(_,Lengths), WsNest ),
     flatten( WsNest, WsL ),
     once( append(WsLComma,[_],WsL) ),
     append( WsLComma, ['.'], WsLDot ),
     atomic_list_concat( WsLDot, '', Right ),
-    atom_concat( Prefixed, Right, Message ),
     findall( [Name,Length], (nth1(N,Names,Name),nth1(N,Lengths,Length)), NLNest ),
     flatten( NLNest, NLs ),
-    debug_message( Topic, Message, NLs ). % do the messaging
+    atom_concat( With, Right, Vess ),
+    debug_call_message_opts( Vess, NLs, Message, Args, Bogs ),
+    debug_message( Topic, Message, Args ). % do the messaging
 debug_call_topic( list, InArg, Bogs, Topic ) :-
     ground( InArg ),
     ( InArg = Left/List -> 
@@ -722,35 +724,33 @@ debug_call_topic( list, InArg, Bogs, Topic ) :-
         ;
         List = InArg, Hdr = '', Ftr = ''
     ),
-    ( memberchk(prefix(Pfx),Bogs) -> true; Pfx = '' ),
-    debug_call_topic_list_delim( Hdr, Topic, Pfx, 'Starting listing of list: ~w' ),
+    debug_call_topic_list_delim( Hdr, Topic, 'Starting listing of list: ~w', Bogs),
     maplist( debug_message(Topic,'~w'), List ),
-    debug_call_topic_list_delim( Ftr, Topic, Pfx, 'Ended listing of list: ~w' ).
+    debug_call_topic_list_delim( Ftr, Topic, 'Ended listing of list: ~w', Bogs ).
 debug_call_topic( odir, Odir, Bogs, Topic ) :-
     ( exists_directory(Odir) ->
         Mess = 'Output in directory: ~w'
         ;
         Mess = 'Output (claimed) in (non-existing) directory: ~w'
     ),
-    debug_message_prefixed( Bogs, Mess, Prefixed ),
-    debug_message( Topic, Prefixed, [Odir] ).
+    debug_call_message_opts( Mess, [Odir], Message, Args, Bogs ),
+    debug_message( Topic, Message, Args ).
 debug_call_topic( option, Opt, Bogs, Topic ) :-
     Ness = 'Option selected: ~w',
-    debug_call_pred_in_opts_mess( Ness, Opt, Pess, Prgs, Bogs ),
     ( (memberchk(all(OrgOpts),Bogs),is_list(OrgOpts)) ->
                ( memberchk(internal(true),Bogs) ->
                     RdcOpts = OrgOpts
                     ;
                     findall( R, (member(R,OrgOpts),functor(R,F,_),\+(atom_concat('$',_,F))), RdcOpts )
                ),
-               atom_concat( Pess, ' from options: ~w', Mess ),
-               append( Prgs, [RdcOpts], Mrgs )
+               atom_concat( Ness, ' from options: ~w', Mess ),
+               Mrgs = [Opt,RdcOpts]
                ;
-               atom_concat( Pess, '.', Mess ),
-               Prgs = Mrgs
+               atom_concat( Ness, '.', Mess ),
+               [Opt] = Mrgs
     ),
-    debug_message_prefixed( Bogs, Mess, Prefixed ),
-    debug_message( Topic, Prefixed, Mrgs ).
+    debug_call_message_opts( Mess, Mrgs, Message, Args, Bogs ),
+    debug_message( Topic, Message, Args ).
 debug_call_topic( options, RepOpts, Bogs, Topic ) :-
     Ness = 'Options: ~w',
     ( memberchk(internal(true),Bogs) -> 
@@ -758,14 +758,18 @@ debug_call_topic( options, RepOpts, Bogs, Topic ) :-
                ;
                findall( R, (member(R,RepOpts),functor(R,F,_),\+(atom_concat('$',_,F))), RdcOpts )
     ),
-    debug_call_pred_in_opts_mess( Ness, RdcOpts, Mess, Prgs, Bogs ),
-    debug_message_prefixed( Bogs, Mess, Prefixed ),
-    % append( Prgs, [RdcOpts], Drgs ),
-    debug( Topic,  Prefixed, Prgs ).
-debug_call_topic( term, DbgTerm, Bogs, Topic ) :-
-    Mess = '~w',
-    debug_message_prefixed( Bogs, Mess, Prefixed ),
-    debug_message( Topic, Prefixed, [DbgTerm] ).
+    debug_call_message_opts( Ness, [RdcOpts], Message, Args, Bogs ),
+    debug( Topic,  Message, Args ).
+debug_call_topic( term, Derm, Bogs, Topic ) :-
+    ( memberchk(term_name(Tnm),Bogs) -> 
+          Mess = 'Reporting term (~w): ~w',
+          Mrgs = [Tnm,Derm]
+          ; 
+          Mess = 'Reporting term: ~w',
+          Mrgs = [Derm]
+    ),
+    debug_call_message_opts( Mess, Mrgs, Message, Args, Bogs ),
+    debug_message( Topic, Message, Args ).
 debug_call_topic( var, DbgTerm, Bogs, Topic ) :-
     arg( 1, DbgTerm, Var ),
     arg( 2, DbgTerm, Val ),
@@ -857,10 +861,9 @@ debug_call_topic_enum( [H|T], I, Len, Topic ) :-
     J is I + 1,
     debug_call_topic_enum( T, J, Len, Topic ).
 
-debug_call_topic_list_delim( '', _Topic, _Pfx, _Mess ).
-debug_call_topic_list_delim( ListName, Topic, Pfx, Mess ) :-
-    debug_message_prefixed( Pfx, Mess, Prefixed ),
-    debug_message( Topic, Prefixed, [ListName] ).
+debug_call_topic_list_delim( ListName, Topic, Std, Bogs ) :-
+     debug_call_message_opts( Std, [ListName], Mess, Args, Bogs ), 
+     debug_message( Topic, Mess, Args ).
 
 debug_call_topic_time_which_readable( Wch, Wchable ) :-
     debug_call_topic_time_which_readable_known( Wch, Wchable ),
@@ -905,12 +908,6 @@ debug_message_prefixed( [H|T], Standard, Prefixed ) :-
     debug_message_prefixed_atom( Pfx, Standard, Prefixed ).
 debug_message_prefixed( _, Standard, Standard ).
 
-debug_message_prefixed_atom( Pfx, Standard, Prefixed ) :-
-    sub_atom( Standard, 0, 1, Aft, Fst ),
-    downcase_atom( Fst, Low ),
-    sub_atom( Standard, 1, Aft, 0, Right ),
-    atomic_list_concat( [Pfx,' ',Low,Right], Prefixed ).
-
 debug_call_message_opts( Std, Srgs, Mess, Args, Opts ) :-
      debug_call_pred_in_opts_mess( Std, Srgs, Pess, Args, Opts ),
      debug_message_prefixed( Opts, Pess, Mess ).
@@ -932,3 +929,9 @@ debug_call_pred_in_opts( Pid, Opts ) :-
     Fun/Ar = Pid.
 debug_call_pred_in_opts( Pid, Opts ) :-
     memberchk( pred(Pid), Opts ).
+
+debug_message_prefixed_atom( Pfx, Standard, Prefixed ) :-
+    sub_atom( Standard, 0, 1, Aft, Fst ),
+    downcase_atom( Fst, Low ),
+    sub_atom( Standard, 1, Aft, 0, Right ),
+    atomic_list_concat( [Pfx,' ',Low,Right], Prefixed ).
