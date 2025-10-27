@@ -96,6 +96,7 @@ debug_calls uses dynamic =..  .
 @version 1.4 2020/9/18
 @version 1.5 2022/12/29
 @version 2.0 2025/10/7
+@version 2.1 2025/10/27
 @see debug_call/4 for version information
 
 */
@@ -106,11 +107,11 @@ Current version and release date for the library.
 
 ==
 ?- debug_call_version( -V, -D ).
-V = 1:5:0,
-D = date(2022,12,29).
+V = 2:1:0,
+D = date(2025,10,27).
 ==
 */
-debug_call_version( 1:5:0, date(2022,12,29) ).
+debug_call_version( 2:1:0, date(2025,10,27) ).
 
 :- use_module(library(apply)).   % maplist/4,...
 :- use_module(library(lists)).   % member/4,...
@@ -535,17 +536,17 @@ debug_portray( _Topic, _Term ).
 % As of version 1.2 debug_call/3 can act as a replacement of debug/3 but with the old behaviour.
 %
 %==
-% ?- debug( ex, 'Messagging...', true ).
-% Messagging...
-% [[ EXCEPTION while printing message 'Messagging...'
+% ?- debug( ex, 'Messaging...', true ).
+% Messaging...
+% [[ EXCEPTION while printing message 'Messaging...'
 %       with arguments user:true:
 %       raised: format('too many arguments')
 %    ]]
 % 
 % true.
 % 
-% ?- debuc( ex, 'Messagging...', true ).
-% % Messagging...
+% ?- debuc( ex, 'Messaging...', true ).
+% % Messaging...
 % true.
 %==
 %
@@ -559,6 +560,7 @@ debug_portray( _Topic, _Term ).
 % @version  1.2 2020/03/07  now can be used as a replacement for debug/3 (but with old 3rd arg behaviour, allowing eg 'true').
 % @version  1.3 2020/09/14  added canned calls info and enum, debuc/2,3,4
 % @version  2.0 2025/10/07  changed last two arguments, new option goal recogniser, pred/1, internal/1 & all/1
+% @version  2.1 2025/10/27  pid(F,A) & prefix() universal; call() fixed; doc; enum terms fix; ns_sel simplify
 % @see file examples/exo.pl
 % @see debuc/3 shorthand for debug_call/3
 %

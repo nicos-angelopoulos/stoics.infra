@@ -5,7 +5,7 @@ TBD
    17.03.10   debug_call with Success/failure by colour too (see SWI installation)
 ---
 
-2.1         
+2.1         @ 25.10.27
      25.10.27  OPTS:     pid(F,A) allowed for pid(Pid)
                FIXED:    debuc Goal call/1 (also added prefix and pred info from Opts)
                IFACE:    added debuc Goal call/2
