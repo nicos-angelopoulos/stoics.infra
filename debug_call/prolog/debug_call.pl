@@ -28,6 +28,7 @@ user:message_property( Dbg, Property ) :-
 Avoids running goals to produce output that is only relevant while debugging.
 Includes pre-canned, often used calls that print informative messages for common debugging tasks.
 
+See the main predicate's documenation, debug_call/4, for more details.<br>
 See file examples/exo.pl for a full pallette of examples. 
 
 ---+++ Examples
