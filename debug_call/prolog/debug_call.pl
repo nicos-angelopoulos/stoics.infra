@@ -392,24 +392,35 @@ debug_portray( _Topic, _Term ).
 % ?- Mtx = [h(a,b,c),r(1,2,3),r(4,5,6),r(7,8,9)],
 %    debuc(ex, dims, mtx/Mtx).
 % 
-% Dimensions for matrix,  (mtx) nR: 4, nC: 3.
-% Mtx = [h(a, b, c), r(1, 2, 3), r(4, 5, 6), r(7, 8, 9)].
+% Dimensions for matrix, mtx: nR: 4, nC: 3.
 % ==
 % 
-% As of v1.2 it can work as a replacement to debug/3. That is if Goal does not match any of the forms below, it will be interpreted as a message.
+% The predicate can work as a replacement to debug/3. That is, if Goal does not match any of the forms below, it will be interpreted as a message.
 % ==
 % ?- debuc(ex, 'A simple message in a ~a.', [bottle] ).
 % A simple message in a bottle.
 % ==
 % 
-% The predicate can be used to call arbitrary Goal and then print a message after it has successfull completed.<br>
+% The predicate can be used to call arbitrary Goal and then print a message after it has successfull completed (see below).<br>
 % When Goal is a known abbreviation from those shown below, the Arg usually qualifies the output generated.
 %
-%  As of v2 the last two arguments of the /4 version of the predicate where switched from _Pfx_ and Arg
+%  As of v2 the last two arguments of the /4 version of the predicate were switched from _Pfx_ and Arg
 %  to Arg and Opts. Opts pass arbitary things to Goal, each abbreviation Goal can demand different options. 
-%  All abbreviation Goal them can take =prefix(Pfx)= which corresponds to Pfx in the old /4 verison. 
-%  Opts will be forced to be a list via en_list/2, Goal will know what todo with it.
-% 
+%  All debuc Goals can take =|prefix(Pfx)|= which corresponds to Pfx in the old /4 verison, and =|pred(Fnc,Ar)|= or =|pred(Pid)|=.
+%==
+% ?- debuc(ex, enum, list_x/[x1,x1,x3], [pred(integral,2),prefix('At')] ).
+% % At predicate: integral/2 starting enumeration of list: list_x
+% % 1.x1
+% % 2.x1
+% % 3.x3
+% % At predicate: integral/2 ended enumeration of list: lis
+%==
+% The predicate is relaxed about Opts. It can be a single term, which will be cast into a list.
+%==
+% ?- debuc(ex, pwd, my_run, pred(bio_db,3) ).
+%
+% Predicate: bio_db/3 pwd at, my_run, is: '/home/nicos/pl/packs/private/debug_call/'
+%==
 %
 % Goal in:
 %  * call(Goal)
@@ -667,7 +678,6 @@ debug_call_topic( info, Arg, Bogs, _Topic ) :-
           Mess = Arg,
           Args = []
      ),
-     % lib_message_report( Format, Args, Kind ) :-
      debug_call_message_opts( Mess, Args, Prefixed, Prgs, Bogs ),
 	phrase('$messages':translate_message(debug(Prefixed,Prgs)), Lines),
 	print_message_lines(current_output, kind(informational), Lines).
@@ -774,50 +784,49 @@ debug_call_topic( var, DbgTerm, Bogs, Topic ) :-
     arg( 1, DbgTerm, Var ),
     arg( 2, DbgTerm, Val ),
     Mess = 'Variable: ~a, value: ~w',
-    debug_message_prefixed( Bogs, Mess, Prefixed ),
-    debug_message( Topic, Prefixed, [Var,Val] ).
+    debug_call_message_opts( Mess, [Var,Val], Message, Args, Bogs ),
+    debug_message( Topic, Message, Args ).
 debug_call_topic( wrote, ForLoc, Bogs, Topic ) :-
     ( ForLoc = loc(Spec,Ext) -> true; Spec=ForLoc, Ext = '' ),
     catch( locate(Spec,Ext,Loc), Excp, true ),
     MessW = 'Wrote on file: ~p',
-    debug_call_location_exception_message( Excp, write, Loc, MessW, Mess, Bogs, Args ),
-    debug_message_prefixed( Bogs, Mess, Prefixed ),
-    debug_message( Topic, Prefixed, Args ).
+    debug_call_location_exception_message( Excp, write, Loc, MessW, Mess, Bogs, Mrgs ),
+    debug_call_message_opts( Mess, Mrgs, Message, Args, Bogs ),
+    debug_message( Topic, Message, Args ).
 debug_call_topic( read, ForLoc, Bogs, Topic ) :-
      debug_call_topic( input, ForLoc, Bogs, Topic ).
 debug_call_topic( input, ForLoc, Bogs, Topic ) :-
     ( ForLoc = loc(Spec,Ext) -> true; Spec=ForLoc, Ext = '' ),
     catch( locate(Spec,Ext,Loc), Excp, true ),
     MessW = 'Input from file: ~p',
-    debug_call_location_exception_message( Excp, input, Loc, MessW, Mess, Bogs, Args ),
-    debug_message_prefixed( Bogs, Mess, Prefixed ),
-    debug_message( Topic, Prefixed, Args ).
+    debug_call_location_exception_message( Excp, input, Loc, MessW, Mess, Bogs, Mrgs ),
+    debug_call_message_opts( Mess, Mrgs, Message, Args, Bogs ),
+    debug_message( Topic, Message, Args ).
 debug_call_topic( task(Whc), Task, Bogs, Topic ) :-
     datime_readable( Readable ),
     debug_call_topic_time_which_readable( Whc, Whcable ),
     atomic_list_concat( [Readable,' ',Whcable,' task: ~w.'], Mess ),
-    debug_message_prefixed( Bogs, Mess, Prefixed ),
-    debug_message( Topic, Prefixed, [Task] ).
+    debug_call_message_opts( Mess, [Task], Message, Args, Bogs ),
+    debug_message( Topic, Message, Args ).
 debug_call_topic( start, Arg, Bogs, Topic ) :-
     Mess = 'Starting: ~w',
-    debug_message_prefixed( Bogs, Mess, Prefixed ),
     ( Arg == true -> Rep = Topic; Rep = Arg ),
-    debug_message( Topic, Prefixed, [Rep] ).
-% 25.10.07, use this as an example of how to have back compatibility to the new args order.
+    debug_call_message_opts( Mess, [Rep], Message, Args, Bogs ),
+    debug_message( Topic, Message, Args ).
 debug_call_topic( end, Arg, Bogs, Topic ) :-
     Mess = 'Finished: ~w',
-    debug_message_prefixed( Bogs, Mess, Prefixed ),
     ( Arg == true -> Rep = Topic; Rep = Arg ),
-    debug_message( Topic, Prefixed, [Rep] ).
+    debug_call_message_opts( Mess, [Rep], Message, Args, Bogs ),
+    debug_message( Topic, Message, Args ).
 debug_call_topic( pwd, Stage, Bogs, Topic ) :-
     working_directory( Pwd, Pwd ),
     ( Stage == false -> 
-        Mess = 'Pwd: ~p', Args = [Pwd]
+        Mess = 'Pwd: ~p', Mrgs = [Pwd]
         ;
-        Mess = 'Pwd at, ~w, is: ~p', Args = [Stage,Pwd]
+        Mess = 'Pwd at, ~w, is: ~p', Mrgs = [Stage,Pwd]
     ),
-    debug_message_prefixed( Bogs, Mess, Prefixed ),
-    debug_message( Topic, Prefixed, Args ).
+    debug_call_message_opts( Mess, Mrgs, Message, Args, Bogs ),
+    debug_message( Topic, Message, Args ).
 debug_call_topic( ns_sel, Term, Bogs, Topic ) :-
     % ( Term = [Fst,Sec] -> true; arg(1,Term,Fst),arg(2,Term,Sec) ),
     arg( 1, Term, Fst ), 
@@ -845,8 +854,8 @@ debug_call_topic( ns_sel, Term, Bogs, Topic ) :-
                 Mess = 'Continuing: ~w, from non singleton list: ~w', MArgs = [Fst,Sec]
             )
         ),
-        debug_message_prefixed( Bogs, Mess, Prefixed ),
-        debug_message( Topic, Prefixed, MArgs )
+        debug_call_message_opts( Mess, MArgs, Message, Args, Bogs ),
+        debug_message( Topic, Message, Args )
     ).
 
 debug_call_topic_enum( [], _I, _Len, _Topic ).
