@@ -406,14 +406,14 @@ debug_portray( _Topic, _Term ).
 %
 %  As of v2 the last two arguments of the /4 version of the predicate were switched from _Pfx_ and Arg
 %  to Arg and Opts. Opts pass arbitary things to Goal, each abbreviation Goal can demand different options. 
-%  All debuc Goals can take =|prefix(Pfx)|= which corresponds to Pfx in the old /4 verison, and =|pred(Fnc,Ar)|= or =|pred(Pid)|=.
+%  All debuc Goals can take =|prefix(Pfx)|= which corresponds to Pfx in the old /4 version, and =|pred(Fnc,Ar)|= or =|pred(Pid)|=.
 %==
 % ?- debuc(ex, enum, list_x/[x1,x1,x3], [pred(integral,2),prefix('At')] ).
 % % At predicate: integral/2 starting enumeration of list: list_x
 % % 1.x1
 % % 2.x1
 % % 3.x3
-% % At predicate: integral/2 ended enumeration of list: lis
+% % At predicate: integral/2 ended enumeration of list: list_x
 %==
 % The predicate is relaxed about Opts. It can be a single term, which will be cast into a list.
 %==
@@ -452,11 +452,8 @@ debug_portray( _Topic, _Term ).
 %    else it is translated as Hdr/''/List or ''/''/List. 
 %    If Hdr or Ftr are '' then that part of the message is skipped
 %  * ns_sel
-%    first argument is the item selected from second arg list (only reported if 2nd arg is not a singleton (ns))
-%    accepts 2 optional args, 3rd is the token of what is selected (false for printing nothing on the subject, default)
-%    and 4th is whether to report if the 2nd argument is indeed a singleton (default: false)
-%  * ns_sel(true)
-%    first argument is the item selected from second arg list. reports differently if 2nd arg is a singleton, but always does report
+%    first argument of Arg is the item selected from second arg which is expected to be a list.
+%    The selected argument can be named on the massage via sel_name(Lnm) in Opts.
 %  * odir
 %    output directory (Arg should exist and be a directory)
 %  * option
@@ -520,8 +517,8 @@ debug_portray( _Topic, _Term ).
 % true.
 % 
 % ?-  Etcs = [suv-17.09.26.txg,suv-17.09.21.txg], Etc = suv-17.09.26.txg,
-%     debuc(suv, ns_sel, c(Etc,Etcs,'suv file',true)).
-% Continuing with: suv file, as: suv-17.09.26.txg, from non singleton list: [suv-17.09.26.txg,suv-17.09.21.txg]
+%     debuc(suv, ns_sel, c(Etc,Etcs, sel_name('suv file') ).
+% Continuing with: suv-17.09.26.txg as the: suv file. From list: [suv-17.09.26.txg,suv-17.09.21.txg]
 %
 % ?- assert( (list_avg_mess(List,Mess,Args) :- length(List,Len), sum_list(List,Sum), Avg is Sum / Len, Mess = 'Avg: ~w', Args = Avg) ).
 % ?- debuc( ex, call(list_avg_mess), [1,2,3] ).
@@ -830,35 +827,17 @@ debug_call_topic( pwd, Stage, Bogs, Topic ) :-
     debug_call_message_opts( Mess, Mrgs, Message, Args, Bogs ),
     debug_message( Topic, Message, Args ).
 debug_call_topic( ns_sel, Term, Bogs, Topic ) :-
-    % ( Term = [Fst,Sec] -> true; arg(1,Term,Fst),arg(2,Term,Sec) ),
-    arg( 1, Term, Fst ), 
+    arg( 1, Term, Fst ),
     arg( 2, Term, Sec ),
-    functor( Term, _Tname, Arity ),
-    ( Sec == [] -> 
-        true % fixme: it will make more sense to throw an error if Sec = []
-        ;
-        ( Sec = [_Single] ->
-            ( (Arity>3,arg(4,Term,true)) ->
-                ( (Arity>2,\+ arg(3,Term,false)) ->
-                    arg(3,Term,Trd),
-                    Mess= 'Continuing with: ~w as: ~w, (only match).', MArgs = [Trd,Fst]
-                    ;
-                    Mess= 'Continuing with only match: ~w.', MArgs = [Fst,Sec]
-                )
-                ;
-                Mess = 'Continuing: ~w, from non singleton list: ~w', MArgs = [Fst,Sec]
-            )
-            ;
-            ( (Arity>2,\+ arg(3,Term,false)) ->
-                arg(3,Term,Trd),
-                Mess = 'Continuing with: ~w, as: ~w, from non singleton list: ~w', MArgs = [Trd,Fst,Sec]
-                ;
-                Mess = 'Continuing: ~w, from non singleton list: ~w', MArgs = [Fst,Sec]
-            )
-        ),
-        debug_call_message_opts( Mess, MArgs, Message, Args, Bogs ),
-        debug_message( Topic, Message, Args )
-    ).
+    ( memberchk(sel_name(Trd),Bogs) ->
+          Mess = 'Continuing with: ~w as the: ~w. From list: ~w',
+          MArgs= [Fst,Trd,Sec]
+          ;
+          Mess = 'Continuing with: ~w from list: ~w',
+          MArgs= [Fst,Sec]
+    ),
+    debug_call_message_opts( Mess, MArgs, Message, Args, Bogs ),
+    debug_message( Topic, Message, Args ).
 
 debug_call_topic_enum( [], _I, _Len, _Topic ).
 debug_call_topic_enum( [H|T], I, Len, Topic ) :-

@@ -8,7 +8,7 @@ exo_defaults([debug(true),op1(one),op2(two)]).
 
 /** exo(+Opts)
 
-Option reporting example.
+Reporting examples for all debuc Goals in debug_call/4.
 
 Opts
   * debug(Dbg=true)
@@ -18,46 +18,65 @@ Examples
 ==
 ?- exo.
 ?- exo([]).
-% Predicate: exo/1, option selected: op1(one).
-% Predicate: exo/1, with options: [debug(true),op1(one),op2(two)].
-% Predicate: exo/1, with options: [$restore(exo,debug,true),$restore(exo,debug,false),debug(true),op1(one),op2(two)].
+% Predicate: exo/1 option selected: op1(one).
+% Predicate: exo/1 options: [debug(true),op1(one),op2(two)]
+% Predicate: exo/1 options: [$restore(exo,debug,true),$restore(exo,debug,false),debug(true),op1(one),op2(two)]
+% Full predicate: exo/1 options: [$restore(exo,debug,true),$restore(exo,debug,false),debug(true),op1(one),op2(two)]
 % Option selected: op2(two).
 % Option selected: op2(two) from options: [debug(true),op1(one),op2(two)]
+% For predicate: exo/1 option selected: op2(two) from options: [debug(true),op1(one),op2(two)]
 % Arbitrary: two
+% Reporting term: termo(a,b,c)
+% A term from predicate: exo/1 reporting term (termal): termo(a,b,c)
 % Variable: X, value: 2
-% Variable: Y, value: 3
+% In predicate: exo/1 variable: Y, value: 3
 % Length for list, ops: 2.
+% what length for list, ops: 2.
+% what predicate: exo/1 length for list, ops: 2.
 % Starting listing of list: ops
 % one
 % two
 % Ended listing of list: ops
-% abc starting enumeration of list: ops
+% Abc starting enumeration of list: ops
 % 1.one
 % 2.two
-% abc ended enumeration of list: ops
+% Abc ended enumeration of list: ops
+% Starting enumeration of term: term_abc (func: t)
+% 1.a
+% 2.b
+% 3.c
+% Ended enumeration of term: term_abc (func: t)
 % My message is long.
-% Dimensions for matrix,  (mtxo) nR: 4, nC: 3.
-% fixme dimensions for matrix,  (mtxo) nR: 4, nC: 3.
+% Why predicate: exo/1 my message is long ?
+% Dimensions for matrix, mtxo: nR: 4, nC: 3.
+% fixme dimensions for matrix, mtxo: nR: 4, nC: 3.
 % Output (claimed) in (non-existing) directory: res
-% After mkdir output in directory: res
-% Input from file: '/home/nicos/pl/packs/src/debug_call/examples/a_file.txt'
-% RNA expression input from file: rna.tsv
-% Wrote on file: '/home/nicos/pl/packs/src/debug_call/examples/a_file.txt'
+% After mkdir predicate: exo/1 output in directory: res
+% Input from file: '/home/nicos/pl/packs/private/debug_call/a_file.txt'
+% RNA expression predicate: exo/1 input from file: rna.tsv
+% Wrote on file: '/home/nicos/pl/packs/private/debug_call/a_file.txt'
+% Via predicate: exo/1 wrote on file: a_file.txt
 % Could not locate write file specified by: nonX_file.txt, and extensions: 
-% At 10:5:57 on 8th of Oct 2025 stop task: write on file.
-% At 10:5:57 on 8th of Oct 2025 unk task: write on file.
+% At 15:50:4 on 27th of Oct 2025 stop task: write on file.
+% At 15:50:4 on 27th of Oct 2025 unk task: write on file.
+% Prefixed by predicate: exo/1 at 15:50:4 on 27th of Oct 2025 unk task: write on file.
 % Starting: my_run
-% Pwd at, my_run, is: '/home/nicos/pl/packs/src/debug_call/examples/'
+% From predicate: exo/1 starting: my_run
+% Pwd at, my_run, is: '/home/nicos/pl/packs/private/debug_call/'
+% While in predicate: exo/1 pwd at, my_run, is: '/home/nicos/pl/packs/private/debug_call/'
 % Continuing with: suv file, as: suv-17.09.26.txg, from non singleton list: [suv-17.09.26.txg,suv-17.09.21.txg]
-% pfx1 finished: exo
+% At predicate: exo/1 continuing with: suv file, as: suv-17.09.26.txg, from non singleton list: [suv-17.09.26.txg,suv-17.09.21.txg]
 % Avg: 2, list: [1,2,3]
 % By call predicate: exo/1 avg: 2, list: [1,2,3]
+% pfx1 finished: exo
+% At predicate: exo/1 finished: exo
 % Finished: exo
 true.
 ==
 
 @author nicos angelopoulos
 @version  0.1 2025/10/07
+@version  0.2 2025/10/27
 
 */
 exo :-
