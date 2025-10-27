@@ -11,6 +11,7 @@ TBD
                IFACE:    added debuc Goal call/2
                IFACE:    more verobse message for "term", also option term_name(Tnm)
                CHANGE:   debuc Goals now via single predicate for uniform pred/1,2 and prefix/1 options
+               CHANGE:   change reporting of enumerated compounds
 
 2.0         @ 25.10.07
      25.10.07  IFACE:    new 'option' debug call

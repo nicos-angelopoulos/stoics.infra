@@ -433,7 +433,7 @@ debug_portray( _Topic, _Term ).
 %  * end
 %    translates to finishing ~Arg or finishing ~Topic if Arg == true
 %  * enum
-%    print lists and deconstructed terms, where each item is prefixed with an index number
+%    print members of lists and arguments of terms, where each item is printed on single line and prefixed by an index number
 %  * goal
 %    anything that does n't match any of the above is retrived as call(Goal)
 %  * info
@@ -704,13 +704,15 @@ debug_call_topic( enum, InArg, Bogs, Topic ) :-
         debug_call_topic_enum( Term, 1, SpcLen, Topic ),
         debug_call_topic_list_delim( Left, Topic, 'Ended enumeration of list: ~w', Bogs )
         ;
-        Term =.. Args,
+        Term =.. [Func|Args],
         length( Args, Len ),
         number_codes( Len, LenCs ),
         length( LenCs, SpcLen ),
-        debug_call_topic_list_delim( Left, Topic, 'Starting enumeration of list: ~w', Bogs ),
+        atomic_list_concat( ['Starting enumeration of term: ~w (func: ',Func,')'], StrMess ),
+        debug_call_topic_list_delim( Left, Topic, StrMess, Bogs ),
         debug_call_topic_enum( Args, 1, SpcLen, Topic ),
-        debug_call_topic_list_delim( Left, Topic, 'Ended enumeration of list: ~w', Bogs )
+        atomic_list_concat( ['Ended enumeration of term: ~w (func: ',Func,')'], EndMess ),
+        debug_call_topic_list_delim( Left, Topic, EndMess, Bogs )
     ).
 debug_call_topic( length, NamesPrv/ListsPrv, Bogs, Topic ) :-
     ( is_list(NamesPrv) -> Names=NamesPrv, ListsPrv=Lists, With = 'Lengths for lists, '

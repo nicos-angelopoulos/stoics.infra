@@ -87,6 +87,7 @@ exo( Args ) :-
      debuc( Self, length, ops/Ops, [prefix(what),pred(Self,1)] ),
      debuc( Self, list, ops/ops/Ops, true ),
      debuc( Self, enum, ops/Ops, prefix('Abc') ),
+     debuc( Self, enum, term_abc/t(a,b,c) ),
      debuc( Self, info, 'My message is ~w.'/long ),
           % ^ written in Green
      debuc( Self, info, 'My message is ~w ?'/long, [pred(Self,1),prefix('Why')] ),
