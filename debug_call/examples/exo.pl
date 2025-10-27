@@ -50,6 +50,8 @@ Examples
 % Pwd at, my_run, is: '/home/nicos/pl/packs/src/debug_call/examples/'
 % Continuing with: suv file, as: suv-17.09.26.txg, from non singleton list: [suv-17.09.26.txg,suv-17.09.21.txg]
 % pfx1 finished: exo
+% Avg: 2, list: [1,2,3]
+% By call predicate: exo/1 avg: 2, list: [1,2,3]
 % Finished: exo
 true.
 ==
@@ -106,4 +108,8 @@ exo( Args ) :-
      Etcs = ['suv-17.09.26.txg','suv-17.09.21.txg'], Etc = 'suv-17.09.26.txg',
      debug_call( Self, ns_sel, c(Etc,Etcs,'suv file',true) ),
      debuc( Self, end, true, prefix(pfx1) ),
+     assert( (list_avg_mess(Vist,Vess,Vrgs) :- length(Vist,Ven), sum_list(Vist,Vum), Vvg is Vum / Ven, Vess = 'Avg: ~w, list: ~w', Vrgs=[Vvg,Vist]) ),
+     Nist = [1,2,3],
+     debuc( Self, call(list_avg_mess), Nist ), 
+     debuc( Self, call(list_avg_mess), Nist, [pred(Self,1),prefix('By call')] ), 
      debuc( Self, end, true ).

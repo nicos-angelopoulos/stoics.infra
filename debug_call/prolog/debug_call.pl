@@ -415,7 +415,8 @@ debug_portray( _Topic, _Term ).
 %
 % Goal in:
 %  * call(Goal)
-%    call Goal before printing debugging message debug(Topic, Mess, Arg).  (Goal is called in non-deterministic context.)
+%    call Goal before printing debugging message debug(Topic, Mess, MArgS).  Goal is called in deterministic context.
+%    Goal is called with extra arguments +Arg, -Mess and -MArgS.
 %  * dims
 %    prints the dimensions of matrix, see mtx_dims/3
 %  * end
@@ -509,6 +510,15 @@ debug_portray( _Topic, _Term ).
 %     debuc(suv, ns_sel, c(Etc,Etcs,'suv file',true)).
 % Continuing with: suv file, as: suv-17.09.26.txg, from non singleton list: [suv-17.09.26.txg,suv-17.09.21.txg]
 %
+% ?- assert( (list_avg_mess(List,Mess,Args) :- length(List,Len), sum_list(List,Sum), Avg is Sum / Len, Mess = 'Avg: ~w', Args = Avg) ).
+% ?- debuc( ex, call(list_avg_mess), [1,2,3] ).
+% Avg: 2
+%
+% ?- debuc( ex, call(list_avg_mess), [1,2,3], prefix('By call') ).
+% By call avg: 2
+%
+% ?- debuc( ex, call(list_avg_mess), [1,2,3], [pred(p1,2),prefix('By call')] ).
+% By call predicate: p1/2 avg: 2
 %==
 % 
 % At some point around SWI-Prolog 8, behaviour of debug/3 changed in being more strict about messages with no arguments.
@@ -552,13 +562,19 @@ debug_call( Topic, Goal, Arg, OptsPrv ) :-
     debugging_call( Topic, Goal, Arg, Opts ).
 debug_call( _Topic, _Goal, _Arg, _Opts ).
 
+debugging_call( Topic, call(Goal), Arg, Opts) :-
+    !,
+    call( Goal, Arg, Gess, Grgs ),
+    debug_call_message_opts( Gess, Grgs, Mess, Args, Opts ),
+    debug_message( Topic, Mess, Args ).
+debugging_call( Topic, call_opts(Goal), Arg, Opts ) :-
+    !,
+    call( Goal, Arg, Gess, Grgs, Opts ),
+    debug_call_message_opts( Gess, Grgs, Mess, Args, Opts ),
+    debug_message( Topic, Mess, Args ).
 debugging_call( Topic, Goal, Arg, Opts ) :- 
     debug_call_topic( Goal, Arg, Opts, Topic ),
     !.
-debugging_call( Topic, call(Goal), Mess, Args ) :-
-    !,
-    call( Goal ),
-    debug_message( Topic, Mess, Args ).
 debugging_call( Topic, Goal, Mess, Args ) :-
     compound( Goal ),
     call( Goal ),
@@ -737,13 +753,13 @@ debug_call_topic( option, Opt, Bogs, Topic ) :-
     debug_message( Topic, Prefixed, Mrgs ).
 debug_call_topic( options, RepOpts, Bogs, Topic ) :-
     Ness = 'Options: ~w',
-    debug_call_pred_in_opts_mess( Ness, RdcOpts, Mess, Prgs, Bogs ),
-    debug_message_prefixed( Bogs, Mess, Prefixed ),
     ( memberchk(internal(true),Bogs) -> 
                RepOpts = RdcOpts
                ;
                findall( R, (member(R,RepOpts),functor(R,F,_),\+(atom_concat('$',_,F))), RdcOpts )
     ),
+    debug_call_pred_in_opts_mess( Ness, RdcOpts, Mess, Prgs, Bogs ),
+    debug_message_prefixed( Bogs, Mess, Prefixed ),
     % append( Prgs, [RdcOpts], Drgs ),
     debug( Topic,  Prefixed, Prgs ).
 debug_call_topic( term, DbgTerm, Bogs, Topic ) :-
@@ -895,17 +911,23 @@ debug_message_prefixed_atom( Pfx, Standard, Prefixed ) :-
     sub_atom( Standard, 1, Aft, 0, Right ),
     atomic_list_concat( [Pfx,' ',Low,Right], Prefixed ).
 
+debug_call_message_opts( Std, Srgs, Mess, Args, Opts ) :-
+     debug_call_pred_in_opts_mess( Std, Srgs, Pess, Args, Opts ),
+     debug_message_prefixed( Opts, Pess, Mess ).
+
 debug_call_pred_in_opts_mess( Std, Opt, Prefixed, Prgs, Bogs ) :-
+     en_list( Opt, Opts ),
      ( debug_call_pred_in_opts(Pid, Bogs)  ->
           Pfx = 'Predicate: ~w',
           debug_message_prefixed_atom( Pfx, Std, Prefixed ),
-          Prgs = [Pid,Opt]
+          Prgs = [Pid|Opts]
           ;
-          Prgs = [Opt]
+          Prefixed = Std,
+          Prgs = Opts
      ).
 
 debug_call_pred_in_opts( Pid, Opts ) :-
-    memberchk( pred(Fun,Ar), Opts ), 
+    memberchk( pred(Fun,Ar), Opts ),
     !,
     Fun/Ar = Pid.
 debug_call_pred_in_opts( Pid, Opts ) :-
