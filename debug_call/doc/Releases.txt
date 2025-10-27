@@ -5,6 +5,8 @@ TBD
    17.03.10   debug_call with Success/failure by colour too (see SWI installation)
 ---
 
+2.1         
+     25.10.27  OPTS:     pid(F,A) allowed for pid(Pid)
 2.0         @ 25.10.07
      25.10.07  IFACE:    new 'option' debug call
                OPTS:     options for option and options calls

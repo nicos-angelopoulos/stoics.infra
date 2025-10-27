@@ -376,9 +376,9 @@ debug_portray( _Topic, _Term ).
 %% debug_call( +Topic, +Goal, +Arg ).
 %% debug_call( +Topic, +Goal, +Arg, +Opts ).
 %
-% Automates often used debug calls with emphasis on avoiding calling things that will not be reported and tailoring the messages.
+% Automates often used debug calls with emphasis on: (a) avoiding calling things that will not be reported and (b) easy tailoring of the messages.
 % 
-% The main novelty is the introduction of abbreviated Goals, that print bespoke message for often used debugging information. 
+% The main novelty is the introduction of abbreviated Goals, that print bespoke messages for often used debugging information. 
 % For example the following code ejects info on the legth of the list. Not only the code for calculating the length
 % only happens if debugging for the topic ex, is on, but the message is also tailored to reporting lengths of lists.
 %==
@@ -386,19 +386,33 @@ debug_portray( _Topic, _Term ).
 % ?- debug_call(ex, length, math_vars/[x,y,z]).
 % % Length for list, math_vars: 3
 %==
+% With v1.3 the debuc/n shorthand was introduced. So debuc/1,2,3,4 are shorthands for debug_call/1,2,3,4.
+% 
+% ==
+% ?- Mtx = [h(a,b,c),r(1,2,3),r(4,5,6),r(7,8,9)],
+%    debuc(ex, dims, mtx/Mtx).
+% 
+% Dimensions for matrix,  (mtx) nR: 4, nC: 3.
+% Mtx = [h(a, b, c), r(1, 2, 3), r(4, 5, 6), r(7, 8, 9)].
+% ==
+% 
+% As of v1.2 it can work as a replacement to debug/3. That is if Goal does not match any of the forms below, it will be interpreted as a message.
+% ==
+% ?- debuc(ex, 'A simple message in a ~a.', [bottle] ).
+% A simple message in a bottle.
+% ==
+% 
 %
-% Predicate can be used to call arbitrary Goal and then print a message after it has successfull completed. <br>
+% The predicate can be used to call arbitrary Goal and then print a message after it has successfull completed.<br>
 %  When Goal is a known abbreviation from those shown below, the Arg usually qualifies the output generated.
-%  When Goal is of the form call(Goal), Arg will be passed to debug(Topic,Mess,Arg). 
+%  When Goal is of the form call(Goal), Arg will be passed to debug(Topic,Mess,Arg). Mess is constructed from 
 %
 %  As of v2 the last two arguments of the /4 version of the predicate where switched from _Pfx_ and Arg
 %  to Arg and Opts. Opts pass arbitary things to Goal, each abbreviation Goal can demand different options. 
 %  All abbreviation Goal them can take =prefix(Pfx)= which corresponds to Pfx in the old /4 verison. 
 %  Opts will be forced to be a list via en_list/2, Goal will know what todo with it.
 % 
-% As of v1.2 it can work as a replacement to debug/3. <br>
-% With v1.3 the debuc/3 shorthand was introduced.
-% 
+%
 % Goal in:
 %  * call(Goal)
 %    call Goal before printing debugging message debug(Topic, Mess, Arg).  (Goal is called in non-deterministic context.)
@@ -434,10 +448,10 @@ debug_portray( _Topic, _Term ).
 %  * odir
 %    output directory (Arg should exist and be a directory)
 %  * option
-%    option selected from options for predicate. Possible options: pred(Pid), the caller predicate, all(OrigOpts), shows all options, 
+%    option selected from options for predicate. Possible options: pred(Fnc,Ar) or pred(Pid), the caller predicate, all(OrigOpts), shows all options, 
 %    internal(true), shows also '$' starting options.
 %  * options
-%    options used on call to a predicate. Possible options: pred(Pid), the caller predicate, internal(true), shows also '$' starting options.
+%    options used on call to a predicate. Possible options: pred(Func,Ar), pred(Pid), the caller predicate, internal(true), shows also '$' starting options.
 %  * pwd 
 %    message about current dir Location (=Arg), (if Arg == false, location is not shown)- see examples
 %  * read
@@ -472,8 +486,8 @@ debug_portray( _Topic, _Term ).
 % 
 % ?- debuc(ex, wrote, loc(file,csv)).
 % % Could not locate wrote on file specified by: file, and extensions: csv
-% ?- csv_write_file( 'file.csv', []).
 %
+% ?- csv_write_file( 'file.csv', []).
 % ?- debuc(ex, wrote, loc(file,csv)).
 % % Wrote on file: 'file.csv'
 %
@@ -524,7 +538,7 @@ debug_portray( _Topic, _Term ).
 % @version  1.1 2018/03/20  prefer +2 arity in debug_call/2
 % @version  1.2 2020/03/07  now can be used as a replacement for debug/3 (but with old 3rd arg behaviour, allowing eg 'true').
 % @version  1.3 2020/09/14  added canned calls info and enum, debuc/2,3,4
-% @version  2.0 2025/10/07  changed last two arguments, new option goal recogniser, pred/1, internal/1 & all/1 [not published yet]
+% @version  2.0 2025/10/07  changed last two arguments, new option goal recogniser, pred/1, internal/1 & all/1
 % @see file examples/exo.pl
 % @see debuc/3 shorthand for debug_call/3
 %
@@ -705,13 +719,8 @@ debug_call_topic( odir, Odir, Bogs, Topic ) :-
     debug_message_prefixed( Bogs, Mess, Prefixed ),
     debug_message( Topic, Prefixed, [Odir] ).
 debug_call_topic( option, Opt, Bogs, Topic ) :-
-    ( memberchk(pred(Pid),Bogs) ->
-          Pess = 'Predicate: ~w, option selected: ~w',
-          Prgs = [Pid,Opt]
-          ;
-          Pess = 'Option selected: ~w',
-          Prgs = [Opt]
-    ),
+    Ness = 'Option selected: ~w',
+    debug_call_pred_in_opts_mess( Ness, Opt, Pess, Prgs, Bogs ),
     ( (memberchk(all(OrgOpts),Bogs),is_list(OrgOpts)) ->
                ( memberchk(internal(true),Bogs) ->
                     RdcOpts = OrgOpts
@@ -727,20 +736,16 @@ debug_call_topic( option, Opt, Bogs, Topic ) :-
     debug_message_prefixed( Bogs, Mess, Prefixed ),
     debug_message( Topic, Prefixed, Mrgs ).
 debug_call_topic( options, RepOpts, Bogs, Topic ) :-
-    ( memberchk(pred(Pid),Bogs) ->
-          Mess = 'Predicate: ~w, with options: ~w.',
-          Mrgs = [Pid,RdcOpts]
-          ;
-          Mess = 'Options: ~w.',
-          Mrgs = [RdcOpts]
-    ),
+    Ness = 'Options: ~w',
+    debug_call_pred_in_opts_mess( Ness, RdcOpts, Mess, Prgs, Bogs ),
     debug_message_prefixed( Bogs, Mess, Prefixed ),
     ( memberchk(internal(true),Bogs) -> 
                RepOpts = RdcOpts
                ;
                findall( R, (member(R,RepOpts),functor(R,F,_),\+(atom_concat('$',_,F))), RdcOpts )
     ),
-    debug( Topic,  Prefixed, Mrgs ).
+    % append( Prgs, [RdcOpts], Drgs ),
+    debug( Topic,  Prefixed, Prgs ).
 debug_call_topic( term, DbgTerm, Bogs, Topic ) :-
     Mess = '~w',
     debug_message_prefixed( Bogs, Mess, Prefixed ),
@@ -889,3 +894,19 @@ debug_message_prefixed_atom( Pfx, Standard, Prefixed ) :-
     downcase_atom( Fst, Low ),
     sub_atom( Standard, 1, Aft, 0, Right ),
     atomic_list_concat( [Pfx,' ',Low,Right], Prefixed ).
+
+debug_call_pred_in_opts_mess( Std, Opt, Prefixed, Prgs, Bogs ) :-
+     ( debug_call_pred_in_opts(Pid, Bogs)  ->
+          Pfx = 'Predicate: ~w',
+          debug_message_prefixed_atom( Pfx, Std, Prefixed ),
+          Prgs = [Pid,Opt]
+          ;
+          Prgs = [Opt]
+     ).
+
+debug_call_pred_in_opts( Pid, Opts ) :-
+    memberchk( pred(Fun,Ar), Opts ), 
+    !,
+    Fun/Ar = Pid.
+debug_call_pred_in_opts( Pid, Opts ) :-
+    memberchk( pred(Pid), Opts ).
