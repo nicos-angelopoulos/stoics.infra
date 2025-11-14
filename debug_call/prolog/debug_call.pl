@@ -460,7 +460,7 @@ debug_portray( _Topic, _Term ).
 %    message in the singular is used.
 %  * list
 %    writes contents of list with header and footer. Arg should be of the form Hdr/Ftr/List, 
-%    else it is translated as Hdr/''/List or ''/''/List. 
+%    else Hdr/List unfolds to Hdr/Hdr/List and List is translated to unknown/unknown/List. 
 %    If Hdr or Ftr are '' then that part of the message is skipped
 %  * ns_sel
 %    first argument of Arg is the item selected from second arg which is expected to be a list.
@@ -743,9 +743,9 @@ debug_call_topic( length, NamesPrv/ListsPrv, Bogs, Topic ) :-
 debug_call_topic( list, InArg, Bogs, Topic ) :-
     ground( InArg ),
     ( InArg = Left/List -> 
-        ( Left = Hdr/Ftr -> true ; Hdr = Left, Ftr = '' )
+        ( Left = Hdr/Ftr -> true ; Hdr = Left, Ftr = Left )
         ;
-        List = InArg, Hdr = '', Ftr = ''
+        List = InArg, Hdr = unamed, Ftr = unamed
     ),
     debug_call_topic_list_delim( Hdr, Topic, 'Starting listing of list: ~w', Bogs),
     maplist( debug_message(Topic,'~w'), List ),
