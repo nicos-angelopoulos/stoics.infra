@@ -461,7 +461,7 @@ debug_portray( _Topic, _Term ).
 %  * list
 %    writes contents of list with header and footer. Arg should be of the form Hdr/Ftr/List, 
 %    else Hdr/List unfolds to Hdr/Hdr/List and List is translated to unknown/unknown/List. 
-%    If Hdr or Ftr are '' then that part of the message is skipped
+%    Knows: depth(Depth) (restricts items to list).
 %  * ns_sel
 %    first argument of Arg is the item selected from second arg which is expected to be a list.
 %    The selected argument can be named on the massage via sel_name(Lnm) in Opts.
@@ -748,7 +748,19 @@ debug_call_topic( list, InArg, Bogs, Topic ) :-
         List = InArg, Hdr = unamed, Ftr = unamed
     ),
     debug_call_topic_list_delim( Hdr, Topic, 'Starting listing of list: ~w', Bogs),
-    maplist( debug_message(Topic,'~w'), List ),
+    ( memberchk(depth(Depth),Bogs) -> 
+          length( Clean, Depth ),
+          ( append(Clean,[H|T],List) ->
+                    maplist( debug_message(Topic,'~w'), Clean ),
+                    length( [H|T], Xen ),
+                    Mess = '... + ~d other elements',
+                    debug_message( Topic, Mess, Xen )
+                    ;
+                    maplist( debug_message(Topic,'~w'), List )
+          )
+          ;
+          maplist( debug_message(Topic,'~w'), List )
+    ),
     debug_call_topic_list_delim( Ftr, Topic, 'Ended listing of list: ~w', Bogs ).
 debug_call_topic( odir, Odir, Bogs, Topic ) :-
     ( exists_directory(Odir) ->
