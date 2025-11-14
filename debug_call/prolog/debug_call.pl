@@ -53,6 +53,14 @@ See file examples/exo.pl for a full pallette of examples.
 % Ended enumeration of list: testo
 true.
 
+?- debug_call( ex, enum, testo/[a,b,c,d,e], depth(3) ).
+% Starting enumeration of list: testo
+% 1.a
+% 2.b
+% 3.c
+% ... + 2 other elements
+% Ended enumeration of list: testo
+
 ?- debug_call( ex, info, 'My message is ~w.'/long ).
 % My message is long.
 true.    
@@ -436,6 +444,7 @@ debug_portray( _Topic, _Term ).
 %    translates to finishing ~Arg or finishing ~Topic if Arg == true
 %  * enum
 %    print members of lists and arguments of terms, where each item is printed on single line and prefixed by an index number
+%    Knows: depth(Depth) (restricts items to print).
 %  * goal
 %    anything that does n't match any of the above is retrived as call(Goal)
 %  * info
@@ -701,7 +710,8 @@ debug_call_topic( enum, InArg, Bogs, Topic ) :-
         number_codes( Len, LenCs ),
         length( LenCs, SpcLen ),
         debug_call_topic_list_delim( Left, Topic, 'Starting enumeration of list: ~w', Bogs ),
-        debug_call_topic_enum( Term, 1, SpcLen, Topic ),
+        ( memberchk(depth(Depth), Bogs) -> true; Depth = inf ),
+        debug_call_topic_enum( Term, 1, Depth, SpcLen, Topic ),
         debug_call_topic_list_delim( Left, Topic, 'Ended enumeration of list: ~w', Bogs )
         ;
         Term =.. [Func|Args],
@@ -710,7 +720,8 @@ debug_call_topic( enum, InArg, Bogs, Topic ) :-
         length( LenCs, SpcLen ),
         atomic_list_concat( ['Starting enumeration of term: ~w (func: ',Func,')'], StrMess ),
         debug_call_topic_list_delim( Left, Topic, StrMess, Bogs ),
-        debug_call_topic_enum( Args, 1, SpcLen, Topic ),
+        ( memberchk(depth(Depth), Bogs) -> true; Depth = inf ),
+        debug_call_topic_enum( Args, 1, Depth, SpcLen, Topic ),
         atomic_list_concat( ['Ended enumeration of term: ~w (func: ',Func,')'], EndMess ),
         debug_call_topic_list_delim( Left, Topic, EndMess, Bogs )
     ).
@@ -842,17 +853,25 @@ debug_call_topic( ns_sel, Term, Bogs, Topic ) :-
     debug_call_message_opts( Mess, MArgs, Message, Args, Bogs ),
     debug_message( Topic, Message, Args ).
 
-debug_call_topic_enum( [], _I, _Len, _Topic ).
-debug_call_topic_enum( [H|T], I, Len, Topic ) :-
-    number_codes( I, ICs ),
-    length( ICs, ICsLen ),
-    PadLen is Len - ICsLen,
-    findall( ' ', between(1,PadLen,_), Spcs ),
-    atomic_list_concat( Spcs, '', Pad ),
-    atomic_list_concat( [Pad,'~d.~w'], '', Mess ),
-    debug_message( Topic, Mess, [I,H] ),
+debug_call_topic_enum( [], _I, _Depth, _Len, _Topic ).
+debug_call_topic_enum( [H|T], I, Depth, Len, Topic ) :-
+    ( I > Depth -> 
+          Rem = [],
+          Mess = '... + ~d other elements',
+          length( [H|T], HTen ),
+          debug_message( Topic, Mess, HTen )
+          ;
+          T = Rem,
+          number_codes( I, ICs ),
+          length( ICs, ICsLen ),
+          PadLen is Len - ICsLen,
+          findall( ' ', between(1,PadLen,_), Spcs ),
+          atomic_list_concat( Spcs, '', Pad ),
+          atomic_list_concat( [Pad,'~d.~w'], '', Mess ),
+          debug_message( Topic, Mess, [I,H] )
+    ),
     J is I + 1,
-    debug_call_topic_enum( T, J, Len, Topic ).
+    debug_call_topic_enum( Rem, J, Depth, Len, Topic ).
 
 debug_call_topic_list_delim( ListName, Topic, Std, Bogs ) :-
      debug_call_message_opts( Std, [ListName], Mess, Args, Bogs ), 
