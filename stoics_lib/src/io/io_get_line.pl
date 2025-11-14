@@ -17,8 +17,13 @@ Atom = abc.
 */
 io_get_line( Stream, Cs ) :-
 	get_code( Stream, C ),
-     ( (C =:= -1;C =:= 0'\n) -> Cs = end_of_file
+     ( C =:= -1 -> 
+          Cs = end_of_file
+          ;
+          ( C =:= 0'\n -> 
+                                Cs = []
                               ; io_get_line(C, Stream,Cs)
+          )
      ).
 
 io_get_line( -1, _Stream, Cs ) :- !, Cs = [].

@@ -2,6 +2,7 @@
 --------------------
   
 1.9
+     25.11.14   FIXED:  serious bug in io_get_line/2 where an empty lines terminated input from file
      24.10.28   LIB:    internal stoics_lib_throw/2. Makes dependancy to pack_errors a suggestion.
                 OPTS:   4th arg of break_nth/4 can now be an options list, allowing shorter list to pass through if desired
      24.10.17   DEPS:   library(filesex) in expand_spec/2
