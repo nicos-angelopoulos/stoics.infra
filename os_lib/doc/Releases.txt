@@ -1,6 +1,7 @@
 ---   Releases   ---
 --------------------
 1.9
+     25.11.26   OPT:      success() in os_exists/2
      24.09.27   FIXED:    pass options of os_mill/4 to os_postfix/4 so separator can take effect
      24.11.08   FIXED:    mask ext() in postfixs of os_mill/4
      24.12.13   ERROR:    changed failure to ground error when both 2nd and 3rd args are non-ground

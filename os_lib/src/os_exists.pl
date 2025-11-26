@@ -1,5 +1,5 @@
 
-os_exists_defaults( [dir('.'),err(test),not(false),type(any),mode(exist)] ).
+os_exists_defaults( [dir('.'),err(test),not(false),type(any),mode(exist),success(true)] ).
 
 /** os_exists( +Os ).
     os_exists( +Os, +Opts ).
@@ -23,7 +23,8 @@ Opts
     (see options: err(E), on_exit(O) and message(M) in throw/2)
 
   * not(Not=false)
-    reverse polarity, if true require Os not to exist
+    reverse polarity, if true require Os not to exist. <br> 
+    As of v0.2 success(false) also has similar effect.
 
   * type(Type)
     in addition to Os existing, require file type-ness (dir,link,file,flink,dlink,any).<br>
@@ -32,6 +33,10 @@ Opts
 
   * mode(Mode=exists)
     one of exist, read, write and append
+
+  * success(Succ=true)
+    when a variable, predicate always succeeds and the true succeed status is bound to it.<br>
+    Note that =|Succ=false|= is possible, in which case the call, succeeds, if =|os_exists(Os,[])|= fails.
 
   * wins_file_exec(WinsFileExec=sys)
     alternatively, use fail for failure and error for error
@@ -95,7 +100,19 @@ true.
 
 ?- os_exists( dir1/link2, type(base(Base)) ).
 Base = file.
+
+?- os_exists( dir1/link2, success(Succ) ).
+
+?- os_exists( dir1/link2, success(S) ).
+S = true.
+
+?- os_exists( dir1/link3, success(S) ).
+S = false.
 ==
+
+@author nicos angelopoulos
+@version 0.2 2026/11/26,   added success() option
+
 */
 os_exists( Os ) :-
      os_exists( Os, [] ).
@@ -106,7 +123,12 @@ os_exists( OsPrv, Args ) :-
      options( not(Not), Opts ),
      options( dir(Dir), Opts ),
      ( Dir == '.' -> OsAtm = Os ; os_path( Dir, OsAtm, +(Os) ) ),
-     os_exists_1( Not, Os, [os(OsPrv)|Opts] ).
+     options( success(Succ), Opts ),
+     ( os_exists_1(Not, Os, [os(OsPrv)|Opts]) -> 
+                              Succ = true
+                              ;
+                              Succ = false
+     ).
 
 os_exists_1( true, Os, Opts ) :-
      os_exists_not( Os, Opts ).
