@@ -321,4 +321,4 @@ D = date(2024,1,7)
 ==
 
 */
-os_version( 1:7:0, date(2024,2,7) ).
+os_version( 1:7:4, date(2025,11,29) ).  % developmental
