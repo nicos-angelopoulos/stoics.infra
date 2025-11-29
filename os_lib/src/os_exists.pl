@@ -20,26 +20,26 @@ Opts
 
   * err(Err=test)
     test for report and fail, fail for failing, error for throwing, true for success<br>
-    (see options: err(E), on_exit(O) and message(M) in throw/2)
+    (see options: err(E), on_exit(O) and message(M) in throw/2).
 
   * not(Not=false)
-    reverse polarity, if true require Os not to exist. <br> 
+    Reverse polarity, if true require Os not to exist. <br> 
     As of v0.2 success(false) also has similar effect.
 
   * type(Type)
-    in addition to Os existing, require file type-ness (dir,link,file,flink,dlink,any).<br>
+    In addition to Os existing, require file type-ness (dir,link,file,flink,dlink,any).<br>
     Can be used to return the type, when input is a variable. <br>
     Type = base(BaseType) streamline type to either file or dir (see os_type_base/2).
 
   * mode(Mode=exists)
-    one of exist, read, write and append
+    One of exist, read, write and append.
 
   * success(Succ=true)
-    when a variable, predicate always succeeds and the true succeed status is bound to it.<br>
+    When a variable, predicate always succeeds and the true succeed status is bound to it.<br>
     Note that =|Succ=false|= is possible, in which case the call, succeeds, if =|os_exists(Os,[])|= fails.
 
   * wins_file_exec(WinsFileExec=sys)
-    alternatively, use fail for failure and error for error
+    Alternatively, use fail for failure and error for error.
 
 ==
 ?- os_exists( pack(os_lib/src) ).
