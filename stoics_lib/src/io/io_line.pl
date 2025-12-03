@@ -15,5 +15,5 @@ io_line( Stream, Line ) :-
     !, 
     io_get_line( Stream, Line ).
 io_line( Stream, Line ) :-
-    Line = [_|_],
+    is_list( Line ),
     io_put_line( Line, Stream ).
