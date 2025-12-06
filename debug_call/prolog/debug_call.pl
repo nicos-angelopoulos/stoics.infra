@@ -485,6 +485,8 @@ debug_portray( _Topic, _Term ).
 %    Message about current dir Location (=Arg), (if Arg == false, location is not shown)- see examples.
 %  * read
 %    Alias for input.
+%  * session
+%    Print info on all loaded code, packs are shown with versions both from packs and info from <Pred>_version/2,3 if available (as per stoics.org.uk packs).
 %  * start 
 %    Translates to starting ~Arg or starting ~Topic if Arg == true.
 %  * task(Wch)
@@ -588,7 +590,7 @@ debug_portray( _Topic, _Term ).
 % @version  1.3 2020/09/14  added debuc Goal info and enum, debuc/2,3,4
 % @version  2.0 2025/10/07  changed last two arguments, new option goal recogniser, pred/1, internal/1 & all/1
 % @version  2.1 2025/10/27  pid(F,A) & prefix() universal; call() fixed; doc; enum terms fix; ns_sel simplify
-% @version  2.2 ...         farg() option; debuc Goal version
+% @version  2.2 ...         farg() option; debuc Goals: version, session.
 % @see file examples/exo.pl
 % @see debuc/3 shorthand for debug_call/3
 %
@@ -833,6 +835,100 @@ debug_call_topic( var, DbgTerm, Bogs, Topic ) :-
     Mess = 'Variable: ~a, value: ~w',
     debug_call_message_opts( Mess, [Var,Val], Message, Args, Bogs ),
     debug_message( Topic, Message, Args ).
+debug_call_topic( session, _Derm, Bogs, Topic ) :-
+     ( memberchk(in_module(Mod), Bogs) -> true; Mod = user),
+     current_prolog_flag( version_data, Swi ),  % Swi = swi(9, 3, 34, []).
+     Swi  = swi(Mj,Mn,Fx,Inc),
+     ( Inc == [] -> 
+          atomic_list_concat( [Mj,Mn,Fx], ':', Vers )
+          ;
+          atomic_list_concat( [Mj,Mn,Fx,Inc], ':',Vers )
+     ),
+     debug_message( Topic, 'Session Info', [] ),
+     ( current_prolog_flag(version_git, Git) -> % Git = '9.3.34-41-g8cf975236'.
+          atomic_list_concat( ['Interpreter is SWI-Prolog ',Vers,', [Git: ',Git,'].'], Mess )
+          ;
+          atomic_list_concat( ['Interpreter is SWI-Prolog ',Vers,'.'], Mess )
+     ),
+     debug_call_message_opts( Mess, [], Message, Args, Bogs ),
+     debug_message( Topic, Message, Args ),
+     % find where alias pack points to
+     once( (file_search_path(pack,PackPath),atomic(PackPath)) ),
+     debug_call_topic_session_predicate_file_prefixed( PackPath, Mod, pack, Lacks ),
+     findall( APack-ItsVers, (member(APack,Lacks),pack_property(APack,version(ItsVers))), PVs ),
+     findall( Stoic-VersInfo, (  Mod:predicate_property(P,file(_)),
+                                 functor(P,Fun,Ari),
+                                 atom_concat(Stoic,'_version',Fun),
+                                 ( Ari = 3 -> 
+                                        G =.. [Fun,Ser,Sdt,_],
+                                        call(G)
+                                        ;  % defaulty 2
+                                        Ari =:= 2,
+                                        G =.. [Fun,Ser,Sdt],
+                                        call(G)
+                                  ),
+                                  VersInfo = (Ser @< Sdt)
+                              ),
+                                 SVs ),
+     ( SVs == [] ->
+          true
+          ;
+          ( SVs == [_] ->
+               debug_message( Topic, 'Pack with predicated version info.', [] )
+               ;
+               debug_message( Topic, 'Packs with predicated version info.', [] )
+          ),
+          debug_call_topic_versions_predicated( SVs, PVs, Topic, RemPVs )
+     ),
+     ( RemPVs = [] -> 
+          true
+          ;
+          ( RemPVs = [_] ->
+               debug_message( Topic, 'Pack with version from pack file only.', [] )
+               ;
+               debug_message( Topic, 'Packs with version from pack file only.', [] )
+          ),
+          findall( _, (member(P-V,RemPVs),debug_message(Topic,'~w-~w',[P,V])), _ )
+     ),
+     once( (file_search_path(swi,SwiPath),atomic(SwiPath)) ),
+     debug_call_topic_session_predicate_file_prefixed( SwiPath, Mod, boot, Boots ),
+     debug_message( Topic, 'System boot files loaded.', [] ),
+     findall( _, (member(Boot,Boots),debug_message(Topic,'~w',[Boot])), _ ),
+     directory_file_path( SwiPath, library, LibPath ),
+     debug_call_topic_session_predicate_file_prefixed( LibPath, Mod, rel, Libs ),
+     ( Libs = [] ->
+          debug_message( Topic, 'No system libraries found loaded.', [] )
+          ;
+          ( Libs =[_] ->
+               debug_message( Topic, 'System library loaded.', [] )
+               ;
+               debug_message( Topic, 'System libraries loaded.', [] )
+          ),
+          findall( _, (member(Lib,Libs),debug_message(Topic,'~w',[Lib])), _ )
+     ),
+     findall( AppF, (   Mod:predicate_property(_,file(AppF)),
+                        ( atom_concat(PackPath,PackPsfx,AppF) ->
+                              catch(( atom_concat('/',PackSub,PackPsfx),
+                                      directory_file_path(PPDir,_PPF,PackSub),
+                                      directory_file_path(_,InpD,PPDir)
+                                     ),_,fail),
+                                     \+ memberchk(InpD,[prolog,src])
+                        ),
+                        \+atom_concat(SwiPath,_,AppF)
+                    ),
+                         AppFsL ),
+     sort( AppFsL, AppFs ),
+     ( AppFs = [] ->
+          debug_message( Topic, 'There where no application files loaded.', [] )
+          ;
+          ( AppFs = [_] ->
+               debug_message( Topic, 'There is one application file loaded.', [] )
+               ;
+               debug_message( Topic, 'Application files loaded.', [] )
+          ),
+          findall( AnAF, (member(AnAF,AppFs),debug_message(Topic,'~w',[AnAF])), _ )
+     ),
+     debug_message( Topic, 'Session Info End', [] ).
 debug_call_topic( version, Derm, Bogs, Topic ) :-
      ( atomic(Derm) -> 
           atom_concat( Derm, '_version', Verm ),
@@ -939,6 +1035,37 @@ debug_call_topic( ns_sel, Term, Bogs, Topic ) :-
     ),
     debug_call_message_opts( Mess, MArgs, Message, Args, Bogs ),
     debug_message( Topic, Message, Args ).
+
+debug_call_topic_session_predicate_file_prefixed( Path, Mod, Iface, Lacks ) :-
+     findall( APack, ( Mod:predicate_property(_Pead, file(File)), 
+                             atom_concat(Path, Psfx, File), 
+                             ( Iface == pack -> 
+                                   atomic_list_concat(['',APack|_], '/', Psfx)
+                                   ;
+                                   ( atom_concat('/',APack,Psfx) -> 
+                                        ( Iface == boot ->
+                                             \+ atom_concat( library, _, APack )
+                                             ;
+                                             true
+                                        )
+                                        ;
+                                        Psfx = APack
+                                   )
+                             )
+                           ),
+                              AllPacks ),
+     sort( AllPacks, Lacks ).
+
+debug_call_topic_versions_predicated( [], PVs, _Topic, RemPVs ) :-
+     PVs = RemPVs.
+debug_call_topic_versions_predicated( [Pack-SVers|T], PVs, Topic, RemPVs ) :-
+     ( select(Pack-InfoVer,PVs,NxtPVs) ->
+          debug_message( Topic, '~w-~w (Pack file version: ~w)', [Pack,SVers,InfoVer] )
+          ;
+          debug_message( Topic, '~w-~w', [Pack,SVers] ),
+          PVs = NxtPVs
+     ),
+     debug_call_topic_versions_predicated( T, NxtPVs, Topic, RemPVs ).
 
 debug_call_topic_enum( [], _I, _Depth, _Len, _Topic ).
 debug_call_topic_enum( [H|T], I, Depth, Len, Topic ) :-

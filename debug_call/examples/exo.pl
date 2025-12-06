@@ -77,6 +77,24 @@ Examples
 % By call predicate: exo/1 avg: 2, list: [1,2,3]
 % pfx1 finished: exo
 % At predicate: exo/1 finished: exo
+% Session Info
+% Interpreter is SWI-Prolog 9:3:34, [Git: 9.3.34-41-g8cf975236].
+% Packs with predicated version info.
+% debug_call-2:1:1@<date(2025,12,6) (Pack file version: 2.1)
+% options-1:5:0@<date(2022,12,29) (Pack file version: 1.5)
+% Pack with version from pack file only.
+% lib-2.11
+% System boot files loaded.
+% boot/init.pl
+% boot/messages.pl
+% boot/syspred.pl
+% System libraries loaded.
+% ansi_term.pl
+% lists.pl
+% There is one application file loaded.
+% /home/nicos/.local/share/swi-prolog/pack/debug_call/examples/exo.pl
+% Session Info End
+% Finished: exo
 % Finished: exo
 true.
 ==
@@ -158,4 +176,5 @@ exo( Args ) :-
      abolish( list_avg_mess/3 ),
      debuc( Self, end, true, prefix(pfx1) ),
      debuc( Self, end, true, [prefix('At'),pred(Self,1)] ),
+     debuc( Self, session, true ),
      debuc( Self, end, true ).
