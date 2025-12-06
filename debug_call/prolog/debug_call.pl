@@ -434,58 +434,58 @@ debug_portray( _Topic, _Term ).
 %
 % Goal in:
 %  * call(Goal)
-%    call Goal before printing debugging message debug(Topic, Mess, MArgS).  Goal is called in deterministic context.
+%    Call Goal before printing debugging message debug(Topic, Mess, MArgS).  Goal is called in deterministic context.
 %    Goal is called with extra arguments +Arg, -Mess and -MArgS.
-%  * call(Goal,Opts) 
-%    as above, but Opts are passed as an extra, last argument in the call
+%  * call(Goal,Opts)
+%    As above, but Opts are passed as an extra, last argument in the call.
 %  * dims
-%    prints the dimensions of matrix, see mtx_dims/3
+%    Prints the dimensions of matrix, see mtx_dims/3.
 %  * end
-%    translates to finishing ~Arg or finishing ~Topic if Arg == true
+%    Translates to finishing ~Arg or finishing ~Topic if Arg == true.
 %  * enum
-%    print members of lists and arguments of terms, where each item is printed on single line and prefixed by an index number
+%    Print members of lists and arguments of terms, where each item is printed on single line and prefixed by an index number
 %    Knows: depth(Depth) (restricts items to print).
 %  * goal
-%    anything that does n't match any of the above is retrived as call(Goal)
+%    Anything that does n't match any of the above is retrived as call(Goal)
 %  * info
-%    print using informational machinery (usually different/green colour, to debug's blue)
+%    Print using informational machinery (usually different/green colour, to debug's blue)
 %    term should Mess/Args in the debug/3 version
 %  * input
-%    reports reading from a file. Arg should be file specification suitable for locate/3.
+%    Reports reading from a file. Arg should be file specification suitable for locate/3.
 %    Either loc(File,Exts) or simply File in which case Exts = ''.
 %    As of v2.0 the default is to print the basename, use path(abs) in Opts.
 %  * length
-%    prints the lenghts of a bunch of lists. Args should be ListNames/Lists. 
+%    Prints the lenghts of a bunch of lists. Args should be ListNames/Lists. 
 %    uses non list ListNames if debuging the length of a single list, in which case
 %    message in the singular is used.
 %  * list
-%    writes contents of list with header and footer. Arg should be of the form Hdr/Ftr/List, 
+%    Writes contents of list with header and footer. Arg should be of the form Hdr/Ftr/List, 
 %    else Hdr/List unfolds to Hdr/Hdr/List and List is translated to unknown/unknown/List. 
 %    Knows: depth(Depth) (restricts items to list).
 %  * ns_sel
-%    first argument of Arg is the item selected from second arg which is expected to be a list.
+%    First argument of Arg is the item selected from second arg which is expected to be a list.
 %    The selected argument can be named on the massage via sel_name(Lnm) in Opts.
 %  * odir
-%    output directory (Arg should exist and be a directory)
+%    Output directory (Arg should exist and be a directory)
 %  * option
-%    option selected from options for predicate. Possible options: pred(Fnc,Ar) or pred(Pid), the caller predicate, all(OrigOpts), shows all options, 
+%    Option selected from options for predicate. Possible options: pred(Fnc,Ar) or pred(Pid), the caller predicate, all(OrigOpts), shows all options, 
 %    internal(true), shows also '$' starting options.
 %  * options
-%    options used on call to a predicate. Possible options: pred(Func,Ar), pred(Pid), the caller predicate, internal(true), shows also '$' starting options.
+%    Options used on call to a predicate. Possible options: pred(Func,Ar), pred(Pid), the caller predicate, internal(true), shows also '$' starting options.
 %  * pwd 
-%    message about current dir Location (=Arg), (if Arg == false, location is not shown)- see examples
+%    Message about current dir Location (=Arg), (if Arg == false, location is not shown)- see examples.
 %  * read
-%    alias for input
+%    Alias for input.
 %  * start 
-%    translates to starting ~Arg or starting ~Topic if Arg == true
-%  * task(Wch)  
-%    time of start/stop (Wch) of a task. Other values for Wch are allowed but printed as they come. Arg can be a term (as of Version 1.5).
+%    Translates to starting ~Arg or starting ~Topic if Arg == true.
+%  * task(Wch)
+%    Time of start/stop (Wch) of a task. Other values for Wch are allowed but printed as they come. Arg can be a term (as of Version 1.5).
 %  * term
 %    Report the input term. The term can be named via option term_name(Tnm).
 %  * var
-%    reports variable name (arg(1)) and its current instantiation (arg(2))
+%    Reports variable name (arg(1)) and its current instantiation (arg(2))
 %  * wrote 
-%    reports the writting of output on a file. Arg should be file specification suitable for locate/3.
+%    Reports the writting of output on a file. Arg should be file specification suitable for locate/3.
 %    Either loc(File,Exts) or simply File in which case Exts = ''.
 %    As of v2.0 the default is to print the basename, use path(abs) in Opts.
 %
