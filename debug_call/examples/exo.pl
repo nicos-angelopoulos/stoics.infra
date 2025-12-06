@@ -18,6 +18,8 @@ Examples
 ==
 ?- exo.
 ?- exo([]).
+% Using debug_call, at version: 2:1:1 (published on: date(2025,12,6))
+% Using exo, at version: 0:3 (published on: 25.12.6)
 % Predicate: exo/1 option selected: op1(one).
 % Predicate: exo/1 options: [debug(true),op1(one),op2(two)]
 % Predicate: exo/1 options: [$restore(exo,debug,true),$restore(exo,debug,false),debug(true),op1(one),op2(two)]
@@ -82,6 +84,7 @@ true.
 @author nicos angelopoulos
 @version  0.1 2025/10/07
 @version  0.2 2025/10/27
+@version  0.3 2025/12/6
 
 */
 exo :-
@@ -89,6 +92,8 @@ exo :-
 exo( Args ) :-
      Self = exo,
      options_append( Self, Args, Opts ),
+     debuc( Self, version, debug_call ),
+     debuc( Self, version, v(exo,0:3,'25.12.6') ),
      options( op1(Op1), Opts ),
      debuc( Self, option, op1(Op1), pred(exo/1) ),
      debuc( Self, options, Opts, pred(exo/1) ),

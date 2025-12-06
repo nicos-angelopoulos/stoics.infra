@@ -70,6 +70,9 @@ true.
 % Could not locate wrote on file specified by: file, and extensions: csv
 ?- csv_write_file('file.csv', []).
 
+?- debuc( Self, version, debug_call ),
+% Using debug_call_version, at version: 2:1:1 (published on: date(2025,12,6))
+
 ?- debuc(ex, wrote, loc(file,csv)).
 % Wrote on file: 'file.csv'
 
@@ -580,10 +583,10 @@ debug_portray( _Topic, _Term ).
 % @version  0.5 2014/??/??  added ns_sel
 % @version  1.1 2018/03/20  prefer +2 arity in debug_call/2
 % @version  1.2 2020/03/07  now can be used as a replacement for debug/3 (but with old 3rd arg behaviour, allowing eg 'true').
-% @version  1.3 2020/09/14  added canned calls info and enum, debuc/2,3,4
+% @version  1.3 2020/09/14  added debuc Goal info and enum, debuc/2,3,4
 % @version  2.0 2025/10/07  changed last two arguments, new option goal recogniser, pred/1, internal/1 & all/1
 % @version  2.1 2025/10/27  pid(F,A) & prefix() universal; call() fixed; doc; enum terms fix; ns_sel simplify
-% @version  2.2 ... farg() option
+% @version  2.2 ...         farg() option; debuc Goal version
 % @see file examples/exo.pl
 % @see debuc/3 shorthand for debug_call/3
 %
@@ -830,29 +833,55 @@ debug_call_topic( var, DbgTerm, Bogs, Topic ) :-
     debug_message( Topic, Message, Args ).
 debug_call_topic( version, Derm, Bogs, Topic ) :-
      ( atomic(Derm) -> 
-          ( current_predicate(Derm/2) -> 
-               Goal =.. [Derm,V,D],
+          atom_concat( Derm, '_version', Verm ),
+          ( current_predicate(Verm/2) ->
+               Goal =.. [Verm,V,D],
                once(Goal)
                ;
-               atom_concat( Derm, _version, Verm )
-               ( current_predicate(Verm/2) ->
-                    Goal =.. [Verm,V,D],
+               ( current_predicate(Verm/3) ->
+                    Goal =.. [Verm,V,D,_],
                     once(Goal)
                     ;
-                    V = Derm; D = no_date
+                    ( current_predicate(Derm/2) -> 
+                         Goal =.. [Derm,V,D],
+                         once(Goal)
+                         ;
+                         V = Derm; D = no_date
+                    )
+               )
+          ),
+          Mrgs = [Derm,V,D]
+          ;
+          ( functor(Derm,_,2) ->
+               arg( 1, Derm, Sw ),
+               arg( 2, Derm, V ),
+               Mrgs = [Sw,V,no_date]
+               ;
+               ( functor(Derm,_,3) ->
+                    arg( 1, Derm, Sw ),
+                    arg( 2, Derm, V ),
+                    arg( 3, Derm, D ),
+                    Mrgs = [Sw,V,D]
+                    ;
+                    Mrgs = [Derm,no_vers,no_date]
                )
           )
-          ;
-          ( functor(Derm,2) ->
-               arg( 1, Derm, V ),
-               arg( 2, Derm, D )
-               ;
-               V = Derm; D = no_date
-          )
      ),
-     Mess = 'Using ~w, at version: ~w (published on: ~w)', 
-     Mrgs = [Derm,V,D],
-     debug_call_message_opts( Mess, Mrgs, Message, Args, Bogs ),
+     ( D == no_date ->
+          (   V == no_vers ->
+               Mess = 'Using ~w',
+               Mrgs = [A|_],
+               Crgs = [A]
+               ;
+               Mess = 'Using ~w, at version: ~w',
+               Mrgs = [A,B|_],
+               Crgs = [A,B]
+          )
+          ;
+          Mess = 'Using ~w, at version: ~w (published on: ~w)',
+          Mrgs = Crgs
+     ),
+     debug_call_message_opts( Mess, Crgs, Message, Args, Bogs ),
      debug_message( Topic, Message, Args ).
 
 debug_call_topic( wrote, ForLoc, Bogs, Topic ) :-
