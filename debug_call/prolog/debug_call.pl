@@ -884,8 +884,12 @@ debug_call_topic_enum( [], _I, _Depth, _Len, _Topic ).
 debug_call_topic_enum( [H|T], I, Depth, Len, Topic ) :-
     ( I > Depth -> 
           Rem = [],
-          Mess = '... + ~d other elements',
           length( [H|T], HTen ),
+          ( HTen =:= 1 -> 
+               Mess = '... + ~d other element'
+               ;
+               Mess = '... + ~d other elements'
+          ),
           debug_message( Topic, Mess, HTen )
           ;
           T = Rem,
