@@ -35,17 +35,17 @@ See file examples/exo.pl for a full pallette of examples.
 
 ==
 
-?- debug( ex ).
-?- debug_call( ex, length, list1/[x,y,z] ).
+?- debug(ex).
+?- debug_call(ex, length, list1/[x,y,z]).
 % Length for list, list1: 3
 
-?- debug_call( ex, length, [list1,list2]/[[x,y,z],[a,b,c]], prefix('Some prefix') ).
+?- debug_call(ex, length, [list1,list2]/[[x,y,z],[a,b,c]], prefix('Some prefix')).
 % Some prefix lengths for lists, list1: 3, list2: 3
 
-?- debug_call( ex, dims, [m1,m2]/[[a(x),a(y),a(z)],[xy(a,b),xy(c,d),xy(e,f)]] ).
+?- debug_call(ex, dims, [m1,m2]/[[a(x),a(y),a(z)],[xy(a,b),xy(c,d),xy(e,f)]]).
 %  Dimensions for matrices,  (m1) nR: 3, nC: 1. (m2) nR: 3, nC: 2.
 
-?- debug_call( ex, enum, testo/[a,b,c] ).
+?- debug_call(ex, enum, testo/[a,b,c]).
 % Starting enumeration of list: testo
 % 1.a
 % 2.b
@@ -53,7 +53,7 @@ See file examples/exo.pl for a full pallette of examples.
 % Ended enumeration of list: testo
 true.
 
-?- debug_call( ex, enum, testo/[a,b,c,d,e], depth(3) ).
+?- debug_call(ex, enum, testo/[a,b,c,d,e], depth(3)).
 % Starting enumeration of list: testo
 % 1.a
 % 2.b
@@ -61,23 +61,26 @@ true.
 % ... + 2 other elements
 % Ended enumeration of list: testo
 
-?- debug_call( ex, info, 'My message is ~w.'/long ).
+?- debug_call(ex, info, 'My message is ~w.'/long).
 % My message is long.
 true.    
    % message above is printed in informational colour
 
-?- debuc( ex, wrote, loc(file,csv) ).
+?- debuc(ex, wrote, loc(file,csv)).
 % Could not locate wrote on file specified by: file, and extensions: csv
-?- csv_write_file( 'file.csv', [] ).
+?- csv_write_file('file.csv', []).
 
-?- debuc( ex, wrote, loc(file,csv) ).
+?- debuc(ex, wrote, loc(file,csv)).
 % Wrote on file: 'file.csv'
 
-?- debuc( ex, task(stop), 'write on file' ).
+?- debuc(ex, task(stop), 'write on file').
 At 15:44:1 on 2nd of Jul 2024 finished task: write on file.
 
-?- assert( (simple_mess(KVs,Mess,Args):- KVs =[a=A,b=B], atom_concat(A,B,Mess), Args=[]) ).
-?- debuc( ex, simple_mess([a=1,b=2]) ).
+?- debuc( ex, task(stop), 'talking ~w', [farg(point)] ).
+% At 13:58:50 on 6th of Dec 2025 stop task: talking point
+
+?- assert((simple_mess(KVs,Mess,Args):- KVs =[a=A,b=B], atom_concat(A,B,Mess), Args=[])).
+?- debuc(ex, simple_mess([a=1,b=2])).
 % 12
 true.
 ==
@@ -106,7 +109,7 @@ debug_calls uses dynamic =..  .
 @version 1.5 2022/12/29
 @version 2.0 2025/10/7
 @version 2.1 2025/10/27
-@see debug_call/4 for version information
+@see debug_call/4 for information on what each version added.
 
 */
 
@@ -120,7 +123,7 @@ V = 2:1:0,
 D = date(2025,10,27).
 ==
 */
-debug_call_version( 2:1:0, date(2025,10,27) ).
+debug_call_version( 2:1:1, date(2025,12,6) ).
 
 :- use_module(library(apply)).   % maplist/4,...
 :- use_module(library(lists)).   % member/4,...
@@ -167,8 +170,10 @@ debuc( Topic, Goal, Arg, Opts ) :-
 % 
 % Examples
 %==
-% ?- assert( (simple_mess(KVs,Mess,Args):- KVs =[a=A,b=B], atom_concat(A,B,Mess), Args=[]) ).
-% ?- debug_call( ex, simple_mess([a=1,b=2], 
+% ?- debug(ex)
+% ?- assert((simple_mess(KVs,Mess,Args):- KVs =[a=A,b=B], atom_concat(A,B,Mess), Args=[])).
+% ?- debug_call(ex, simple_mess([a=1,b=2])).
+% 12
 %==
 %
 % @author nicos angelopoulos
@@ -451,6 +456,7 @@ debug_portray( _Topic, _Term ).
 %    Print using informational machinery (usually different/green colour, to debug's blue)
 %    term should Mess/Args in the debug/3 version
 %  * input
+% At 14:2:30 on 6th of Dec 2025 stop task: talking point
 %    Reports reading from a file. Arg should be file specification suitable for locate/3.
 %    Either loc(File,Exts) or simply File in which case Exts = ''.
 %    As of v2.0 the default is to print the basename, use path(abs) in Opts.
@@ -479,7 +485,9 @@ debug_portray( _Topic, _Term ).
 %  * start 
 %    Translates to starting ~Arg or starting ~Topic if Arg == true.
 %  * task(Wch)
-%    Time of start/stop (Wch) of a task. Other values for Wch are allowed but printed as they come. Arg can be a term (as of Version 1.5).
+%    Time of start/stop (Wch) of a task. Other values for Wch are allowed but printed as they come. 
+%    Arg can be a term (as of Version 1.5).
+%    Arg can include formatting tidles, and associated arguments should be passed via farg() option.
 %  * term
 %    Report the input term. The term can be named via option term_name(Tnm).
 %  * var
@@ -491,6 +499,8 @@ debug_portray( _Topic, _Term ).
 %
 % As of v2.1 all debuc Goals work with options prefix(Pfx) and pred(Ar,Fn) (also synonymed to pred(Pid)).
 % 
+% v2.2 introduced ability to pass formatting patterns and arguments via farg() option.
+%
 % See file examples/exo.pl for a test suit including at least one example from each debuc Goal.
 %
 %==
@@ -571,6 +581,7 @@ debug_portray( _Topic, _Term ).
 % @version  1.3 2020/09/14  added canned calls info and enum, debuc/2,3,4
 % @version  2.0 2025/10/07  changed last two arguments, new option goal recogniser, pred/1, internal/1 & all/1
 % @version  2.1 2025/10/27  pid(F,A) & prefix() universal; call() fixed; doc; enum terms fix; ns_sel simplify
+% @version  2.2 ... farg() option
 % @see file examples/exo.pl
 % @see debuc/3 shorthand for debug_call/3
 %
@@ -830,8 +841,8 @@ debug_call_topic( input, ForLoc, Bogs, Topic ) :-
 debug_call_topic( task(Whc), Task, Bogs, Topic ) :-
     datime_readable( Readable ),
     debug_call_topic_time_which_readable( Whc, Whcable ),
-    atomic_list_concat( [Readable,' ',Whcable,' task: ~w.'], Mess ),
-    debug_call_message_opts( Mess, [Task], Message, Args, Bogs ),
+    atomic_list_concat( [Readable,' ',Whcable,' task: ', Task], Mess ),
+    debug_call_message_opts( Mess, [], Message, Args, Bogs ),
     debug_message( Topic, Message, Args ).
 debug_call_topic( start, Arg, Bogs, Topic ) :-
     Mess = 'Starting: ~w',
@@ -941,11 +952,12 @@ debug_call_pred_in_opts_mess( Std, Opt, Prefixed, Prgs, Bogs ) :-
      ( debug_call_pred_in_opts(Pid, Bogs)  ->
           Pfx = 'Predicate: ~w',
           debug_message_prefixed_atom( Pfx, Std, Prefixed ),
-          Prgs = [Pid|Opts]
+          PrgsPrv = [Pid|Opts]
           ;
           Prefixed = Std,
-          Prgs = Opts
-     ).
+          PrgsPrv = Opts
+     ),
+     debug_call_pred_in_opts_mess_format_args( PrgsPrv, Prgs, Bogs ).
 
 debug_call_pred_in_opts( Pid, Opts ) :-
     memberchk( pred(Fun,Ar), Opts ),
@@ -953,6 +965,10 @@ debug_call_pred_in_opts( Pid, Opts ) :-
     Fun/Ar = Pid.
 debug_call_pred_in_opts( Pid, Opts ) :-
     memberchk( pred(Pid), Opts ).
+
+debug_call_pred_in_opts_mess_format_args( PrgsPrv, Prgs, Bogs ) :-
+     findall( Farg, member(farg(Farg),Bogs), Fargs ),
+     append( PrgsPrv, Fargs, Prgs ).
 
 debug_message_prefixed_atom( Pfx, Standard, Prefixed ) :-
     sub_atom( Standard, 0, 1, Aft, Fst ),

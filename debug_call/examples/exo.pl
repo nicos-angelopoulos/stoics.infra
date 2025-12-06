@@ -60,6 +60,7 @@ Examples
 % At 15:50:4 on 27th of Oct 2025 stop task: write on file.
 % At 15:50:4 on 27th of Oct 2025 unk task: write on file.
 % Prefixed by predicate: exo/1 at 15:50:4 on 27th of Oct 2025 unk task: write on file.
+% At 14:2:30 on 6th of Dec 2025 stop task: talking point
 % Starting: my_run
 % From predicate: exo/1 starting: my_run
 % Pwd at, my_run, is: '/home/nicos/pl/packs/private/debug_call/'
@@ -132,6 +133,7 @@ exo( Args ) :-
      debuc( Self, task(stop), 'write on file' ),
      debuc( Self, task(unk), 'write on file' ),
      debuc( Self, task(unk), 'write on file', [prefix('Prefixed by'),pred(Self,1)] ),
+     debuc( Self, task(stop), 'talking ~w', [farg(point)] ),
      debuc( Self, start, my_run ),
      debuc( Self, start, my_run, [prefix('From'),pred(Self,1)] ),
      debuc( Self, pwd, my_run ),
