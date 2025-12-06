@@ -764,7 +764,11 @@ debug_call_topic( list, InArg, Bogs, Topic ) :-
           ( append(Clean,[H|T],List) ->
                     maplist( debug_message(Topic,'~w'), Clean ),
                     length( [H|T], Xen ),
-                    Mess = '... + ~d other elements',
+                    ( Xen =:= 1 -> 
+                         Mess = '... + ~d other element'
+                         ;
+                         Mess = '... + ~d other elements'
+                    ),
                     debug_message( Topic, Mess, Xen )
                     ;
                     maplist( debug_message(Topic,'~w'), List )
