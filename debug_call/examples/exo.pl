@@ -46,6 +46,10 @@ Examples
 % 2.b
 % 3.c
 % Ended enumeration of term: term_abc (func: t)
+% Starting enumeration of list: list3
+% 1.a
+% 2.b
+% ... + 1 other element
 % My message is long.
 % Why predicate: exo/1 my message is long ?
 % Dimensions for matrix, mtxo: nR: 4, nC: 3.

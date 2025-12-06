@@ -492,6 +492,8 @@ debug_portray( _Topic, _Term ).
 %    Report the input term. The term can be named via option term_name(Tnm).
 %  * var
 %    Reports variable name (arg(1)) and its current instantiation (arg(2))
+%  * version,
+%    Reports version of software, either be explicit or provide stem of <Stem>_version(V,D) predicate that provides the information.
 %  * wrote 
 %    Reports the writting of output on a file. Arg should be file specification suitable for locate/3.
 %    Either loc(File,Exts) or simply File in which case Exts = ''.
@@ -826,6 +828,33 @@ debug_call_topic( var, DbgTerm, Bogs, Topic ) :-
     Mess = 'Variable: ~a, value: ~w',
     debug_call_message_opts( Mess, [Var,Val], Message, Args, Bogs ),
     debug_message( Topic, Message, Args ).
+debug_call_topic( version, Derm, Bogs, Topic ) :-
+     ( atomic(Derm) -> 
+          ( current_predicate(Derm/2) -> 
+               Goal =.. [Derm,V,D],
+               once(Goal)
+               ;
+               atom_concat( Derm, _version, Verm )
+               ( current_predicate(Verm/2) ->
+                    Goal =.. [Verm,V,D],
+                    once(Goal)
+                    ;
+                    V = Derm; D = no_date
+               )
+          )
+          ;
+          ( functor(Derm,2) ->
+               arg( 1, Derm, V ),
+               arg( 2, Derm, D )
+               ;
+               V = Derm; D = no_date
+          )
+     ),
+     Mess = 'Using ~w, at version: ~w (published on: ~w)', 
+     Mrgs = [Derm,V,D],
+     debug_call_message_opts( Mess, Mrgs, Message, Args, Bogs ),
+     debug_message( Topic, Message, Args ).
+
 debug_call_topic( wrote, ForLoc, Bogs, Topic ) :-
     ( ForLoc = loc(Spec,Ext) -> true; Spec=ForLoc, Ext = '' ),
     catch( locate(Spec,Ext,Loc), Excp, true ),

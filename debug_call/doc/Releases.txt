@@ -7,6 +7,7 @@ TBD
 
 2.2
      25.12.06  OPTS:     pass format patterns via farg() (wired & tested on task())
+               IFACE:    added debuc Goal version
      25.11.14  OPTS:     enum and list have now option depth
 
 2.1         @ 25.10.27
