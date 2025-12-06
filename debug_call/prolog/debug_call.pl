@@ -495,8 +495,10 @@ debug_portray( _Topic, _Term ).
 %    Report the input term. The term can be named via option term_name(Tnm).
 %  * var
 %    Reports variable name (arg(1)) and its current instantiation (arg(2))
-%  * version,
-%    Reports version of software, either be explicit or provide stem of <Stem>_version(V,D) predicate that provides the information.
+%  * version
+%    Reports version of software currently using:
+%    * predicate name of <Arg>_version/2,3 or <Arg>/2 (1st arg Version, 2nd arg release date),
+%    * Arg should be a term of arity 3 (Sw/Vers/Date) or arity 2 (Sw/Vrs/Date).
 %  * wrote 
 %    Reports the writting of output on a file. Arg should be file specification suitable for locate/3.
 %    Either loc(File,Exts) or simply File in which case Exts = ''.
