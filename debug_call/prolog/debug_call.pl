@@ -859,13 +859,17 @@ debug_call_topic( session, _Derm, Bogs, Topic ) :-
      findall( Stoic-VersInfo, (  Mod:predicate_property(P,file(_)),
                                  functor(P,Fun,Ari),
                                  atom_concat(Stoic,'_version',Fun),
-                                 ( Ari = 3 -> 
+                                 ( Mod:predicate_property(P,imported_from(ImpFrom)) ->
+                                    ;
+                                    true
+                                 ),
+                                 ( Ari =:= 3 -> 
                                         G =.. [Fun,Ser,Sdt,_],
-                                        call(G)
+                                        call(Mod:G)
                                         ;  % defaulty 2
                                         Ari =:= 2,
                                         G =.. [Fun,Ser,Sdt],
-                                        call(G)
+                                        call(Mod:G)
                                   ),
                                   VersInfo = (Ser @< Sdt)
                               ),

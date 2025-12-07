@@ -47,6 +47,7 @@
               os_tmp_dir/1,              % -Os
               os_type_base/2,            % ?Type, ?Base
               os_version/2,              % -Vers, -Date
+              os_lib_version/2,          % -Vers, -Date
 
               % logical
               os_exists/1, os_exists/2,  % +Os[, +Opts]
@@ -310,7 +311,7 @@ The library predicates can be split to 4 groups.
 
 :- lib(end(os_lib)).
 
-/** os_version( -Version, -Date ).
+/** os_lib_version( -Version, -Date ).
 
 Current version and release date for the pack.
 
@@ -321,4 +322,14 @@ D = date(2024,1,7)
 ==
 
 */
-os_version( 1:7:4, date(2025,11,29) ).  % developmental
+os_lib_version(2:0:0, date(2025,12,7)).
+
+/** os_version( -Version, -Date ).
+
+Synonym to os_lib_version/2 (the latter being the canonical predicate).
+
+This was the original version predicate as the pack was originally named "os".
+
+*/
+os_version( V, D ) :-
+     os_lib_version( V, D ).

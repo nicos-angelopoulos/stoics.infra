@@ -1,17 +1,18 @@
 ---   Releases   ---
 --------------------
 1.9
+     25.12.06   IFACE:    synonimise os_version/2 to os_lib_version/2
      25.11.26   OPT:      success() in os_exists/2
      24.09.27   FIXED:    pass options of os_mill/4 to os_postfix/4 so separator can take effect
      24.11.08   FIXED:    mask ext() in postfixs of os_mill/4
      24.12.13   ERROR:    changed failure to ground error when both 2nd and 3rd args are non-ground
                 CHANGED:  deconstruct '' similarly to constructing it; now in both cases [''] force the issue
                 DOC:      os_postfix/4 v0.5; description of examples of the above and couple of standards
-
-1.8  24.07.13   CHANGED:  make sure all preds have own src file and multi-arity interface are singly loaded
+     24.07.13   CHANGED:  make sure all preds have own src file and multi-arity interface are singly loaded
      24.07.07   FIXED:    option/2 -> options/2 in os_remove_debug/2
      24.04.24   CHANGED:  os_mill/4, returning 3rd argument does not include Dir
      24.03.24   FIXED:    error handling of os_name/2
+
 1.7         @   24.02.07
      24.02.07   FIXED:    missing argument in 2nd clause of keep_to_unique_base_name_by_date/11
      23.09.02   DOC:      fixed spurious == in os_ext/4, added note and example for Opts argument
