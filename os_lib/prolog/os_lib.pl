@@ -230,6 +230,7 @@ The library predicates can be split to 4 groups.
 @version 1.5 2019/4/22 os_path/2, fixes and new options to os_mill/4 ; os_exists/2 (return type) & os_sel/4
 @version 1.6 2022/6/14 fixed: os_exist( file, type(link) ), added option read_link(RLnk) to os_file/2
 @version 1.7 2024/2/7  fixes in: os_unique/3 and os_ext/4
+@version 2.0 2025/12/7 intro succ() opt in os_exists/2; os_lib_version/2
 @see http://www.stoics.org.uk/~nicos/sware/os
 @see http://www.stoics.org.uk/~nicos/sware/os/html/os_lib.html
 @see doc/Releases.txt
@@ -317,8 +318,8 @@ Current version and release date for the pack.
 
 ==
 ?- os_version( V, D ).
-V = 1:7:0,
-D = date(2024,1,7)
+V = 2:0:0,
+D = date(2025,12,7)
 ==
 
 */

@@ -1,6 +1,7 @@
 ---   Releases   ---
 --------------------
-1.9
+
+2.0         @   25.12.07
      25.12.06   IFACE:    synonimise os_version/2 to os_lib_version/2
      25.11.26   OPT:      success() in os_exists/2
      24.09.27   FIXED:    pass options of os_mill/4 to os_postfix/4 so separator can take effect
