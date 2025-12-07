@@ -859,9 +859,10 @@ debug_call_topic( session, _Derm, Bogs, Topic ) :-
      findall( Stoic-VersInfo, (  Mod:predicate_property(P,file(_)),
                                  functor(P,Fun,Ari),
                                  atom_concat(Stoic,'_version',Fun),
-                                 ( Mod:predicate_property(P,imported_from(ImpFrom)) ->
-                                    ;
+                                 ( Mod:predicate_property(P,imported_from(Stoic)) ->
                                     true
+                                    ;
+                                    Mod:predicate_property(P,exported)
                                  ),
                                  ( Ari =:= 3 -> 
                                         G =.. [Fun,Ser,Sdt,_],
@@ -912,11 +913,11 @@ debug_call_topic( session, _Derm, Bogs, Topic ) :-
      ),
      findall( AppF, (   Mod:predicate_property(_,file(AppF)),
                         ( atom_concat(PackPath,PackPsfx,AppF) ->
-                              catch(( atom_concat('/',PackSub,PackPsfx),
-                                      directory_file_path(PPDir,_PPF,PackSub),
-                                      directory_file_path(_,InpD,PPDir)
-                                     ),_,fail),
-                                     \+ memberchk(InpD,[prolog,src])
+                                            % fixme: check PackTop below, against loaded ?
+                                   catch( atomic_list_concat([_Empty,_PackTop,TopSub|_],'/',PackPsfx),_,fail),
+                                   \+ memberchk(TopSub,[prolog,src])
+                                   ;
+                                   true
                         ),
                         \+atom_concat(SwiPath,_,AppF)
                     ),
