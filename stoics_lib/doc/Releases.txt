@@ -1,7 +1,7 @@
 ---   Releases   ---
 --------------------
   
-1.9
+2.0         @   25.12.08
      25.12.03   FIXED:  bug: io_line would not spit out empty lines
      25.11.14   FIXED:  serious bug in io_get_line/2 where an empty line terminated input from file
      24.10.28   LIB:    internal stoics_lib_throw/2. Makes dependancy to pack_errors a suggestion.
@@ -11,7 +11,7 @@
      24.08.09   IFACE:  io_url/1
      24.04.29   ADDED:  record Url and hostname in url_file/3
 
-1.8             @ 23.04.05
+1.8         @   23.04.05
      24.04.05   OPTS:   added insecure(false) to url_file/3
      24.03.24   IFACE:  added list_is_invariant/1
      23.09.20   IFACE:  1st arg of arg_add/4 can now be a negative integer

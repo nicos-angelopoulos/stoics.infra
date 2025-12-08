@@ -60,6 +60,8 @@ Ns = [1, 2, 3].
 @version   1.5 2022/12/29
 @version   1.6 2023/1/2
 @version   1.7 2023/1/2
+@version   1.8 2023/4/5
+@versino   2.0 2025/12/8
 @see http://www.stoics.org.uk/~nicos/sware/stoics_lib
 
 */
@@ -129,14 +131,14 @@ Ns = [1, 2, 3].
 
 stoics_lib.
 
-/** stoics_lib_version( Version, Date ).
+/** stoics_lib_version(Version, Date).
 
 Version, term of the from Mj:Mn:Fx and Date is date(Year,Month,Day).
 
 ==
-?- stoics_lib_version( -V, -D ).
-D = 1:8:0,
-V = date(2024,4,5).
+?- stoics_lib_version(-V, -D).
+D = 2:0:0,
+V = date(2025,12,8).
 ==
 
 @author nicos angelopoulos
@@ -144,6 +146,7 @@ V = date(2024,4,5).
 @version 1:6:0, 2023/01/02, improvements to arg_arg/4, list_frequency/4, new: latex_colour/4, colour_hex/2
 @version 1:7:0, 2023/01/02, known/2 optionised
 @version 1:8:0, 2024/04/05, added opt(insecure(false)) in url_file/3 + smaller changes
+@version 2:0:0, 2025/12/08, fixed bugs in io_ preds; io_url/1, url_file/3 enhancements
 
 */
-stoics_lib_version( 1:8:0, date(2024,4,5) ).
+stoics_lib_version(2:0:0, date(2025,12,8)).
