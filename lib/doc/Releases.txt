@@ -4,6 +4,7 @@
 Tbd: document @, & (remove fixme: code that might have been needed due to MAIN instead of PACK variable bug.).
 
 3.0   
+      25.12.8  VERS:     lib(version(V,D)) was carrying the wrong number
       25.09.27 IFACE:    promise/2 -> now also recognises r libraries and arbitrary calls as second argument
                IFACE:    lib_r_promised/1
 

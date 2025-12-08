@@ -670,7 +670,7 @@ lib( end(Src), _Cxt, Opts ) :-
 lib( version(V,D), _, _Args ) :-
     !,
     % V = 2:10:0, D = date(2022,12,29).
-    V = 2:10:1, D = date(2024,11,19).
+    V = 2:11:1, D = date(2025,12,8).
 lib( suggests(Lib), _, _Args ) :- 
     !,
     lib_suggests( Lib ).
