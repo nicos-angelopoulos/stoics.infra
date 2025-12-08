@@ -133,7 +133,7 @@ stoics_lib.
 
 /** stoics_lib_version(Version, Date).
 
-Version, term of the from Mj:Mn:Fx and Date is date(Year,Month,Day).
+Version, term of the form Mj:Mn:Fx and Date is date(Year,Month,Day).
 
 ==
 ?- stoics_lib_version(-V, -D).
@@ -149,4 +149,4 @@ V = date(2025,12,8).
 @version 2:0:0, 2025/12/08, fixed bugs in io_ preds; io_url/1, url_file/3 enhancements
 
 */
-stoics_lib_version(2:0:0, date(2025,12,8)).
+stoics_lib_version(2:0:1, date(2025,12,8)).
