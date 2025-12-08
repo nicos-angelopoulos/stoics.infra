@@ -70,8 +70,8 @@ true.
 % Could not locate wrote on file specified by: file, and extensions: csv
 ?- csv_write_file('file.csv', []).
 
-?- debuc( Self, version, debug_call ),
-% Using debug_call_version, at version: 2:1:1 (published on: date(2025,12,6))
+?- debuc(ex, version, debug_call).
+% Using debug_call_version, at version: 2:1:1 (published on: date(2025,12,6)).
 
 ?- debuc(ex, wrote, loc(file,csv)).
 % Wrote on file: 'file.csv'
@@ -79,7 +79,7 @@ true.
 ?- debuc(ex, task(stop), 'write on file').
 At 15:44:1 on 2nd of Jul 2024 finished task: write on file.
 
-?- debuc( ex, task(stop), 'talking ~w', [farg(point)] ).
+?- debuc(ex, task(stop), 'talking ~w', [farg(point)]).
 % At 13:58:50 on 6th of Dec 2025 stop task: talking point
 
 ?- assert((simple_mess(KVs,Mess,Args):- KVs =[a=A,b=B], atom_concat(A,B,Mess), Args=[])).
@@ -112,6 +112,7 @@ debug_calls uses dynamic =..  .
 @version 1.5 2022/12/29
 @version 2.0 2025/10/7
 @version 2.1 2025/10/27
+@version 2.2 2025/12/8
 @see debug_call/4 for information on what each version added.
 
 */
@@ -122,11 +123,11 @@ Current version and release date for the library.
 
 ==
 ?- debug_call_version( -V, -D ).
-V = 2:1:0,
-D = date(2025,10,27).
+V = 2:2:0,
+D = date(2025,12,8).
 ==
 */
-debug_call_version( 2:1:1, date(2025,12,6) ).
+debug_call_version(2:2:0, date(2025,12,8)).
 
 :- use_module(library(apply)).   % maplist/4,...
 :- use_module(library(lists)).   % member/4,...
@@ -508,7 +509,7 @@ debug_portray( _Topic, _Term ).
 %
 % As of v2.1 all debuc Goals work with options prefix(Pfx) and pred(Ar,Fn) (also synonymed to pred(Pid)).
 % 
-% v2.2 introduced ability to pass formatting patterns and arguments via farg() option.
+% v2.2 introduced ability to pass formatting patterns and arguments via farg() option. 
 %
 % See file examples/exo.pl for a test suit including at least one example from each debuc Goal.
 %
@@ -590,7 +591,7 @@ debug_portray( _Topic, _Term ).
 % @version  1.3 2020/09/14  added debuc Goal info and enum, debuc/2,3,4
 % @version  2.0 2025/10/07  changed last two arguments, new option goal recogniser, pred/1, internal/1 & all/1
 % @version  2.1 2025/10/27  pid(F,A) & prefix() universal; call() fixed; doc; enum terms fix; ns_sel simplify
-% @version  2.2 ...         farg() option; debuc Goals: version, session.
+% @version  2.2 2025/12/08  farg() option; depth() option in list and enum; debuc Goals: version, session.
 % @see file examples/exo.pl
 % @see debuc/3 shorthand for debug_call/3
 %
@@ -945,11 +946,15 @@ debug_call_topic( version, Derm, Bogs, Topic ) :-
                     Goal =.. [Verm,V,D,_],
                     once(Goal)
                     ;
-                    ( current_predicate(Derm/2) -> 
-                         Goal =.. [Derm,V,D],
-                         once(Goal)
+                    ( pack_property(Derm,version(V)) ->
+                         D = no_date
                          ;
-                         V = Derm; D = no_date
+                         ( current_predicate(Derm/2) -> 
+                              Goal =.. [Derm,V,D],
+                              once(Goal)
+                              ;
+                              V = no_vers, D = no_date
+                         )
                     )
                )
           ),
@@ -972,21 +977,20 @@ debug_call_topic( version, Derm, Bogs, Topic ) :-
      ),
      ( D == no_date ->
           (   V == no_vers ->
-               Mess = 'Using ~w',
+               Mess = 'Using ~w (no version or publication date available).',
                Mrgs = [A|_],
                Crgs = [A]
                ;
-               Mess = 'Using ~w, at version: ~w',
+               Mess = 'Using ~w, at version: ~w.',
                Mrgs = [A,B|_],
                Crgs = [A,B]
           )
           ;
-          Mess = 'Using ~w, at version: ~w (published on: ~w)',
+          Mess = 'Using ~w, at version: ~w (published on: ~w).',
           Mrgs = Crgs
      ),
      debug_call_message_opts( Mess, Crgs, Message, Args, Bogs ),
      debug_message( Topic, Message, Args ).
-
 debug_call_topic( wrote, ForLoc, Bogs, Topic ) :-
     ( ForLoc = loc(Spec,Ext) -> true; Spec=ForLoc, Ext = '' ),
     catch( locate(Spec,Ext,Loc), Excp, true ),

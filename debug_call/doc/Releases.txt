@@ -5,7 +5,7 @@ TBD
    17.03.10   debug_call with Success/failure by colour too (see SWI installation)
 ---
 
-2.2
+2.2         @  25.12.08
      25.12.06  OPTS:     pass format patterns via farg() (wired & tested on task())
                IFACE:    added debuc Goals: version & session
      25.11.14  OPTS:     enum and list have now option depth
