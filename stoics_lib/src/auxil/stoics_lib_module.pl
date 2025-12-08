@@ -61,7 +61,7 @@ Ns = [1, 2, 3].
 @version   1.6 2023/1/2
 @version   1.7 2023/1/2
 @version   1.8 2023/4/5
-@versino   2.0 2025/12/8
+@version   2.0 2025/12/8
 @see http://www.stoics.org.uk/~nicos/sware/stoics_lib
 
 */
