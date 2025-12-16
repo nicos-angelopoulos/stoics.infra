@@ -15,8 +15,15 @@ the argument of PredName_defaults/1.<br>
 Appending of the profile terms, can be by passed with options append_profile(false).<br>
 Listens to debug(options_append).
  
-The predicate can process debug(Dbg) a commonly used option (in All). When Dbg is set to true =|debug( PredName )|= is called.  <br>
-The default value of Dbg is provided by PredName_defaults/1.
+The predicate processes the following options within Opts
+     * debug(Dbg)
+       when Dbg is _true_ =|debug(PredName)|= is called.
+     * help(Help)
+       when Help is _true_ call PredName_help(Self) if it exists
+     * usage(Usg)
+       when Usg is _true_ call PredName_help(Self) if it exists
+
+If Help or Usg are set to _true_ $oa_cont(false)$ is returned else $oa_cont(true)$ is returned.
 
 OptS and All are options of PredName, whereas OAopts are options of options_append/4 and control
 how OptS are transformed into All.
