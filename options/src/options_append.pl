@@ -2,8 +2,10 @@
 :- use_module(library(readutil)).   % read_file_to_terms/3
 :- lib(debugging_status/2).
 
-options_append_known_process_option( debug ).
-options_append_known_process_option( version ).
+options_append_known_process_option(help).
+options_append_known_process_option(debug).
+options_append_known_process_option(usage).
+options_append_known_process_option(version).
 
 /** options_append( +PredName, +OptS, -All ).
     options_append( +PredName, +OptS, -All, +OAopts ).
@@ -24,6 +26,7 @@ The predicate processes the following options within Opts
        when Usg is _true_ call PredName_help(Self) if it exists
 
 If Help or Usg are set to _true_ $oa_cont(false)$ is returned else $oa_cont(true)$ is returned.
+When _help ad _usage predicates are called debug channel _PredName_ is turned on.
 
 OptS and All are options of PredName, whereas OAopts are options of options_append/4 and control
 how OptS are transformed into All.
@@ -86,7 +89,8 @@ OAopts term or list of
   * remove_types(Rtypes=true)
      to pass options_types(OTypes) to the result Options use Rtypes == false
 
- When processing debugging options in All, the first matching term of the following is used:
+
+When processing debugging options in All, the first matching term of the following is used:
     * debug
         short for debug(true)
    
@@ -107,6 +111,7 @@ OAopts term or list of
 
     * all
         debug(_) same as
+
     * Other
         debug(Other) other
 
@@ -154,10 +159,10 @@ The default OAopts list is [funnel(debug)].
 */
 
 options_append( Pname, Args, Opts ) :-
-    options_append( Pname, Args, Opts, [funnel(debug),funnel(version)] ).
+    options_append( Pname, Args, Opts, [funnel(debug),funnel(help),funnel(usage),funnel(version)] ).
 options_append( Pname, ArgS, Opts, OAoptS ) :-
     options_en_list( OAoptS, OAoptsWA0 ),
-    append( OAoptsWA0, [funnel(debug),funnel(version)], OAoptsWA ),
+    append( OAoptsWA0, [funnel(debug),funnel(help),funnel(usage),funnel(version)], OAoptsWA ),
     atom_concat( Pname, '_defaults', Dname ),
     ( ArgS == true ->
         ArgsPrv = []
@@ -184,7 +189,8 @@ options_append( Pname, ArgS, Opts, OAoptS ) :-
     append( ProfArgs, Xargs, ExtArgs ),
     options_def_append( Dname, Pname, ProfArgs, ExtArgs, Defs, OptsUnpro ),
     options_append_select_own_debug( OAopts, ProcessOpts, Restore ),
-    options_append_process( ProcessOpts, OptsUnpro, Args, Defs, Pname, DbgMod, OptsWT ),
+    options_append_process( ProcessOpts, OptsUnpro, Args, Defs, Pname, DbgMod, OptsPO ),
+    options_append_continuation( ProcessOpts, OptsPO, OptsWT ),
     options_append_types( ChkTypes, Pname/PArity, Pack, OptsWT ),
     options_append_types_remove( RmvTypes, OptsWT, Opts ),
     options_append_restore_debug_status( Restore ).
@@ -233,6 +239,13 @@ options_append_args( _Opts, Args, Arity ) :-
     Arity is 1.
 */
 
+/** options_append_process(+OAopts, +Pall, +PArgs, +PDefs, +Self, +DbgMod, -Call).
+
+     Pall is the appended PArgs (given as input) and PDefs predicate defaults.
+     Self is the predicat name. DbgMod is the debugging module.
+     Continuation options Call.
+
+*/
 options_append_process( [], Opts, _Args, _Defs, _Pname, _DbgMod, Opts ).
 options_append_process( [extra_arg(_)|T], All, Args, Defs, Pname, DbgMod, Opts ) :-
     !,
@@ -240,12 +253,12 @@ options_append_process( [extra_arg(_)|T], All, Args, Defs, Pname, DbgMod, Opts )
 options_append_process( [process(Opt)|T], All, Args, Defs, Pname, DbgMod, Opts ) :-
     !,
     options_remainder( T, process, 1, Opt, Rem ),
-    options_append_process_option( Opt, All, Pname, DbgMod, Args, Defs, Nxt, _Enh, Rem ),
+    options_append_process_option( Opt, All, Pname, DbgMod, Args, Defs, Nxt, _Enh ),
     options_append_process( Rem, Nxt, Args, Defs, Pname, DbgMod, Opts ).
 options_append_process( [funnel(Opt)|T], All, Args, Defs, Pname, DbgMod, Opts ) :-
     !,
     options_remainder( T, process, 1, Opt, Rem ),
-    options_append_process_option( Opt, All, Pname, DbgMod, Args, Defs, _Nxt, Enh, Rem ),
+    options_append_process_option( Opt, All, Pname, DbgMod, Args, Defs, _Nxt, Enh ),
     options_append_process( Rem, Enh, Args, Defs, Pname, DbgMod, Opts ).
 options_append_process( [foreign(Fgn)|T], All, Args, Defs, Pname, DbgMod, Opts ) :-
     !,
@@ -260,11 +273,11 @@ template_in_defaults( Defs, Term ) :-
     functor( Template, Tname, Tarity ),
     memberchk( Template, Defs ).
 
-options_append_process_option( Opt, All, Pname, DbgMod, Args, Defs, Nxt, Enh, Rem ) :-
+options_append_process_option( Opt, All, Pname, DbgMod, Args, Defs, Nxt, Enh ) :-
     options_append_known_process_option( Opt ),
     !,
-    options_append_option_process( Opt, All, Pname, DbgMod, Args, Defs, Nxt, Enh, Rem ).
-options_append_process_option( Opt, _All, _Pname, _DbgMod, _Args, _Defs, _Nxt, _Enh, _Rem ) :-
+    options_append_option_process( Opt, All, Pname, DbgMod, Args, Defs, Nxt, Enh ).
+options_append_process_option( Opt, _All, _Pname, _DbgMod, _Args, _Defs, _Nxt, _Enh ) :-
     throw( options_append( unknown_process_option(Opt)) ).
 
 % user + program can use debug/0,1,2 the first one
@@ -273,7 +286,7 @@ options_append_process_option( Opt, _All, _Pname, _DbgMod, _Args, _Defs, _Nxt, _
 %
 % fixme: this doesn't work properly for multi_debugs
 %
-options_append_option_process( debug, All, Pname, DbgMod, _Args, _Defs, NxtEnh, Enh, _Rem ) :-
+options_append_option_process( debug, All, Pname, DbgMod, _Args, _Defs, NxtEnh, Enh ) :-
     partition( option_name(debug), All, Dbgs, Nxt ),
     Dbgs = [Dbg|_],
     !,
@@ -284,12 +297,31 @@ options_append_option_process( debug, All, Pname, DbgMod, _Args, _Defs, NxtEnh, 
     Enh = [Rst|All],
     NxtEnh = [Rst|Nxt],
     options_append_option_process_debug( Dbg, Pname, DbgMod ).
-% next clause states that we shouldn't complain if there is no debug/1,2,3
-options_append_option_process( debug, All, _Pname, _DbgMod, _Args, _Defs, Nxt, Enh, _Rem ) :-
-    % fixme: add option_append option for strictness here ?
-    Nxt = All,
-    Enh = All.
-options_append_option_process( version, All, Pname, _DbgMod, Args, Defs, NxtEnh, Enh, _Opts ) :-
+options_append_option_process( help, All, Pname, _DbgMod, _Args, _Defs, NxtEnh, Enh ) :-
+    partition( option_name(help), All, Helps, Nxt ),
+    Helps = [help(true)|_],
+    atom_concat( Pname, '_help', Hname ),
+    current_predicate( Hname/1 ),
+    !,
+    ( debugging(Pname) -> WasDbg = true; WasDbg = false, debug(Pname) ),
+    call( Hname, Pname ),
+    Rst = '$oa_cont'(false),
+    Enh = [Rst|All],
+    NxtEnh = [Rst|Nxt],
+    ( WasDbg == true -> true;  nodebug(Pname) ).
+options_append_option_process( usage, All, Pname, _DbgMod, _Args, _Defs, NxtEnh, Enh ) :-
+    partition( option_name(usage), All, Uses, Nxt ),
+    Uses = [usage(true)|_],
+    atom_concat( Pname, '_usage', Hname ),
+    current_predicate( Hname/1 ),
+    !,
+    ( debugging(Pname) -> WasDbg = true; WasDbg = false, debug(Pname) ),
+    call( Hname, Pname ),
+    Rst = '$oa_cont'(false),
+    Enh = [Rst|All],
+    NxtEnh = [Rst|Nxt],
+    ( WasDbg == true -> true;  nodebug(Pname) ).
+options_append_option_process( version, All, Pname, _DbgMod, Args, Defs, NxtEnh, Enh ) :-
     ( memberchk(version(V),Defs) -> true; V=null ),
     ( memberchk(version(RetV),Args) ->
         ThisV =.. [Pname,V],
@@ -301,7 +333,29 @@ options_append_option_process( version, All, Pname, _DbgMod, Args, Defs, NxtEnh,
         % we can remove, as user is not going to be able to access these,...
         options_remainder(  All, version, 1, _, Rem ),
         NxtEnh = Rem, Enh = Rem
-    ).
+    ),
+    !.
+% don't complain if there is no options for any of the funnels
+options_append_option_process( _, All, _Pname, _DbgMod, _Args, _Defs, Nxt, Enh ) :-
+    % fixme: add option_append option for strictness here ?
+    Nxt = All,
+    Enh = All.
+
+/** when processing/funnelling help &/or usage and they have n't passed
+    $oa_cont(true) -> then add $oa_cont(false) into the options.
+*/
+options_append_continuation( Ppts, OptsPO, OptsWT ) :-
+     (   memberchk( process(help), Ppts )
+       ; memberchk( process(usage), Ppts )
+       ; memberchk( funnel(help), Ppts )
+       ; memberchk( funnel(usage), Ppts )
+     ),
+     ( memberchk('$oa_cont'(_), OptsPO) ->
+          OptsPO = OptsWT
+          ;
+          append( OptsPO, ['$oa_cont'(true)], OptsWT )
+     ),
+     !.
 
 options_append_option_process_version_return( RetV, _ThisV ) :-
     ground(RetV),

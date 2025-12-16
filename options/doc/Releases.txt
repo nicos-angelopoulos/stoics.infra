@@ -3,6 +3,8 @@
 
 
 1.6  
+     25.12.16  FIXED:   multiple processed options were passing the wrong arguments
+               OPTS:    new processed options help() and usage()
      24.10.18  DEPS:    lib(pack_errors) is now suggested, also vio options_throw/2
      24.03.17  IFACE:   new arity options_return/3
                ERROR:   new pack_error - associated with return options
