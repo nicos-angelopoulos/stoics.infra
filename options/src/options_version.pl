@@ -5,13 +5,13 @@ Current version and release date for the library.
 
 Currently:
 ==
-?- options_version( Vers, Date ).
+?- options_version(Vers, Date).
 Date = date(2022,12,29),
 Vers = 1:5:0.
 ==
 
 @author  nicos angelopoulos
-@version 1:5:0 2022/12/29
+@version 1:5:1 2025/12/16
 
 */
-options_version(1:5:0, date(2022,12,29)).
+options_version(1:5:1, date(2025,12,16)).
