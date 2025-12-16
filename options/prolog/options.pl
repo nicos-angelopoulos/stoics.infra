@@ -52,6 +52,8 @@ Some distinctive features of pack(options)
 
   * processing debug(Dbg) terms which optionise calls to debug/1
 
+  * processing help(Help) and usage(Usg) uniformly; decluttering user's code (v
+
   * uniform access to user specific file-based default options
 
 For an example see program options_example_sort_defaults.pl in examples directory.
@@ -110,6 +112,7 @@ missing curly brackets in the errors DCG (2016/11/14).
 @version  1.3   2020/9/18
 @version  1.4   2021/1/22
 @version  1.5   2022/12/29
+@version  1.6   2025/12/16,   process help() and usage() if preds exist
 @see http://www.stoics.org.uk/~nicos/sware/options
 
 */
