@@ -505,7 +505,7 @@ debug_portray( _Topic, _Term ).
 %  * wrote 
 %    Reports the writting of output on a file. Arg should be file specification suitable for locate/3.
 %    Either loc(File,Exts) or simply File in which case Exts = ''.
-%    As of v2.0 the default is to print the basename, use path(abs) in Opts.
+%    As of v2.0 the default is to print the basename, use path(abs) in Opts if the full path to the file is needed.
 %
 % As of v2.1 all debuc Goals work with options prefix(Pfx) and pred(Ar,Fn) (also synonymed to pred(Pid)).
 % 
