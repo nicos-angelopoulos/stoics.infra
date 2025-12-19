@@ -50,7 +50,7 @@ Opts
  Sects = [[[97], [98]], [[99], [100]]].
 
  ?- write('example 2'), nl.
- ?- o_sections( pack('stoics_lib/examples/sectioned.txt'), Sects, [separator(`[term]`),include_separator(true)] ).
+ ?- io_sections( pack('stoics_lib/examples/sectioned.txt'), Sects, [separator(`[term]`),include_separator(true)] ).
     Sects = [[[91, 116, 101, 114, 109, 93], [97], [98]], [[91, 116, 101, 114, 109, 93], [99], [100]]].
 
 
