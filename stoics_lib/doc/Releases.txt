@@ -2,6 +2,7 @@
 --------------------
 2.1
      25.12.19   OPTS:   changed behaviour of Sid- added example of new usage, io_sections/3
+                IFACE:  io_section/3 and associated io_section_open/3 and io_section_close/1
      25.12.08   DOC:    tiny typo fix
   
 2.0         @   25.12.08
