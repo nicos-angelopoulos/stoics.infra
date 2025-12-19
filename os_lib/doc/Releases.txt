@@ -1,5 +1,7 @@
 ---   Releases   ---
 --------------------
+2.1
+     25.12.19   FIXED:    broken call: os_ext(Ext, pack('stoics_lib/examples/sectioned.txt')),Ext=txt
 
 2.0         @   25.12.07
      25.12.06   IFACE:    synonimise os_version/2 to os_lib_version/2

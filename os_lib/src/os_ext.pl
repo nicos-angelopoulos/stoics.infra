@@ -223,4 +223,4 @@ os_ext_file_alias( alias, Os, _Stem, _Ext ) :-
 	!,
 	throw( pack_error(os,nested_alias(1,os_path/3,Os)) ).
 os_ext_file_alias( Other, Os, Stem, Ext ) :-
-	os_ext_file( Other, Stem, Ext, Os ).
+	os_ext_file( Other, Stem, Ext, Os, [] ).
