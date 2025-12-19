@@ -39,7 +39,7 @@ Opts
 
   * separator(Sep=`\\`)
     section separating line, used if SepCall is not present 
-    (back compatibility, this is now define as sep_call(==(Line))
+    (back compatibility, this is now defined as sep_call(==(Line))
     
   * terminating_separator(Tmn=true)
     whether a terminating separator is required at end of file
