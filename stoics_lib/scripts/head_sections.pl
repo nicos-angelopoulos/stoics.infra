@@ -101,8 +101,6 @@ head_sections_opts( true, Self, Opts ) :-
 head_sections_nos( 0, _SetUp, _Osep, _Out, _Self ) :- !.
 head_sections_nos( Nos, SetUp, Osep, Out, Self ) :-
      Nos > 0,
-     write( remain(Nos) ), nl,
-     ( Nos =:= 6 -> trace; true ),
      io_section( SetUp, Sect, SetUp1 ),
      ( Sect == end_of_file -> 
           debuc( Self, 'Run out of input with ~d sections missing', [Nos] ),
