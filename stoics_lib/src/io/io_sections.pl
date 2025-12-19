@@ -23,7 +23,7 @@ Opts
     See example 2.
 
   * process(Pgoal= (=))
-    Goal to process the Sections before storing.
+    Goal to process the Sections before storing
 
   * process_opts(Popts=false)
     if different to =|false|= pass Sopts to processor Pgoal (as last arg)
