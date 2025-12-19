@@ -26,7 +26,7 @@ Opts
     Goal to process the Sections before storing.
 
   * process_opts(Popts=false)
-    else pass Sopts to processor Pgoal (as last arg)
+    if different to =|false|= pass Sopts to processor Pgoal (as last arg)
 
   * separator_call(SepCall)
     if given it is used to separate sections, called with 1 argument:
