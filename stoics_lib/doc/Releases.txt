@@ -1,6 +1,7 @@
 ---   Releases   ---
 --------------------
 2.1
+     25.12.19   OPTS:   changed behaviour of Sid- added example of new usage, io_sections/3
      25.12.08   DOC:    tiny typo fix
   
 2.0         @   25.12.08

@@ -14,8 +14,10 @@ io_sections_defaults( Defs ) :-
 /** io_sections( +File, -Sections, +Opts ).
 
 Read a file to a list of Sections. 
-In vanilla operation, each section is a list of the codes read-in. 
-Each section is delimited by a marker line. 
+
+Each section is delimited by a marker line and returned as a list of codes as read-in.
+
+Empty sections are currently ignored and not returned.
 
 Opts 
   * include_separator(Inc=false)
@@ -34,8 +36,10 @@ Opts
     separator line. See example 3.
 
   * separator_id(Sid=false)
-    if =|true|= SepCall is called with an extra argument which is 
-    used to create SectionId-Section pairlists of sections 
+    if an integer is taken to be the Id (increasing with each section, otherwise is assumed to be callable,
+    for which when first argument is an integer it is assumed to be a counter which is increased with each
+    read section, the section lines themselves are passed as penultimate argument and the Id for the section as
+    the last argument
 
   * separator(Sep=`\\`)
     section separating line, used if SepCall is not present 
@@ -55,7 +59,12 @@ Opts
 
 
  ?- write('example 3'), nl.
- ?- assert( 
+ ?- io_sections( pack('stoics_lib/examples/sectioned.txt'), Sects, [separator(`[term]`),separator_id(1)] ).
+ Sects = [1-[[97], [98]], 2-[[99], [100]]].
+
+ ?- assert( (by_two(N,_,Id) :- Id is N * 2) ).
+ ?- io_sections( pack('stoics_lib/examples/sectioned.txt'), Sects, [separator(`[term]`),separator_id(by_two(1))] ).
+ Sects = [2-[[97], [98]], 4-[[99], [100]]].
 
  ?- write('private example'), nl.
  ?- cd( '/usr/local/users/nicos/work/2015/15.10.05-lmtk3_substrates' ).
@@ -66,6 +75,7 @@ Opts
 @version  0.1 2015/10/05
 @version  0.2 2016/02/04
 @version  0.3 2021/02/04, added include_separator(Inc), examples, pass file through absolute_file_name/2
+@vesion   0.4 2025/12/09, changed behaviour of Sid- added example of new usage
 
 */
 io_sections( File, Sections, ArgS ) :-
@@ -94,44 +104,61 @@ io_sections( File, Sections, ArgS ) :-
      read_line_to_codes( Stream, Line ),
      % options( terminating_separator(Tmn), Opts ),
      memberchk( terminating_separator(Tmn), Opts ),
-     io_sections_stream( Line, Stream, Call, Popts, Proc, Tmn, Sid, Inc, null, [], Sections ),
+     io_sections_stream( Line, Stream, Call, Popts, Proc, Tmn, Sid, Inc, [], Sections ),
      close( Stream ).
 
-io_sections_stream( end_of_file, _Stream, _Call, Popts, Proc, Tmn, Sid, Inc, Id, Acc, Sections ) :-
+io_sections_stream( end_of_file, _Stream, _Call, Popts, Proc, Tmn, Sid, Inc, Acc, Sections ) :-
      !,
-     io_sections_end_acc( Tmn, Sid, Inc, Id, Popts, Proc, Acc, Sections ).
-io_sections_stream( Line, Stream, Call, Popts, Proc, Tmn, Sid, Inc, Id, Acc, Sections ) :-
+     io_sections_end_acc( Tmn, Sid, Inc, Popts, Proc, Acc, Sections ).
+io_sections_stream( Line, Stream, Call, Popts, Proc, Tmn, Sid, Inc, Acc, Sections ) :-
      % Line == Sep,
-     io_section_sep_call( Sid, Call, Line, NxtId ),
+     call( Call, Line ),
+     % io_section_sep_call( Sid, Call, Line, NxtId ),
      !,
-     io_accumulator_section( Acc, Sid, Id, Popts, Proc, Sections, Tections ),
-     ( Inc == true -> 
+     io_accumulator_section( Acc, Sid, Popts, Proc, Sections, Nid, Tections ),
+     ( Inc == true ->
           NewAcc = [Line]
           ;
           NewAcc = []
      ),
      read_line_to_codes( Stream, New ),
-     io_sections_stream( New, Stream, Call, Popts, Proc, Tmn, Sid, Inc, NxtId, NewAcc, Tections ).
-io_sections_stream( Line, Stream, Call, Popts, Proc, Tmn, Sid, Inc, Id, Acc, Sections ) :-
+     io_sections_stream( New, Stream, Call, Popts, Proc, Tmn, Nid, Inc, NewAcc, Tections ).
+io_sections_stream( Line, Stream, Call, Popts, Proc, Tmn, Sid, Inc, Acc, Sections ) :-
      read_line_to_codes( Stream, New ),
-     io_sections_stream( New, Stream, Call, Popts, Proc, Tmn, Sid, Inc, Id, [Line|Acc], Sections ).
+     io_sections_stream( New, Stream, Call, Popts, Proc, Tmn, Sid, Inc, [Line|Acc], Sections ).
+
+/* old.del.me
 
 io_section_sep_call( true, Call, Line, Id ) :-
      call( Call, Line, Id ).
 io_section_sep_call( false, Call, Line, _Id ) :-
      call( Call, Line ).
+     */
 
 % the first clause is to catch empty ones, particularly the first one when we have Sid=true
 % maybe a lookahead would be better
-io_accumulator_section( [], _Sid, _Id, _Popts, _Proc, Sections, Sections ) :- !.
-io_accumulator_section( Acc, Sid, Id, Popts, Proc, Sections, Tections ) :-
+io_accumulator_section( [], Sid, _Popts, _Proc, Sections, Sid, Sections ) :- !.
+io_accumulator_section( Acc, Sid, Popts, Proc, Sections, Nid, Tections ) :-
      reverse( Acc, Provisional ),
      optioned_call( Popts, Proc, Provisional, Section ),
-     io_section_id( Sid, Id, Section, Iection ),
+     io_section_id( Sid, Section, Nid, Iection ),
      Sections = [Iection|Tections].
 
-io_section_id( true, Id, Section, Id-Section ).
-io_section_id( false, _Id, Section, Section ).
+io_section_id( false, Section, false, Section ) :- !.
+io_section_id( Gid, Section, Nid, Id-Section ) :-
+     ( integer(Gid) -> 
+          Id is Gid,
+          Nid is Id + 1
+          ;
+          call( Gid, Section, Id ),
+          ( (compound(Gid),Gid =.. [Fun,Fst|Rst],integer(Fst)) -> 
+               Nxt is Fst + 1,
+               Nid =.. [Fun,Nxt|Rst]
+               ;
+               Nid = Gid,
+               call( Gid, Section, Id )
+          )
+     ).
 
 optioned_call( false, Proc, Provisional, Section ) :-
      !,
@@ -146,7 +173,7 @@ io_sections_end_acc( Acc, true ) :-
      % fixme: use pack(pack_errors)
      throw( non_empty_end_accumulator(Acc) ).
 
-io_sections_end_acc( true, _Sid, Inc, _Id, _Popts, _Proc, Acc, [] ) :-
+io_sections_end_acc( true, _Sid, Inc, _Popts, _Proc, Acc, [] ) :-
      io_sections_end_acc( Acc, Inc ).
-io_sections_end_acc( false, Sid, _Inc, Id, Popts, Proc, Acc, Sections ) :-
-     io_accumulator_section( Acc, Sid, Id, Popts, Proc, Sections, [] ).
+io_sections_end_acc( false, Sid, _Inc, Popts, Proc, Acc, Sections ) :-
+     io_accumulator_section( Acc, Sid, Popts, Proc, _NxtId, Sections, [] ).
