@@ -160,4 +160,4 @@ io_sections_end_acc( Acc, true ) :-
 io_sections_end_acc( true, _Sid, Inc, _Popts, _Proc, Acc, [] ) :-
      io_sections_end_acc( Acc, Inc ).
 io_sections_end_acc( false, Sid, _Inc, Popts, Proc, Acc, Sections ) :-
-     io_accumulator_section( Acc, Sid, Popts, Proc, _NxtId, Sections, [] ).
+     io_accumulator_section( Acc, Sid, Popts, Proc, Sections, _NxtId, [] ).

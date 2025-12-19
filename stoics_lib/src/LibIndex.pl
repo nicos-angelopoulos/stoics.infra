@@ -46,6 +46,9 @@ lib_index(io_line, 2, any, user, 'io/io_line').
 lib_index(io_lines, 2, any, user, 'io/io_lines').
 lib_index(io_open, 3, any, user, 'io/io_open').
 lib_index(io_put_line, 2, any, user, 'io/io_put_line').
+lib_index(io_section, 3, any, user, 'io/io_section').
+lib_index(io_section_close, 1, any, user, 'io/io_sections').
+lib_index(io_section_open, 3, any, user, 'io/io_sections').
 lib_index(io_sections, 3, any, user, 'io/io_sections').
 lib_index(io_streams, 3, any, user, 'io/io_streams').
 lib_index(io_url, 1, any, user, 'io/io_url').
