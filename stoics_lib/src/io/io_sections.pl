@@ -79,20 +79,15 @@ Opts
 
 */
 io_sections( File, Sections, ArgS ) :-
-    ( is_list(ArgS) -> Args = ArgS; Args = [ArgS] ),
-    io_sections_defaults( Defs ),
-    append( Args, Defs, Opts ),
-     % options_append( io_sections, Args, Opts ),
+     ( is_list(ArgS) -> Args = ArgS; Args = [ArgS] ),
+     io_sections_defaults( Defs ),
+     append( Args, Defs, Opts ),
      ( memberchk(separator_call(Call),Opts) ->
           true
           ;
-          % options( separator(Sep), Opts ),
-        memberchk( separator(Sep), Opts ),
+          memberchk( separator(Sep), Opts ),
           Call = ==(Sep)
      ),
-     % options( separator_id(Sid), Opts ),
-     % options( [separator(Sep),process(Proc)], Opts ),
-     % options( [process_options(Popts)], Opts ),
      memberchk( separator_id(Sid), Opts ),
      memberchk( separator(Sep), Opts ),
      memberchk( process(Proc), Opts ),
@@ -102,7 +97,6 @@ io_sections( File, Sections, ArgS ) :-
      absolute_file_name( File, FileAbs ),
      open( FileAbs, read, Stream ),
      read_line_to_codes( Stream, Line ),
-     % options( terminating_separator(Tmn), Opts ),
      memberchk( terminating_separator(Tmn), Opts ),
      io_sections_stream( Line, Stream, Call, Popts, Proc, Tmn, Sid, Inc, [], Sections ),
      close( Stream ).
@@ -111,9 +105,7 @@ io_sections_stream( end_of_file, _Stream, _Call, Popts, Proc, Tmn, Sid, Inc, Acc
      !,
      io_sections_end_acc( Tmn, Sid, Inc, Popts, Proc, Acc, Sections ).
 io_sections_stream( Line, Stream, Call, Popts, Proc, Tmn, Sid, Inc, Acc, Sections ) :-
-     % Line == Sep,
      call( Call, Line ),
-     % io_section_sep_call( Sid, Call, Line, NxtId ),
      !,
      io_accumulator_section( Acc, Sid, Popts, Proc, Sections, Nid, Tections ),
      ( Inc == true ->
@@ -126,14 +118,6 @@ io_sections_stream( Line, Stream, Call, Popts, Proc, Tmn, Sid, Inc, Acc, Section
 io_sections_stream( Line, Stream, Call, Popts, Proc, Tmn, Sid, Inc, Acc, Sections ) :-
      read_line_to_codes( Stream, New ),
      io_sections_stream( New, Stream, Call, Popts, Proc, Tmn, Sid, Inc, [Line|Acc], Sections ).
-
-/* old.del.me
-
-io_section_sep_call( true, Call, Line, Id ) :-
-     call( Call, Line, Id ).
-io_section_sep_call( false, Call, Line, _Id ) :-
-     call( Call, Line ).
-     */
 
 % the first clause is to catch empty ones, particularly the first one when we have Sid=true
 % maybe a lookahead would be better
