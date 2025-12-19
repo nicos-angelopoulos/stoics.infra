@@ -34,7 +34,7 @@ Opts
     separator line. See example 3.
 
   * separator_id(Sid=false)
-    if true SepCall is called with an extra argument which is 
+    if =|true|= SepCall is called with an extra argument which is 
     used to create SectionId-Section pairlists of sections 
 
   * separator(Sep=`\\`)
