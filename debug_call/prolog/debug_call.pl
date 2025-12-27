@@ -127,7 +127,7 @@ V = 2:2:0,
 D = date(2025,12,8).
 ==
 */
-debug_call_version(2:2:0, date(2025,12,8)).
+debug_call_version(2:2:1, date(2025,12,27)).
 
 :- use_module(library(apply)).   % maplist/4,...
 :- use_module(library(lists)).   % member/4,...
