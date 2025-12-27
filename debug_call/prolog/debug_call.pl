@@ -460,7 +460,6 @@ debug_portray( _Topic, _Term ).
 %    Print using informational machinery (usually different/green colour, to debug's blue)
 %    term should Mess/Args in the debug/3 version
 %  * input
-% At 14:2:30 on 6th of Dec 2025 stop task: talking point
 %    Reports reading from a file. Arg should be file specification suitable for locate/3.
 %    Either loc(File,Exts) or simply File in which case Exts = ''.
 %    As of v2.0 the default is to print the basename, use path(abs) in Opts if the full path to the file is needed.
