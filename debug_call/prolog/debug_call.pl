@@ -127,7 +127,7 @@ V = 2:2:0,
 D = date(2025,12,8).
 ==
 */
-debug_call_version(2:2:1, date(2025,12,27)).
+debug_call_version(2:2:2, date(2026,1,11)).
 
 :- use_module(library(apply)).   % maplist/4,...
 :- use_module(library(lists)).   % member/4,...
@@ -1009,8 +1009,8 @@ debug_call_topic( input, ForLoc, Bogs, Topic ) :-
 debug_call_topic( task(Whc), Task, Bogs, Topic ) :-
     datime_readable( Readable ),
     debug_call_topic_time_which_readable( Whc, Whcable ),
-    atomic_list_concat( [Readable,' ',Whcable,' task: ', Task], Mess ),
-    debug_call_message_opts( Mess, [], Message, Args, Bogs ),
+    atomic_list_concat( [Readable,Whcable,'task: ~w'], ' ', Mess ),
+    debug_call_message_opts( Mess, [Task], Message, Args, Bogs ),
     debug_message( Topic, Message, Args ).
 debug_call_topic( start, Arg, Bogs, Topic ) :-
     Mess = 'Starting: ~w',
