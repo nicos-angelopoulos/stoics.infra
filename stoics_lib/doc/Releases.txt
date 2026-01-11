@@ -1,6 +1,7 @@
 ---   Releases   ---
 --------------------
 2.1
+     26.01.11   FIXED:  make opts identification more robust: break_nth(1,[a,b],E,[X,Y]).
      26.01.08   CHANGE: has_at_least/3, more efficient implementation
      25.12.19   OPTS:   changed behaviour of Sid- added example of new usage, io_sections/3
                 IFACE:  io_section/3 and associated io_section_open/3 and io_section_close/1

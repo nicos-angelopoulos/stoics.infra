@@ -1,4 +1,5 @@
 
+:- lib(lists).
 :- lib(suggests(options)).
 
 :- lib(stoics_lib_throw/2).
@@ -76,10 +77,11 @@ false.
 */
 break_nth( N, List, Left, Fourth ) :-
 	Self = break_nth,
-     ( var(Fourth) -> 
-          Args = [remainder(Fourth)]
-          ;
+     ( break_nth_is_options(Fourth) ->
           Fourth = Args
+          ;
+          Fourth = Right,
+          Args = [remainder(Right)]
      ),
      options_append( Self, Args, Opts ),
      options( at_short(AtShort), Opts ),
@@ -135,3 +137,15 @@ break_nth_err( write, _List, _Left, _Right, N, Length, ErrOpts ) :-
 break_nth_err( true, List, Left, Right, _N, _Length, _ErrOpt ) :-
      Right = [],
      List = Left.
+
+break_nth_is_options( Opts ) :-
+     \+ var(Opts),
+     once( break_nth_is_options_1(Opts) ).
+
+break_nth_is_options_1(at_short(_)).
+break_nth_is_options_1(remainder(_)).
+break_nth_is_options_1( Opts ) :-
+     is_list( Opts ),
+     member( Opt, Opts ), 
+     \+ var( Opt ),
+     ( Opt = at_short(_); Opt = remainder(_) ).
