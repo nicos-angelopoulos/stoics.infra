@@ -1009,7 +1009,7 @@ debug_call_topic( input, ForLoc, Bogs, Topic ) :-
 debug_call_topic( task(Whc), TaskPrv, Bogs, Topic ) :-
     datime_readable( Readable ),
     debug_call_topic_time_which_readable( Whc, Whcable ),
-    term_to_atom( TaskPrv, Task ),
+    ( compound(TaskPrv) -> term_to_atom( TaskPrv, Task ); TaskPrv = Task ),
     atomic_list_concat( [Readable,' ',Whcable,' task: ',Task,'.'], '', Mess ),
     debug_call_message_opts( Mess, [], Message, Args, Bogs ),
     debug_message( Topic, Message, Args ).
