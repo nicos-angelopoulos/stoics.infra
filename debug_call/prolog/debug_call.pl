@@ -1006,11 +1006,12 @@ debug_call_topic( input, ForLoc, Bogs, Topic ) :-
     debug_call_location_exception_message( Excp, input, Loc, MessW, Mess, Bogs, Mrgs ),
     debug_call_message_opts( Mess, Mrgs, Message, Args, Bogs ),
     debug_message( Topic, Message, Args ).
-debug_call_topic( task(Whc), Task, Bogs, Topic ) :-
+debug_call_topic( task(Whc), TaskPrv, Bogs, Topic ) :-
     datime_readable( Readable ),
     debug_call_topic_time_which_readable( Whc, Whcable ),
-    atomic_list_concat( [Readable,Whcable,'task: ~w'], ' ', Mess ),
-    debug_call_message_opts( Mess, [Task], Message, Args, Bogs ),
+    term_to_atom( TaskPrv, Task ),
+    atomic_list_concat( [Readable,' ',Whcable,' task: ',Task,'.'], '', Mess ),
+    debug_call_message_opts( Mess, [], Message, Args, Bogs ),
     debug_message( Topic, Message, Args ).
 debug_call_topic( start, Arg, Bogs, Topic ) :-
     Mess = 'Starting: ~w',
