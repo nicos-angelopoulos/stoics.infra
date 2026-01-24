@@ -1,10 +1,11 @@
 %% kvs_k_memberchk( +K, +KVset, -V ).
 % 
-%  Select the unique V corresponding to 
+%  Select the unique V corresponding to key K.
+% 
 %  Should this be covered by a unification version of Swi's ord_memberchk/2 ?
 %  It seems counter intuitive that they are using ==.
 %
-%  Should there be a kvo version?  This assumes unique keys in addition to sorted.
+%  This predicate assumes unique keys in addition to sorted.
 %
 %==
 % kvs_k_memberchk( b, [a-1,b-2,c-3], V ).
