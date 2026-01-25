@@ -531,7 +531,7 @@ debug_portray( _Topic, _Term ).
 %  * pred(F,A)
 %    (also pred(F/A)) adds predicate caller identfication to message
 %  * farg(Farg)
-%    pass formating argument when Arg contains '~' formatting terms that expecdt an argument [stat(task),stop(task)]
+%    pass formating argument when Arg contains '~' formatting terms that expecdt an argument [task(start),task(stop)]
 % 
 % Opts for specific debugoals
 %  * check_point(Point)
