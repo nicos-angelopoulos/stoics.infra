@@ -819,6 +819,19 @@ debug_call_topic( options, RepOpts, Bogs, Topic ) :-
     ),
     debug_call_message_opts( Ness, [RdcOpts], Message, Args, Bogs ),
     debug( Topic,  Message, Args ).
+debug_call_topic( stat, Key, Bogs, Topic ) :-
+    statistics( Key, Stat ),
+    ( memberchk(check_point(Point),Bogs) ->
+          Rec = stat(Point,Key,Stat)
+          ;
+          Rec = stat(Key,Stat)
+    ),
+    ( memberchk(comment(false),Bogs) ->
+          format( '~w.\n', [Rec] )
+          ;
+          debug_message( Topic, '~w.', [Rec] )
+    ).
+
 debug_call_topic( term, Derm, Bogs, Topic ) :-
     ( memberchk(term_name(Tnm),Bogs) -> 
           Mess = 'Reporting term (~w): ~w',

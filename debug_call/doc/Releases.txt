@@ -6,7 +6,8 @@ TBD
 ---
 
 2.3
-     26.01.11   CHANGE: task(start/stop) now associated task can be a term (was atom)
+     26.01.25  IFACE:    added debuc Goal: stat with options check_point() and message()
+     26.01.11  CHANGE:   task(start/stop) now associated task can be a term (was atom)
 
 2.2         @  25.12.08
      25.12.06  OPTS:     pass format patterns via farg() (wired & tested on task())
