@@ -460,7 +460,7 @@ debug_portray( _Topic, _Term ).
 %  * dims
 %    Prints the dimensions of matrix, see mtx_dims/3.
 %  * end
-%    Translates to finishing ~Arg or finishing ~Topic if Arg == true.
+%    Translates to finishing ~Arg or finishing ~Topic if =|Arg==true|=.
 %  * enum
 %    Print members of lists and arguments of terms, where each item is printed on single line and prefixed by an index number
 %    Knows: depth(Depth) (restricts items to print).
@@ -492,13 +492,13 @@ debug_portray( _Topic, _Term ).
 %  * options
 %    Options used on call to a predicate. Possible options: pred(Func,Ar), pred(Pid), the caller predicate, internal(true), shows also '$' starting options.
 %  * pwd 
-%    Message about current dir Location (=Arg), (if Arg == false, location is not shown)- see examples.
+%    Message about current dir Location (=Arg), (if =|Arg==false|=, location is not shown)- see examples.
 %  * read
 %    Alias for input.
 %  * session
 %    Print info on all loaded code, packs are shown with versions both from packs and info from <Pred>_version/2,3 if available (as per stoics.org.uk packs).
 %  * start 
-%    Translates to starting ~Arg or starting ~Topic if Arg == true.
+%    Translates to starting ~Arg or starting ~Topic if =|Arg==true|=.
 %  * stat
 %    Arg should be they key (1st arg) of statistics/1, the debuc Goal reports the statistic. Can take options check_point() and comment().
 %    The latter allows for reporting without '%' so terms can be read in by read/1 or consulted.
@@ -537,9 +537,7 @@ debug_portray( _Topic, _Term ).
 %  * check_point(Point)
 %    adds check point info to message [stat]
 %  * comment(Comm)
-%    when =|Comm == false|= print message through format without '%' (portray_message) machineary [_|stat|_- print readable terms]
-%  * comment(Comm)
-%    when =|Comm == false|= print message through format without '%' (portray_message) machineary [stat- print readable terms]
+%    when =|Comm==false|= print message through format without '%' (portray_message) machineary [stat- print readable terms]
 %  * depth(Depth)
 %    limits output times [enum,list]
 % 
