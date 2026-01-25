@@ -535,7 +535,7 @@ debug_portray( _Topic, _Term ).
 % 
 % Opts for specific debugoals
 %  * check_point(Point)
-%    adds check point info to message [_stat_]
+%    adds check point info to message [__stat__]
 %  * comment(Comm)
 %    when =|Comm == false|= print message through format without '%' (portray_message) machineary [_stat_- print readable terms]
 %  * depth(Depth)
