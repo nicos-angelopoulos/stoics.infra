@@ -177,4 +177,8 @@ exo( Args ) :-
      debuc( Self, end, true, prefix(pfx1) ),
      debuc( Self, end, true, [prefix('At'),pred(Self,1)] ),
      debuc( Self, session, true ),
+     debuc( Self, stat, runtime, stat_point(here) ),
+     debuc( Self, stat, runtime, check_point(here) ),
+     debuc( Self, stat, runtime, true ),
+     debuc( Self, stat, runtime, [check_point(here),comment(false)] ),
      debuc( Self, end, true ).

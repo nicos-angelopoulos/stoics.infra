@@ -28,8 +28,8 @@ user:message_property( Dbg, Property ) :-
 Avoids running goals to produce output that is only relevant while debugging.
 Includes pre-canned, often used calls that print informative messages for common debugging tasks.
 
-See the main predicate's documenation, debug_call/4, for more details.<br>
-See file examples/exo.pl for a full pallette of examples. 
+See the main predicate's documenation, debug_call/4, for more details.
+See file examples/exo.pl for a full pallette of examples.
 
 ---+++ Examples
 
@@ -86,6 +86,15 @@ At 15:44:1 on 2nd of Jul 2024 finished task: write on file.
 ?- debuc(ex, simple_mess([a=1,b=2])).
 % 12
 true.
+
+?- debuc( ex, stat, runtime, true ).
+% stat(runtime,[182,4]).
+true.
+
+?- debuc( ex, stat, runtime, [check_point(here),comment(false)] ).
+stat(here,runtime,[193,11]).
+true.
+
 ==
 
 ---+++ Variable topics 
@@ -237,11 +246,11 @@ Particularly useful in sending uninstantiated Topics.
 
 @author nicos angelopoulos
 @version  0.1 2016/11/1
+@version  0.1 2026/1/25, avoid building the term with =.. use call/4 directly
 
 */
 debug_message( Topic, Mess, Args ) :-
-    Call =.. [debug,Topic,Mess,Args],
-    call( Call ).
+    call( debug, Topic, Mess, Args ).
 
 /** debugging_topic( ?Topic ).
 
@@ -489,6 +498,9 @@ debug_portray( _Topic, _Term ).
 %    Print info on all loaded code, packs are shown with versions both from packs and info from <Pred>_version/2,3 if available (as per stoics.org.uk packs).
 %  * start 
 %    Translates to starting ~Arg or starting ~Topic if Arg == true.
+%  * stat
+%    Arg should be they key (1st arg) of statistics/1, the debuc Goal reports the statistic. Can take options check_point() and comment().
+%    The latter allows for reporting without '%' so terms can be read in by read/1 or consulted.
 %  * task(Wch)
 %    Time of start/stop (Wch) of a task. Other values for Wch are allowed but printed as they come. 
 %    Arg can be a term (as of Version 1.5).
@@ -506,7 +518,7 @@ debug_portray( _Topic, _Term ).
 %    Either loc(File,Exts) or simply File in which case Exts = ''.
 %    As of v2.0 the default is to print the basename, use path(abs) in Opts if the full path to the file is needed.
 %
-% As of v2.1 all debuc Goals work with options prefix(Pfx) and pred(Ar,Fn) (also synonymed to pred(Pid)).
+% As of v2.1 almosst all debuc Goals work with options prefix(Pfx) and pred(Ar,Fn) (also synonymed to pred(Pid)).
 % 
 % v2.2 introduced ability to pass formatting patterns and arguments via farg() option. 
 %
@@ -559,6 +571,14 @@ debug_portray( _Topic, _Term ).
 %
 % ?- debuc( ex, call(list_avg_mess), [1,2,3], [pred(p1,2),prefix('By call')] ).
 % By call predicate: p1/2 avg: 2
+%
+% ?- debuc( ex, stat, runtime, true ).
+% stat(runtime,[182,4]).
+% true.
+% 
+% ?- debuc( ex, stat, runtime, [check_point(here),comment(false)] ).   % note this does not have a precedding percentage char
+% stat(here,runtime,[193,11]).   
+% 
 %==
 % 
 % At some point around SWI-Prolog 8, behaviour of debug/3 changed in being more strict about messages with no arguments.
@@ -829,7 +849,8 @@ debug_call_topic( stat, Key, Bogs, Topic ) :-
     ( memberchk(comment(false),Bogs) ->
           format( '~w.\n', [Rec] )
           ;
-          debug_message( Topic, '~w.', [Rec] )
+          debug_call_message_opts( '~w.', [Rec], Message, Args, Bogs ),
+          debug_message( Topic, Message, Args )
     ).
 
 debug_call_topic( term, Derm, Bogs, Topic ) :-
