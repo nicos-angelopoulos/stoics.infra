@@ -8,6 +8,7 @@ TBD
 2.3
      26.01.25  IFACE:    added debuc Goal: stat with options check_point() and message()
                CHANGE:   implementation of debug_message/3
+               DOC:      started doc list of Opts in debuc/4 + start refer to debug goals(s) as debugoal(s)
      26.01.11  CHANGE:   task(start/stop) now associated task can be a term (was atom)
 
 2.2         @  25.12.08

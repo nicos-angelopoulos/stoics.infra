@@ -25,7 +25,8 @@ user:message_property( Dbg, Property ) :-
 
 /** <module> Debugging with calls.
 
-Avoids running goals to produce output that is only relevant while debugging.
+Debugging information focusing on avoiding running goals to produce output that is only relevant while debugging.
+
 Includes pre-canned, often used calls that print informative messages for common debugging tasks.
 
 See the main predicate's documenation, debug_call/4, for more details.
@@ -401,8 +402,8 @@ debug_portray( Topic, Term ) :-
     portray_clause( Term ).
 debug_portray( _Topic, _Term ).
 
-%% debug_call( +Topic, +Goal, +Arg ).
-%% debug_call( +Topic, +Goal, +Arg, +Opts ).
+%% debug_call( +Topic, +DebuGoal, +Arg ).
+%% debug_call( +Topic, +DebuGoal, +Arg, +Opts ).
 %
 % Automates often used debug calls with emphasis on: (a) avoiding calling things that will not be reported and (b) easy tailoring of the messages.
 % 
@@ -523,7 +524,23 @@ debug_portray( _Topic, _Term ).
 % v2.2 introduced ability to pass formatting patterns and arguments via farg() option. 
 %
 % See file examples/exo.pl for a test suit including at least one example from each debuc Goal.
-%
+% 
+% Opts supported by all debugoals
+%  * prefix(Pfx)
+%    prefixes the message
+%  * pred(F,A)
+%    (also pred(F/A)) adds predicate caller identfication to message
+%  * farg(Farg)
+%    pass formating argument when Arg contains '~' formatting terms that expecdt an argument [stat(task),stop(task)]
+% 
+% Opts for specific debugoals
+%  * check_point(Point)
+%    adds check point info to message [_stat_]
+%  * comment(Comm)
+%    when =|Comm == false|= print message through format without '%' (portray_message) machineary [_stat_- print readable terms]
+%  * depth(Depth)
+%    limits output times [enum,list]
+% 
 %==
 % ?- debug(ex).
 % 
@@ -611,6 +628,7 @@ debug_portray( _Topic, _Term ).
 % @version  2.0 2025/10/07  changed last two arguments, new option goal recogniser, pred/1, internal/1 & all/1
 % @version  2.1 2025/10/27  pid(F,A) & prefix() universal; call() fixed; doc; enum terms fix; ns_sel simplify
 % @version  2.2 2025/12/08  farg() option; depth() option in list and enum; debuc Goals: version, session.
+% @version  2.3             debuGoal stat; opts comment(t/f), check_point()
 % @see file examples/exo.pl
 % @see debuc/3 shorthand for debug_call/3
 %
