@@ -22,6 +22,7 @@ lib_index(datime_readable, 2, any, user, 'date_time/datime_readable').
 lib_index(date_two_digit_dotted, 1, any, user, 'date_time/date_two_digit_dotted').
 lib_index(date_two_digit_dotted, 2, any, user, 'date_time/date_two_digit_dotted').
 lib_index(day_trailer, 2, any, user, 'date_time/day_trailer').
+lib_index(even, 1, any, user, 'number/even').
 lib_index(get_date, 1, any, user, 'date_time/get_date').
 lib_index(get_date_time, 1, any, user, 'date_time/get_date_time').
 lib_index(has_at_least, 3, any, user, 'list/has_at_least').
@@ -90,6 +91,7 @@ lib_index(n_breaks, 4, any, user, 'list/n_breaks').
 lib_index(n_digits_integer_codes, 3, any, user, 'codes/n_digits_integer_codes').
 lib_index(n_digits_min, 3, any, uer, 'number/n_digits_min' ).
 lib_index(nth1, 5, any, user, 'list/nth1' ).
+lib_index(odd, 1, any, user, 'number/odd').
 lib_index(on_call, 4, any, user, 'meta/on_call').
 lib_index(on_fail, 2, any, user, 'meta/on_fail').
 lib_index(on_fail, 3, any, user, 'meta/on_fail').

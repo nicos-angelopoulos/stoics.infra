@@ -93,6 +93,8 @@
               int_trailer/2,           % +Int, -Trailer
               compare_arithmetic/3,    % -Op, +X, +Y
               n_digits_min/3,          % +N, +Number, -Padded 
+              odd/1,                   % +Odd
+              even/1,                  % +Even
             % strings/
               letter_strings/3,        % +Start, -N, -Letts 
             % term/

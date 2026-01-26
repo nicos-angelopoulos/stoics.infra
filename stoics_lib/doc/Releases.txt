@@ -1,6 +1,7 @@
 ---   Releases   ---
 --------------------
 2.1
+     26.01.26   IFACE:  odd/1 & even/1
      26.01.24   IFACE:  kvs_k_update_v/7
      26.01.11   FIXED:  make opts identification more robust: break_nth(1,[a,b],E,[X,Y]).
      26.01.08   CHANGE: has_at_least/3, more efficient implementation
