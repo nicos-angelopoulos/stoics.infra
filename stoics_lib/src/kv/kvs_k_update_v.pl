@@ -3,8 +3,8 @@
 Update or insert the V part of two arg sorted terms list KVset to NVset.
 
 GoalNull is called if K does not appear in KVset and GoalUpd when K does exist.
-First is via =| call(+GoalNull, +K, -NewV, -NewKV)|= and second via =| call( +GoalUpd, +K, +V, -NewV, -NewKV ).
-In the former case, V remain unbound.
+First is via =|call(+GoalNull, +K, -NewV, -NewKV)|= and second via =|call( +GoalUpd, +K, +V, -NewV, -NewKV )|=.
+In the former case, V remains unbound.
 
 ==  
 ?- assert( v_plus_1(K,V,NewV,K-NewV):-NewV is V + 1).
