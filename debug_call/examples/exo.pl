@@ -1,4 +1,5 @@
 
+:- use_module(library(lists)).   % sum_list/2.
 :- use_module(library(lib)).
 
 :- lib(options).
@@ -18,12 +19,12 @@ Examples
 ==
 ?- exo.
 ?- exo([]).
-% Using debug_call, at version: 2:1:1 (published on: date(2025,12,6))
-% Using exo, at version: 0:3 (published on: 25.12.6)
+% Using debug_call, at version: 2:2:2 (published on: date(2026,1,11)).
+% Using exo, at version: 0:3 (published on: 25.12.6).
 % Predicate: exo/1 option selected: op1(one).
 % Predicate: exo/1 options: [debug(true),op1(one),op2(two)]
-% Predicate: exo/1 options: [$restore(exo,debug,true),$restore(exo,debug,false),debug(true),op1(one),op2(two)]
-% Full predicate: exo/1 options: [$restore(exo,debug,true),$restore(exo,debug,false),debug(true),op1(one),op2(two)]
+% Predicate: exo/1 options: [$restore(exo,debug,true),$restore(exo,debug,false),debug(true),op1(one),op2(two),$oa_cont(true)]
+% Full predicate: exo/1 options: [$restore(exo,debug,true),$restore(exo,debug,false),debug(true),op1(one),op2(two),$oa_cont(true)]
 % Option selected: op2(two).
 % Option selected: op2(two) from options: [debug(true),op1(one),op2(two)]
 % For predicate: exo/1 option selected: op2(two) from options: [debug(true),op1(one),op2(two)]
@@ -52,27 +53,28 @@ Examples
 % 1.a
 % 2.b
 % ... + 1 other element
+% Ended enumeration of list: list3
 % My message is long.
 % Why predicate: exo/1 my message is long ?
 % Dimensions for matrix, mtxo: nR: 4, nC: 3.
 % fixme dimensions for matrix, mtxo: nR: 4, nC: 3.
 % Output (claimed) in (non-existing) directory: res
 % After mkdir predicate: exo/1 output in directory: res
-% Input from file: '/home/nicos/pl/packs/private/debug_call/a_file.txt'
+% Input from file: '/home/nicos/pl/packs/src/debug_call/examples/a_file.txt'
 % RNA expression predicate: exo/1 input from file: rna.tsv
-% Wrote on file: '/home/nicos/pl/packs/private/debug_call/a_file.txt'
+% Wrote on file: '/home/nicos/pl/packs/src/debug_call/examples/a_file.txt'
 % Via predicate: exo/1 wrote on file: a_file.txt
 % Could not locate write file specified by: nonX_file.txt, and extensions: 
-% At 15:50:4 on 27th of Oct 2025 stop task: write on file.
-% At 15:50:4 on 27th of Oct 2025 unk task: write on file.
-% Prefixed by predicate: exo/1 at 15:50:4 on 27th of Oct 2025 unk task: write on file.
-% At 14:2:30 on 6th of Dec 2025 stop task: talking point
+% At 16:11:55 on 2nd of Feb 2026 stop task: write on file.
+% At 16:11:55 on 2nd of Feb 2026 unk task: write on file.
+% Prefixed by predicate: exo/1 at 16:11:55 on 2nd of Feb 2026 unk task: write on file.
+% At 16:11:55 on 2nd of Feb 2026 stop task: talking point.
 % Starting: my_run
 % From predicate: exo/1 starting: my_run
-% Pwd at, my_run, is: '/home/nicos/pl/packs/private/debug_call/'
-% While in predicate: exo/1 pwd at, my_run, is: '/home/nicos/pl/packs/private/debug_call/'
-% Continuing with: suv file, as: suv-17.09.26.txg, from non singleton list: [suv-17.09.26.txg,suv-17.09.21.txg]
-% At predicate: exo/1 continuing with: suv file, as: suv-17.09.26.txg, from non singleton list: [suv-17.09.26.txg,suv-17.09.21.txg]
+% Pwd at, my_run, is: '/home/nicos/pl/packs/src/debug_call/examples/'
+% While in predicate: exo/1 pwd at, my_run, is: '/home/nicos/pl/packs/src/debug_call/examples/'
+% Continuing with: suv-17.09.26.txg from list: [suv-17.09.26.txg,suv-17.09.21.txg]
+% At predicate: exo/1 continuing with: suv-17.09.26.txg from list: [suv-17.09.26.txg,suv-17.09.21.txg]
 % Avg: 2, list: [1,2,3]
 % By call predicate: exo/1 avg: 2, list: [1,2,3]
 % pfx1 finished: exo
@@ -80,23 +82,36 @@ Examples
 % Session Info
 % Interpreter is SWI-Prolog 9:3:34, [Git: 9.3.34-41-g8cf975236].
 % Packs with predicated version info.
-% debug_call-2:1:1@<date(2025,12,6) (Pack file version: 2.1)
-% options-1:5:0@<date(2022,12,29) (Pack file version: 1.5)
+% by_unix-0:2:0@<date(2014,6,9) (Pack file version: 0.2)
+% upsh-2:6:2@<date(2024,8,17) (Pack file version: 2.6)
+% debug_call-2:2:2@<date(2026,1,11) (Pack file version: 2.2)
+% options-1:5:1@<date(2025,12,16) (Pack file version: 1.5)
 % Pack with version from pack file only.
 % lib-2.11
 % System boot files loaded.
+% boot/bags.pl
 % boot/init.pl
 % boot/messages.pl
 % boot/syspred.pl
 % System libraries loaded.
 % ansi_term.pl
+% ext/clib/filesex.pl
 % lists.pl
-% There is one application file loaded.
-% /home/nicos/.local/share/swi-prolog/pack/debug_call/examples/exo.pl
+% prolog_history.pl
+% system.pl
+% Application files loaded.
+% /home/nicos/.config/swi-prolog/init.pl
+% /home/nicos/.rcpl
+% /home/nicos/pl/packs/src/debug_call/examples/exo.pl
 % Session Info End
+% stat(runtime,[120,120]).
+% stat(here,runtime,[120,0]).
+% stat(runtime,[120,0]).
+stat(here,runtime,[120,0]).
+% duh([.. - 84K]).
+% duh([.. - 84K,../examples-12K,../doc-12K,../prolog-52K,../pack.pl-4.0K]).
+duh(char,[.. - 84K,../examples-12K,../doc-12K,../prolog-52K,../pack.pl-4.0K]).
 % Finished: exo
-% Finished: exo
-true.
 ==
 
 @author nicos angelopoulos
@@ -181,4 +196,7 @@ exo( Args ) :-
      debuc( Self, stat, runtime, check_point(here) ),
      debuc( Self, stat, runtime, true ),
      debuc( Self, stat, runtime, [check_point(here),comment(false)] ),
+     debuc( Self, duh, '..', [] ),
+     debuc( Self, duh, '..', [sub(true)] ),
+     debuc( Self, duh, '..', [check_point(char),comment(false),sub(true)] ),
      debuc( Self, end, true ).

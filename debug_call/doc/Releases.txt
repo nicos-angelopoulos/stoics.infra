@@ -6,7 +6,8 @@ TBD
 ---
 
 2.3
-     26.01.31  DEP:      to prolog_pack for pack_property/2 used in debugoal session
+     26.02.02  IFACE:    added debugoal duh, similar opts to "stat" + sub(f/t)
+     26.01.31  DEPS:     to prolog_pack for pack_property/2 used in debugoal session
      26.01.25  IFACE:    added debuc Goal: stat with options check_point() and message()
                CHANGE:   implementation of debug_message/3
                DOC:      started doc list of Opts in debuc/4 + start refer to debug goals(s) as debugoal(s)

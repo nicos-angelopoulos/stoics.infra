@@ -88,14 +88,16 @@ At 15:44:1 on 2nd of Jul 2024 finished task: write on file.
 % 12
 true.
 
-?- debuc( ex, stat, runtime, true ).
+?- debuc(ex, stat, runtime, true).
 % stat(runtime,[182,4]).
 true.
 
-?- debuc( ex, stat, runtime, [check_point(here),comment(false)] ).
+?- debuc(ex, stat, runtime, [check_point(here),comment(false)]).
 stat(here,runtime,[193,11]).
 true.
 
+?- debuc(ex, stat, testo, [sub(true),comment(false)]).
+duh([testo-8.0K,testo/file_a-0,testo/sub_1-4.0K]).
 ==
 
 ---+++ Variable topics 
@@ -142,6 +144,10 @@ debug_call_version(2:2:2, date(2026,1,11)).
 :- use_module(library(apply)).       % maplist/4,...
 :- use_module(library(lists)).       % member/4,...
 :- use_module(library(debug)).       % debug/1,...
+:- use_module(library(filesex)).     % directory_member/3.
+:- use_module(library(readutil)).    % read_line_to_codes/2.
+:- use_module(library(process)).     % process_create/3.
+:- use_module(library(readutil)).    % read_line_to_codes/2.
 :- use_module(library(prolog_pack)). % pack_property/2.
 :- use_module(library(lib)).
 
@@ -460,6 +466,12 @@ debug_portray( _Topic, _Term ).
 %    As above, but Opts are passed as an extra, last argument in the call.
 %  * dims
 %    Prints the dimensions of matrix, see mtx_dims/3.
+%  * duh
+%    Short for shell command 'du -h -s' which is disc usage, summarized and in human readable form.
+%    Arg should be the directory to report the size of.
+%    Can take options check_point() and comment()- as does =|stat|=.
+%    The latter allows for reporting without '%' so terms can be read in by read/1 or consulted.
+%    In addition, option sub() can be used the subdirectories of 
 %  * end
 %    Translates to finishing ~Arg or finishing ~Topic if =|Arg==true|=.
 %  * enum
@@ -501,7 +513,8 @@ debug_portray( _Topic, _Term ).
 %  * start 
 %    Translates to starting ~Arg or starting ~Topic if =|Arg==true|=.
 %  * stat
-%    Arg should be they key (1st arg) of statistics/1, the debuc Goal reports the statistic. Can take options check_point() and comment().
+%    Arg should be a key that can be used as the 1st arg for statistics/1, the debuc Goal reports the statistic.
+%    Can take options check_point() and comment(). 
 %    The latter allows for reporting without '%' so terms can be read in by read/1 or consulted.
 %  * task(Wch)
 %    Time of start/stop (Wch) of a task. Other values for Wch are allowed but printed as they come. 
@@ -590,11 +603,11 @@ debug_portray( _Topic, _Term ).
 % ?- debuc( ex, call(list_avg_mess), [1,2,3], [pred(p1,2),prefix('By call')] ).
 % By call predicate: p1/2 avg: 2
 %
-% ?- debuc( ex, stat, runtime, true ).
+% ?- debuc(ex, stat, runtime, true).
 % stat(runtime,[182,4]).
 % true.
 % 
-% ?- debuc( ex, stat, runtime, [check_point(here),comment(false)] ).   % note this does not have a precedding percentage char
+% ?- debuc(ex, stat, runtime, [check_point(here),comment(false)]).   % note this does not have a precedding percentage char
 % stat(here,runtime,[193,11]).   
 % 
 %==
@@ -603,7 +616,7 @@ debug_portray( _Topic, _Term ).
 % As of version 1.2 debug_call/3 can act as a replacement of debug/3 but with the old behaviour.
 %
 %==
-% ?- debug( ex, 'Messaging...', true ).
+% ?- debug(ex, 'Messaging...', true).
 % Messaging...
 % [[ EXCEPTION while printing message 'Messaging...'
 %       with arguments user:true:
@@ -612,7 +625,7 @@ debug_portray( _Topic, _Term ).
 % 
 % true.
 % 
-% ?- debuc( ex, 'Messaging...', true ).
+% ?- debuc(ex, 'Messaging...', true).
 % % Messaging...
 % true.
 %==
@@ -629,7 +642,7 @@ debug_portray( _Topic, _Term ).
 % @version  2.0 2025/10/07  changed last two arguments, new option goal recogniser, pred/1, internal/1 & all/1
 % @version  2.1 2025/10/27  pid(F,A) & prefix() universal; call() fixed; doc; enum terms fix; ns_sel simplify
 % @version  2.2 2025/12/08  farg() option; depth() option in list and enum; debuc Goals: version, session.
-% @version  2.3             debuGoal stat; opts comment(t/f), check_point()
+% @version  2.3             debuGoal stat; opts comment(t/f), check_point(), duh (opts as stat + sub(D))
 % @see file examples/exo.pl
 % @see debuc/3 shorthand for debug_call/3
 %
@@ -858,6 +871,21 @@ debug_call_topic( options, RepOpts, Bogs, Topic ) :-
     ),
     debug_call_message_opts( Ness, [RdcOpts], Message, Args, Bogs ),
     debug( Topic,  Message, Args ).
+debug_call_topic( duh, Dir, Bogs, Topic ) :-
+    debug_call_duh_dir( Dir, PaPair ),
+    ( memberchk(sub(true), Bogs ) ->
+          findall( Os, directory_member(Dir, Os, []), Oses ),
+          maplist( debug_call_duh_dir, Oses, SubPairs ),
+          Pairs = [PaPair|SubPairs] 
+          ; 
+          Pairs = [PaPair]
+    ),
+    ( memberchk(check_point(Point),Bogs) ->
+          Rec = duh(Point,Pairs)
+          ;
+          Rec = duh(Pairs)
+    ),
+    debuc_call_topic_term( Rec, Topic, Bogs ).
 debug_call_topic( stat, Key, Bogs, Topic ) :-
     statistics( Key, Stat ),
     ( memberchk(check_point(Point),Bogs) ->
@@ -865,13 +893,7 @@ debug_call_topic( stat, Key, Bogs, Topic ) :-
           ;
           Rec = stat(Key,Stat)
     ),
-    ( memberchk(comment(false),Bogs) ->
-          format( '~w.\n', [Rec] )
-          ;
-          debug_call_message_opts( '~w.', [Rec], Message, Args, Bogs ),
-          debug_message( Topic, Message, Args )
-    ).
-
+    debuc_call_topic_term( Rec, Topic, Bogs ).
 debug_call_topic( term, Derm, Bogs, Topic ) :-
     ( memberchk(term_name(Tnm),Bogs) -> 
           Mess = 'Reporting term (~w): ~w',
@@ -1129,6 +1151,14 @@ debug_call_topic_versions_predicated( [Pack-SVers|T], PVs, Topic, RemPVs ) :-
      ),
      debug_call_topic_versions_predicated( T, NxtPVs, Topic, RemPVs ).
 
+debuc_call_topic_term( Rec, Topic, Bogs ) :-
+    ( memberchk(comment(false),Bogs) ->
+          format( '~w.\n', [Rec] )
+          ;
+          debug_call_message_opts( '~w.', [Rec], Message, Args, Bogs ),
+          debug_message( Topic, Message, Args )
+     ).
+
 debug_call_topic_enum( [], _I, _Depth, _Len, _Topic ).
 debug_call_topic_enum( [H|T], I, Depth, Len, Topic ) :-
     ( I > Depth -> 
@@ -1232,3 +1262,14 @@ debug_message_prefixed_atom( Pfx, Standard, Prefixed ) :-
     downcase_atom( Fst, Low ),
     sub_atom( Standard, 1, Aft, 0, Right ),
     atomic_list_concat( [Pfx,' ',Low,Right], Prefixed ).
+
+debug_call_duh_dir( Dir, Pair ) :-
+    setup_call_cleanup(
+            process_create(path(du), ['-h','-s',Dir],
+                           [ stdout(pipe(Out))
+                           ]),
+            read_line_to_codes( Out, LineCs ),
+            close(Out)),
+    atom_codes( Line, LineCs ),
+    atomic_list_concat( [Size,Item], '\t', Line ),
+    Pair = Item-Size.
