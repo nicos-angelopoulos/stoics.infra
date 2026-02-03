@@ -250,6 +250,8 @@
 :- lib(lexi_n/4).
 :- lib(list_is_invariant/1).
 :- lib(io_url/1).
+:- lib(odd/1).
+:- lib(even/1).
 :- lib(io_section/3).  % also io_section_open/3, io_section_close/1.
 
 :- lib( end(stoics_lib) ).
