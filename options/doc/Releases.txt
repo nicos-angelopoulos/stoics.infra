@@ -2,7 +2,7 @@
 --------------------
 
 
-1.6  
+1.6         @  26.02.08
      25.12.16  FIXED:   multiple processed options were passing the wrong arguments
                OPTS:    new processed options help() and usage()
      24.10.18  DEPS:    lib(pack_errors) is now suggested, also vio options_throw/2
