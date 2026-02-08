@@ -1,6 +1,6 @@
 name(debug_call).
 title('Debugging with calls').
-version('2.2').
+version('2.3').
 author('Nicos Angelopoulos', 'https://stoics.org.uk/~nicos').
 packager('Nicos Angelopoulos', 'https://stoics.org.uk/~nicos').
 maintainer('Nicos Angelopoulos', 'https://stoics.org.uk/~nicos').

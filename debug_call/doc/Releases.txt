@@ -5,7 +5,7 @@ TBD
    17.03.10   debug_call with Success/failure by colour too (see SWI installation)
 ---
 
-2.3
+2.3         @  26.02.08
      26.02.02  IFACE:    added debugoal duh, similar opts to "stat" + sub(f/t)
      26.01.31  DEPS:     to prolog_pack for pack_property/2 used in debugoal session
      26.01.25  IFACE:    added debuc Goal: stat with options check_point() and message()

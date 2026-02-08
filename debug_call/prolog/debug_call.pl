@@ -125,6 +125,7 @@ debug_calls uses dynamic =..  .
 @version 2.0 2025/10/7
 @version 2.1 2025/10/27
 @version 2.2 2025/12/8
+@version 2.3 2026/2/8
 @see debug_call/4 for information on what each version added.
 
 */
@@ -135,11 +136,11 @@ Current version and release date for the library.
 
 ==
 ?- debug_call_version( -V, -D ).
-V = 2:2:0,
-D = date(2025,12,8).
+V = 2:3:0,
+D = date(2026,2,8).
 ==
 */
-debug_call_version(2:2:2, date(2026,1,11)).
+debug_call_version(2:3:0, date(2026,2,8)).
 
 :- use_module(library(apply)).       % maplist/4,...
 :- use_module(library(lists)).       % member/4,...
