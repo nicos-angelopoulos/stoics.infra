@@ -1153,7 +1153,7 @@ debug_call_topic_versions_predicated( [Pack-SVers|T], PVs, Topic, RemPVs ) :-
 
 debuc_call_topic_term( Rec, Topic, Bogs ) :-
     ( memberchk(comment(false),Bogs) ->
-          format( '~w.\n', [Rec] )
+          format( '~q.\n', [Rec] )
           ;
           debug_call_message_opts( '~w.', [Rec], Message, Args, Bogs ),
           debug_message( Topic, Message, Args )

@@ -110,7 +110,7 @@ Examples
 stat(here,runtime,[120,0]).
 % duh([.. - 84K]).
 % duh([.. - 84K,../examples-12K,../doc-12K,../prolog-52K,../pack.pl-4.0K]).
-duh(char,[.. - 84K,../examples-12K,../doc-12K,../prolog-52K,../pack.pl-4.0K]).
+duh(char,[.. - '88K','../examples'-'16K','../doc'-'12K','../prolog'-'52K','../pack.pl'-'4.0K']).
 % Finished: exo
 ==
 
