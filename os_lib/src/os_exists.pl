@@ -40,7 +40,7 @@ Opts
     Note that =|Succ=false|= is possible, in which case the call, succeeds, if =|os_exists(Os,[])|= fails.
 
   * wins_file_exec(WinsFileExec=sys)
-    Alternatively, use fail for failure and error for error.
+    Alternatively, use =fail= for failure and =error= for error.
 
 ==
 ?- os_exists( pack(os_lib/src) ).
