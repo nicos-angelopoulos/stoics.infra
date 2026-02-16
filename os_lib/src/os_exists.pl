@@ -1,5 +1,14 @@
 
-os_exists_defaults( [dir('.'),err(test),not(false),type(any),mode(exist),success(true)] ).
+os_exists_defaults( Defs ) :-
+                         Defs = [
+                                   dir('.'),
+                                   err(test),
+                                   follow(true),
+                                   not(false),
+                                   type(any),
+                                   mode(exist),
+                                   success(true)
+                                ].
 
 /** os_exists( +Os ).
     os_exists( +Os, +Opts ).
@@ -22,6 +31,9 @@ Opts
   * err(Err=test)
     test for report and fail, fail for failing, error for throwing, true for success<br>
     (see options: err(E), on_exit(O) and message(M) in throw/2).
+
+  * follow(Fol=true)
+    whether when looking at links to apply existance test on the target
 
   * not(Not=false)
     Reverse polarity, if true require Os not to exist.<br>
@@ -118,7 +130,7 @@ D = date(2026, 2, 16).
 
 @author nicos angelopoulos
 @version 0.2 2025/11/26,   added success() option
-@version 0.3 2026/02/16,   option version(0:3:0,date(2026,2,16))
+@version 0.3 2026/02/16,   options: follow(), version(0:3:0,date(2026,2,16))
 
 */
 os_exists( Os ) :-
@@ -141,29 +153,29 @@ os_exists( OsPrv, Args ) :-
 os_exists_1( true, Os, Opts ) :-
      os_exists_not( Os, Opts ).
 os_exists_1( false, Os, Opts ) :-
-     options( [type(Type), mode(Mode)], Opts ),
+     options( [type(Type), mode(Mode), follow(Flw)], Opts ),
      ( (\+ var(Type),Type=base(BaseType)) ->
          true
          ;
          OsType = Type
      ),
-     os_exists_true( Os, OsType, Mode, Opts ),
+     os_exists_true( Os, OsType, Flw, Mode, Opts ),
      os_type_base( OsType, BaseType ).
 
-os_exists_true( Os, Type, Mode, Opts ) :-
+os_exists_true( Os, Type, _Flw, Mode, Opts ) :-
      exists_file( Os ),
      !,
      os_exists_file( Type, Os, Mode, Opts ).
-os_exists_true( Os, Type, Mode, Opts ) :-
+os_exists_true( Os, Type, _Flw, Mode, Opts ) :-
      exists_directory( Os ),
      !,
      os_exists_dir( Type, Os, Mode, Opts ).
 % SWI's exists_file/1 fails on dangling links
-os_exists_true( Os, Type, Mode, Opts ) :-
+os_exists_true( Os, Type, Flw, Mode, Opts ) :-
      read_link( Os, _, _ ),
      !,
-     os_exists_file( Type, Os, Mode, Opts ).
-os_exists_true( Os, _Type, _Mode, Opts ) :-
+     os_exists_file( Type, Os, Flw, Mode, Opts ).
+os_exists_true( Os, _Type, _Flw, _Mode, Opts ) :-
      throw( os_exists_not(Os), [os:os_exists/2|Opts] ).
 
 os_exists_dir( dir, Os, Mode, Opts ) :-
@@ -218,24 +230,25 @@ os_exists_dir_mode_write( false, Os, Opts, _Out, _OsTest ) :-
      % fixme: test OsTest ?
      throw( os_mode(Os,write), [os:os_exists/2|Opts] ).
 
-os_exists_file( file, Os, Mode, Opts ) :-
+os_exists_file( file, Os, _Flw, Mode, Opts ) :-
      \+ read_link( Os, _, _ ),
      !,
      os_exists_file_mode( Mode, Os, Opts ).
-os_exists_file( flink, Os, Mode, Opts ) :-
-     os_is_flink( Os, _Which ),
+os_exists_file( flink, Os, Flw, Mode, Opts ) :-
+     os_is_flink( Os, Flw, _Which ),
      os_exists_file_mode( Mode, Os, Opts ),
      !.
-os_exists_file( link, Os, Mode, Opts ) :-
+os_exists_file( link, Os, Flw, Mode, Opts ) :-
      % read_link( Os, _, _ ),
-     os_is_flink( Os, link ),
+     os_is_flink( Os, Flw, link ),
      os_exists_file_mode( Mode, Os, Opts ),
      !.
-os_exists_file( any, Os, Mode, Opts ) :-
+os_exists_file( any, Os, Flw, Mode, Opts ) :-
+     os_is_flink( Os, Flw, _ ),
      !,
      os_exists_file_mode( Mode, Os, Opts ).
-os_exists_file( Unmatched, Os, _Mode, Opts ) :-
-     os_is_flink( Os, Which ),
+os_exists_file( Unmatched, Os, Flw, _Mode, Opts ) :-
+     os_is_flink( Os, Flw, Which ),
      throw( os_type(Os,Unmatched,Which), [os:os_exists/2|Opts] ).
 
 os_exists_file_mode( exist, _Os, _Opts ) :- !.
@@ -280,12 +293,12 @@ os_is_dlink( Os, link ) :-
      read_link( Os, _Target, Abs ),
      exists_directory( Abs ).
 
-os_is_flink( Os, file ) :-
+os_is_flink( Os, _Flw, file ) :-
      exists_file( Os ),
      \+ read_link( Os, _, _Target ),
      !.
-os_is_flink( Os, link ) :-
+os_is_flink( Os, Flw, link ) :-
      read_link( Os, Target, _ ),
      os_path( Dir, _, Os ),
      os_path( Dir, Target, Destination ),
-     exists_file( Destination ).
+     ( Flw == true -> exists_file(Destination); true ).
