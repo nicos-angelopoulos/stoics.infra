@@ -50,6 +50,7 @@ os_file_defaults( Defs ) :-
 % File = file1.
 % 
 % ?- os_file(File, dots(true)).
+
 % File = '.dotty1' ;
 % File = file1.
 % 

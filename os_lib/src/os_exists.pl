@@ -7,7 +7,8 @@ os_exists_defaults( Defs ) :-
                                    not(false),
                                    type(any),
                                    mode(exist),
-                                   success(true)
+                                   success(true),
+                                   version(0:3:0,date(2026,2,16)
                                 ].
 
 /** os_exists( +Os ).
@@ -139,7 +140,6 @@ os_exists( Os ) :-
 os_exists( OsPrv, Args ) :-
      os_cast( atom, OsPrv, OsAtm ),
      options_append( os_exists, Args, Opts ),
-     ( memberchk(version(0:3:0,date(2026,2,16)),Opts) -> true; true ),
      options( not(Not), Opts ),
      options( dir(Dir), Opts ),
      ( Dir == '.' -> OsAtm = Os ; os_path( Dir, OsAtm, +(Os) ) ),
@@ -162,10 +162,10 @@ os_exists_1( false, Os, Opts ) :-
      os_exists_true( Os, OsType, Flw, Mode, Opts ),
      os_type_base( OsType, BaseType ).
 
-os_exists_true( Os, Type, _Flw, Mode, Opts ) :-
+os_exists_true( Os, Type, Flw, Mode, Opts ) :-
      exists_file( Os ),
      !,
-     os_exists_file( Type, Os, Mode, Opts ).
+     os_exists_file( Type, Os, Flw, Mode, Opts ).
 os_exists_true( Os, Type, _Flw, Mode, Opts ) :-
      exists_directory( Os ),
      !,
