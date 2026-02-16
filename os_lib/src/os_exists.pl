@@ -109,10 +109,16 @@ S = true.
 
 ?- os_exists( dir1/link3, success(S) ).
 S = false.
+
+?- os_exists( file1, version(V,D) ).
+V = 0:3:0,
+D = date(2026, 2, 16).
+
 ==
 
 @author nicos angelopoulos
-@version 0.2 2026/11/26,   added success() option
+@version 0.2 2025/11/26,   added success() option
+@version 0.3 2026/02/16,   option version(0:3:0,date(2026,2,16))
 
 */
 os_exists( Os ) :-
@@ -121,6 +127,7 @@ os_exists( Os ) :-
 os_exists( OsPrv, Args ) :-
      os_cast( atom, OsPrv, OsAtm ),
      options_append( os_exists, Args, Opts ),
+     ( memberchk(version(0:3:0,date(2026,2,16)),Opts) -> true; true ),
      options( not(Not), Opts ),
      options( dir(Dir), Opts ),
      ( Dir == '.' -> OsAtm = Os ; os_path( Dir, OsAtm, +(Os) ) ),
@@ -278,7 +285,6 @@ os_is_flink( Os, file ) :-
      \+ read_link( Os, _, _Target ),
      !.
 os_is_flink( Os, link ) :-
-     exists_file( Os ),
      read_link( Os, Target, _ ),
      os_path( Dir, _, Os ),
      os_path( Dir, Target, Destination ),
