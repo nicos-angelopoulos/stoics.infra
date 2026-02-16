@@ -24,11 +24,11 @@ Opts
     (see options: err(E), on_exit(O) and message(M) in throw/2).
 
   * not(Not=false)
-    Reverse polarity, if true require Os not to exist. <br> 
+    Reverse polarity, if true require Os not to exist.<br>
     As of v0.2 success(false) also has similar effect.
 
   * type(Type)
-    In addition to Os existing, require os type-ness (dir,link,file,flink,dlink,any).
+    In addition to Os existing, require os type-ness (dir,link,file,flink,dlink,any).<br>
     Can be used to return the type, when input is a variable. <br>
     Type = base(BaseType) streamline type to either file or dir (see os_type_base/2).
 
