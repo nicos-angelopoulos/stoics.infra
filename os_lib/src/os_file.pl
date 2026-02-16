@@ -13,7 +13,8 @@ os_file_defaults( Defs ) :-
 %% os_file( ?File ).
 %% os_file( ?File, +Opts ).
 %
-% True iff File is a file or a link to an existing file, in the current directory.<br>
+% True iff File is a file or a link to an existing file, in the current directory.
+% 
 % Can be used to enumerate all files. The order is via sort/2.
 %
 % Opts
