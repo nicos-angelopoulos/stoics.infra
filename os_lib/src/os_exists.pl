@@ -4,11 +4,12 @@ os_exists_defaults( [dir('.'),err(test),not(false),type(any),mode(exist),success
 /** os_exists( +Os ).
     os_exists( +Os, +Opts ).
 
-True if Os exists as an object in the filestore. When mode is requested,
-the predicate goes to the source and tries to effect operations of the 
-appropriate mode to establish permissions. The only deviation is 
+True if Os exists as an object in the filestore. 
+
+When mode is requested, the predicate goes to the source and tries to effect operations of the 
+appropriate mode to establish permissions.  The only deviation is 
 permission execute on files. By default the predicate uses 
-access_file(Os,execute). See option WinsFileExec.
+access_file(Os,execute). See option wins_file_exec().
 
 The predicate tries to stay compatible with system predicates, but it does
 introduces two new file types: flink and dlink, for file point link or file, and
@@ -27,7 +28,7 @@ Opts
     As of v0.2 success(false) also has similar effect.
 
   * type(Type)
-    In addition to Os existing, require file type-ness (dir,link,file,flink,dlink,any).<br>
+    In addition to Os existing, require os type-ness (dir,link,file,flink,dlink,any).
     Can be used to return the type, when input is a variable. <br>
     Type = base(BaseType) streamline type to either file or dir (see os_type_base/2).
 
