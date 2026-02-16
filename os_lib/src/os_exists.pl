@@ -3,12 +3,12 @@ os_exists_defaults( Defs ) :-
                          Defs = [
                                    dir('.'),
                                    err(test),
-                                   follow(true),
+                                   follow(false),
                                    not(false),
                                    type(any),
                                    mode(exist),
                                    success(true),
-                                   version(0:3:0,date(2026,2,16)
+                                   version(0:3:0,date(2026,2,16))
                                 ].
 
 /** os_exists( +Os ).
@@ -33,7 +33,7 @@ Opts
     test for report and fail, fail for failing, error for throwing, true for success<br>
     (see options: err(E), on_exit(O) and message(M) in throw/2).
 
-  * follow(Fol=true)
+  * follow(Fol=false)
     whether when looking at links to apply existance test on the target
 
   * not(Not=false)
