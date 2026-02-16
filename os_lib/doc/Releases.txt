@@ -3,6 +3,7 @@
 2.1
      26.02.16   FIXED:    remove unnecessary test on flinks os_exists/2
                 OPT:      os_exists: follow(), version(0:3:0,date(2026,2,16))
+                OPT:      os_file/2: version(,)
      25.12.19   FIXED:    broken call: os_ext(Ext, pack('stoics_lib/examples/sectioned.txt')),Ext=txt
 
 2.0         @   25.12.07
