@@ -1,5 +1,8 @@
 ---   Releases   ---
 --------------------
+2.2  
+     26.03.02   IFACE:  kv_compose_k_nth/3
+
 2.1         @   26.02.08
      26.01.26   IFACE:  odd/1 & even/1
      26.01.24   IFACE:  kvs_k_update_v/7

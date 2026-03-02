@@ -46,6 +46,7 @@
             % kv/
               kv_compose/3,            % +Ks, +Vs, -KVs
               kv_compose/4,            % +List1, +List2, -KVsCont, -Tkvs
+              kv_compose_k_nth/3       % +Terms, +N, -KVs
               kv_decompose/3,          % +Pairs, -Ks, -Vs
               kv_ks/2,                 % +KVs, -Ks
               kv_transpose/2,          % +KVs, -VKs

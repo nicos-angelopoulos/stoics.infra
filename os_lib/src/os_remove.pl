@@ -6,9 +6,13 @@ os_remove_sub_debugs( [exists,missing] ). % sorted list
     os_rm( +File ).
     os_rm( +File, +OptS ).
 
-File will be deleted if it exists.  Extends built-in delete_file/1.<br>
+File will be deleted if it exists.  
+
+Extends built-in delete_file/1.
 Version 1.2 added Options. Opts could be a single option term, see options_append/4.<br>
-Version 1.3 provides better messaging via throw/2.
+Version 1.3 provides better messaging via throw/2.<br>
+Version 1.4 added option(version(V,D)), changed existance check from exists_file/1 to os_exists/2
+and passing of Opts to that call.
 
 Opts
   * err(Ex=exists)  
@@ -52,6 +56,7 @@ false.
 @author Nicos Angelopoulos
 @version 0.1 2014/09/10
 @version 0.2 2018/10/1,    use throw/2
+@version 0.3 2026/2/16,  option version(,) and change exists_file/1 to os_file/2 and pass to it Opts 
 
 */
 os_remove( File ) :-
@@ -65,8 +70,8 @@ os_remove( File, OptS ) :-
 	nodebug(os_remove(_)),
 	os_remove_debug_restore( PrevDbg ).
 
-os_remove_opts( File, _Opts ) :-
-	exists_file(File),
+os_remove_opts( File, Opts ) :-
+	os_exists(File,Opts),
 	!,
 	debug( os_remove(exists), 'Deleting existing file: ~p', File ),
 	delete_file( File ).
