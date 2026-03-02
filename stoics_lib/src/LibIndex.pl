@@ -58,6 +58,8 @@ lib_index(known, 2, any, user, 'meta/known').
 lib_index(known, 3, any, user, 'meta/known').
 lib_index(kv_compose, 3, any, user, 'kv/kv_compose').
 lib_index(kv_compose, 4, any, user, 'kv/kv_compose').
+lib_index(kv_compose_k_frequency, 2, any, user, 'kv/kv_compose_k_frequency').
+lib_index(kv_compose_k_frequency, 3, any, user, 'kv/kv_compose_k_frequency').
 lib_index(kv_compose_k_nth, 3, any, user, 'kv/kv_compose_k_nth').
 lib_index(kv_decompose, 3, any, user, 'kv/kv_decompose').
 lib_index(kv_ks, 2, any, user, 'kv/kv_ks').
