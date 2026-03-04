@@ -36,7 +36,6 @@ locate( FileSpec, Exts, DefExt, Location ) :-
 	expand_spec( FileSpec, Expanded ),
 	locate_expanded( Expanded, [], '', AbsFile ),
 	file_directory_name( AbsFile, Dir ),
-	directory_contents( Dir, DFiles, _, _ ),
 	directory_files( Dir, Entries ),
 	include( exists_file, Entries, DFiles ),
 	file_base_name( AbsFile, Bname ),
