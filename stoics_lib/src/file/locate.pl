@@ -1,3 +1,5 @@
+:- use_module(library(debug)).          % /3.
+
 :- lib( en_list/2 ).
 :- lib( expand_spec/2).
 
