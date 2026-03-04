@@ -44,6 +44,10 @@
 :- dynamic(lib_tables:lib_skeleton_only/1).    % +Pack
 
 :- multifile(user:lib_code_loader/3 ).
+:- dynamic(real:r_call/2).
+:- dynamic(real:r_library_codes/4).
+:- dynamic(real:r_send/1).
+:- dynamic(real:r_library/1).
 
 user:lib_code_loader(bioc, lib, lib_bioc).
 user:lib_code_loader(r, lib, lib_r).
@@ -81,7 +85,7 @@ lib_r_opts( _Opts, Rlib ) :-
      directory_file_path( Rdir, Rbase, Rfile ),
      exists_file( Rfile ),
      !,
-     r_call( source(+Rfile), [] ).
+     real:r_call( source(+Rfile), [] ).
 lib_r_opts( Opts, Rlib ) :-
     memberchk( suggest(Sugg), Opts ),
     current_prolog_flag( lib_suggests_warns, SuggFlag ),
@@ -137,7 +141,7 @@ lib_r_opts( _Opts, Rlib ) :-
 r_lib_sys( Rlib ) :-
      current_prolog_flag( real_suppress_lib_messages, false ),
      !,
-     r_library_codes( Rlib, '', '', Rcodes ), % fixme to atom
+     real:r_library_codes( Rlib, '', '', Rcodes ), % fixme to atom
      atom_codes( R, Rcodes ),
      real:r_send(R).
 r_lib_sys( Rlib ) :-
