@@ -555,7 +555,7 @@ throw_level_on_exit( error, error, Ball ) :-
 throw_level_on_exit( OnExit, Lvl, Ball ) :-
     debug( pack_errors, 'Explicit layout at level: ~w', [Lvl] ),
     prolog:message( Ball, Mess, [] ), % i thinks [] is correct
-	print_message_lines( current_output, kind(Lvl), Mess ),
+     print_message_lines( current_output, kind(Lvl), Mess ),
     throw_level_exit( OnExit ).
 
 throw_level_exit( error ) :-
@@ -859,11 +859,11 @@ of_same_length_mismatch( false, _Lng1, _Lng2, _Tkn1, _Tkn2, _Opts ) :-
 of_same_length_mismatch( throw, Lng1, Lng2, Tkn1, Tkn2, _Opts ) :-
     throw( of_same_length(Lng1,Lng2,Tkn1,Tkn2) ).
 of_same_length_mismatch( warning, Lng1, Lng2, Tkn1, Tkn2, _Opts ) :-
-    % % Format = 'Lists at:~w and ~w, have differing lengths: ~d and ~d',
-    % % message_report( Format, [Tkn1,Tkn2,Lng1,Lng2], informational ).
-    throw( lengths_mismatch(Tkn1,Tkn2,Lng1,Lng2), message(warning) ).
-    % message( lengths_mismatch(Tkn1,Tkn2,Lng1,Lng2), List, [] ),
-	% print_message_lines(current_output, kind(warning), List ).
+     % % Format = 'Lists at:~w and ~w, have differing lengths: ~d and ~d',
+     % % message_report( Format, [Tkn1,Tkn2,Lng1,Lng2], informational ).
+     throw( lengths_mismatch(Tkn1,Tkn2,Lng1,Lng2), message(warning) ).
+     % message( lengths_mismatch(Tkn1,Tkn2,Lng1,Lng2), List, [] ),
+     % print_message_lines(current_output, kind(warning), List ).
 % of_same_length_mismatch( warning, Lng1, Lng2, Tkn1, Tkn2, _Opts ) :-
 
 of_same_length_mismatch( error, Lng1, Lng2, Tkn1, Tkn2, _Opts ) :-
