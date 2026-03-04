@@ -21,15 +21,6 @@ os_unique_defaults( Defs ) :-
 
 :- lib(os_type_create/2).
 
-os_unique_by_date_test :-
-    use_module( library(socket) ),  
-     gethostname( Host ),
-     ( os_unique( [res,Host], Bname, [] )
-      ; os_unique( [res,Host], Bname, [min_length(da,3)] )
-      ; os_unique( [res,Host], Bname, [max_length(ya,3)] )
-    ),
-     write( b_name(Bname) ), nl.
-
 %% os_unique( +TokenS, -Os ).
 %% os_unique( +TokenS, -Os, +Opts ).
 %  
