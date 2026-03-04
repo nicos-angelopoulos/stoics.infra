@@ -2,6 +2,8 @@
 ---------------------
 
 2.3
+     26.03.04   DEPS:      removed dangling dependency to message_report/3
+                FIXED:     reporting + examples for of_same_length/3
      24.10.18   ERROR:     arg_natural_number/2
      24.03.17   CHANGE:    allow terms for OPT in option(OPT) debuc info options
      22.09.22   ADDED:     catch all, unhandled handle and associated message

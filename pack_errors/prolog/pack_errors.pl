@@ -50,24 +50,24 @@ Wrapping is via pack_error/2 where the first argument is the message and second 
 
 ==
 ?- throw( pack_error(lengths_mismatch(a,b,1,2),[]) ).
-ERROR: Lists for a and b have mismatching lengths: 1 and 2 respectively
+ERROR: Lists a and b, have mismatching lengths: 1 and 2 respectively.
 
 ?- throw( pack_error(lengths_mismatch(a,b,1,2),[foo:bar/1]) ).
-ERROR: foo:bar/1: Lists for a and b have mismatching lengths: 1 and 2 respectively
+ERROR: foo:bar/1: Lists a and b, have mismatching lengths: 1 and 2 respectively.
 ==
 
 You can also use throw/2, which is defined in the pack, without wrapping the Message,
 
 ==
 ?- throw( lengths_mismatch(a,b,1,2), [foo:bar/1] ).
-ERROR: foo:bar/1: Lists for a and b have mismatching lengths: 1 and 2 respectively
+ERROR: foo:bar/1: Lists a and b, have mismatching lengths: 1 and 2 respectively.
 ==
 
 In both cases, you can drop the list if it contains a single element, thus
 
 ==
 ?- throw( lengths_mismatch(a,b,1,2), foo:bar/1 ).
-ERROR: foo:bar/1: Lists for a and b have mismatching lengths: 1 and 2 respectively
+ERROR: foo:bar/1: Lists a and b, have mismatching lengths: 1 and 2 respectively.
 ==
 
 Note that in the latter case (throw/2) the options can also contain terms controling the execution of throw/2.
@@ -142,10 +142,10 @@ ERROR: os:os_pred/3: Term at position: 3, is not one of: [a,b,c], (found: d)
 ERROR: os:os_pred/3: Term at position: 3, is not one of: [a,b,c], (found: d)
 
 ?- throw( lengths_mismatch(a,b,1,2), [pack(foo)] ).
-ERROR: foo:_Unk: Lists for a and b have mismatching lengths: 1 and 2 respectively
+ERROR: foo:_Unk: Lists a and b, have mismatching lengths: 1 and 2 respectively.
 
 ?- throw( lengths_mismatch(a,b,1,2), pred(bar/1) ).
-ERROR: _Unk:bar/1: Lists for a and b have mismatching lengths: 1 and 2 respectively
+ERROR: _Unk:bar/1: Lists a and b, have mismatching lengths: 1 and 2 respectively.
 
 ?- throw( cast(abc('file.csv'),atom), os:os_term/2 ).
 ERROR: os:os_term/2: Cannot cast: abc(file.csv), to type: atom
@@ -787,7 +787,7 @@ Opts are passed to throw/2, the only local one is:
      * error
         prints error and fails (default)
      * throw
-        throws a tuntrum of the form, of_same_length(Lng1,Lng2,Tkn1,Tkn2)
+        throws a tantrum of the form, of_same_length(Lng1,Lng2,Tkn1,Tkn2)
      * warning(Tkn)
         prints warning but succeeds
      * warn_lists(Tkn)      
@@ -804,10 +804,23 @@ Opts are passed to throw/2, the only local one is:
 true.
 
 ?- of_same_length( [[a,b,c],[1,2,3]] ).
-true.
+true.G
 
 ?- of_same_length( [1,2,3], [a,b], token1(first) ).
-ERROR: Lists for first and 2 have mismatching lengths: 3 and 2 respectively
+ERROR: Lists first and 2, have mismatching lengths: 3 and 2 respectively.
+
+?- of_same_length( [1,2,3], [a,b], action(throw) ).
+ERROR: Unhandled exception: Unknown message: of_same_length(3,2,1,2)
+
+?- of_same_length( [1,2,3], [a,b], action(warning) ).
+Warning: Lists 1 and 2, have mismatching lengths: 3 and 2 respectively.
+true.
+
+?- of_same_length( [1,2,3], [a,b], action(warn_lists(point_x)) ).
+% Lists at context: point_x, have mismatching lengths: 3 and 2 respectively.
+% List: 1, has items: [1,2,3]
+% List: 2, has items: [a,b]
+true.
 
 ==
 @author nicos angelopoulos
@@ -829,7 +842,7 @@ of_same_length( List1, List2, Opts ) :-
 of_same_length_1( Lists, List1, Args ) :-
     length( List1, Lng1 ),
     \+ var(Args),
-    ( is_list(Args) -> append(Args,[action(throw)],Opts) ; Opts = [Args,action(throw)] ),
+    ( is_list(Args) -> append(Args,[action(error)],Opts) ; Opts = [Args,action(error)] ),
     memberchk( action(Act), Opts ),
     of_same_length_1( Lists, 2, Lng1, List1, Act, Opts ).
 
@@ -844,43 +857,31 @@ of_same_length_1( [HList|T], I, Lng1, List1, Act, Opts ) :-
           % throw( not_of_equal_length(HLng,Lng) )
           ( memberchk(token1(Tkn1),Opts) -> true; Tkn1 = 1 ),
           ( memberchk(token2(Tkn2),Opts) -> true; Tkn2 = I ),
-          of_same_length_mismatch( Act, Lng1, HLng, Tkn1, Tkn2, Opts )
+          of_same_length_mismatch( Act, Lng1, HLng, Tkn1, Tkn2, List1, HList, Opts )
      ),
      J is I + 1,
      of_same_length_1( T, J, Lng1, List1, Act, Opts ).
 
-of_same_length_mismatch( error, Lng1, Lng2, Tkn1, Tkn2, Opts ) :-
-    throw( lengths_mismatch(Tkn1,Tkn2,Lng1,Lng2), Opts ).
-of_same_length_mismatch( fail, _Lng1, _Lng2, _Tkn1, _Tkn2, _Opts ) :-
-    fail.
-of_same_length_mismatch( false, _Lng1, _Lng2, _Tkn1, _Tkn2, _Opts ) :-
-    fail.
-% throw_lists ? which will also include the offender & base lists ?
-of_same_length_mismatch( throw, Lng1, Lng2, Tkn1, Tkn2, _Opts ) :-
-    throw( of_same_length(Lng1,Lng2,Tkn1,Tkn2) ).
-of_same_length_mismatch( warning, Lng1, Lng2, Tkn1, Tkn2, _Opts ) :-
-     % % Format = 'Lists at:~w and ~w, have differing lengths: ~d and ~d',
-     % % message_report( Format, [Tkn1,Tkn2,Lng1,Lng2], informational ).
-     throw( lengths_mismatch(Tkn1,Tkn2,Lng1,Lng2), message(warning) ).
-     % message( lengths_mismatch(Tkn1,Tkn2,Lng1,Lng2), List, [] ),
-     % print_message_lines(current_output, kind(warning), List ).
-% of_same_length_mismatch( warning, Lng1, Lng2, Tkn1, Tkn2, _Opts ) :-
-
-of_same_length_mismatch( error, Lng1, Lng2, Tkn1, Tkn2, _Opts ) :-
-    Format = 'Lists at:~p, have differing lengths, ~d and ~d',
-    message_report( Format, [Tkn1,Tkn2,Lng1,Lng2], error ),
-    fail.
-of_same_length_mismatch( warning(Tkn), Lng1, Lng2, _L1, _L2, _Opts ) :-
-    Format = 'Lists at:~p, have differing lengths, ~d and ~d',
-    message_report( Format, [Tkn,Lng1,Lng2], informational ).
-of_same_length_mismatch( warn_lists(Tkn), Lng1, Lng2, L1, L2, _Opts ) :-
-    Format = 'Lists at:~p, have differing lengths, ~d and ~d. The lists are as follows',
-    Args   = [Tkn,Lng1,Lng2],
-    message_report( Format, Args, informational ),
-    Format1 = 'Length mismatch list1:~p',
-    message_report( Format1, [L1], debug(_) ),
-    Format2 = 'Length mismatch List2:~p',
-    message_report( Format2, [L2], debug(_) ).
+of_same_length_mismatch( error, Lng1, Lng2, Tkn1, Tkn2, _L1, _L2, Opts ) :-
+     throw( lengths_mismatch(Tkn1,Tkn2,Lng1,Lng2), Opts ).
+of_same_length_mismatch( fail, _Lng1, _Lng2, _Tkn1, _Tkn2, _L1, _L2, _Opts ) :-
+     fail.
+of_same_length_mismatch( false, _Lng1, _Lng2, _Tkn1, _Tkn2, _L1, _L2, _Opts ) :-
+     fail.
+     % throw_lists ? which will also include the offender & base lists ?
+of_same_length_mismatch( throw, Lng1, Lng2, Tkn1, Tkn2, _L1, _L2, _Opts ) :-
+     throw( of_same_length(Lng1,Lng2,Tkn1,Tkn2) ).
+of_same_length_mismatch( warning, Lng1, Lng2, Tkn1, Tkn2, _L1, _L2, _Opts ) :-
+     throw( lengths_mismatch(Tkn1,Tkn2,Lng1,Lng2), [message(warning),on_exit(true)] ).
+of_same_length_mismatch( error, Lng1, Lng2, Tkn1, Tkn2, _L1, _L2, _Opts ) :-
+     throw( lengths_mismatch(Tkn1,Tkn2,Lng1,Lng2), [message(error),on_exit(error)] ).
+of_same_length_mismatch( warning(Tkn), Lng1, Lng2, _Tkn1, _Tkn2, _L1, _L2, _Opts ) :-
+    throw( lengths_mismatch(Tkn,Lng1,Lng2), [message(informational),on_exit(true)] ).
+of_same_length_mismatch( warn_lists(Tkn), Lng1, Lng2, Tkn1, Tkn2, L1, L2, _Opts ) :-
+    Opts = [message(informational),on_exit(true)],
+    throw( lengths_mismatch(Tkn,Lng1,Lng2), Opts ),
+    throw( token_list(Tkn1,L1), Opts ),
+    throw( token_list(Tkn2,L2), Opts ).
 
 pack_message_options_augment( Opts, Apts ) :-
     nth1( N, Opts, Mod:Pred, Rest ),
@@ -1039,10 +1040,14 @@ message( arg_ground_pattern(Poss,Args) ) -->
     ['Ground arguments expected in some of the positions: ~w, but found:~w'-[Poss,Args]].
 message( arg_natural_number(Poss,Arg) ) -->
     ['A non-negative integer was expects at position: ~w, but found:~w'-[Poss,Arg]].
+message( lengths_mismatch(Tkn,Len1,Len2) ) -->
+    ['Lists at context: ~w, have mismatching lengths: ~d and ~d respectively.'-[Tkn,Len1,Len2]].
 message( lengths_mismatch(Tkn1,Tkn2,Len1,Len2) ) -->
-    ['Lists for ~w and ~w have mismatching lengths: ~d and ~d respectively'-[Tkn1,Tkn2,Len1,Len2]].
+    ['Lists ~w and ~w, have mismatching lengths: ~d and ~d respectively.'-[Tkn1,Tkn2,Len1,Len2]].
 message( lengths_mismatch(Tkn1,Tkn2,Op,Len1,Len2) ) -->
-    ['Terms idied by: ~w and ~w, have mismatching lengths: ~d and ~d respectively (~w expected)'-[Tkn1,Tkn2,Len1,Len2,Op]].
+    ['Terms idied by: ~w and ~w, have mismatching lengths: ~d and ~d respectively (~w expected).'-[Tkn1,Tkn2,Len1,Len2,Op]].
+message( token_list(Tkn,List) ) -->
+    ['List: ~w, has items: ~w'-[Tkn,List]].
 message( cast(Term,From,To) ) -->
     ['Cannot cast: ~w, from type: ~w to type: ~w'-[Term,From,To]].
 message( cast(Term,To) ) -->
