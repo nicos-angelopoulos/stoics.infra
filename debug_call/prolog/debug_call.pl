@@ -146,6 +146,7 @@ debug_call_version(2:3:0, date(2026,2,8)).
 :- use_module(library(lists)).       % member/4,...
 :- use_module(library(debug)).       % debug/1,...
 :- use_module(library(filesex)).     % directory_member/3.
+:- use_module(library(listing)).     % portray_clause/1.
 :- use_module(library(readutil)).    % read_line_to_codes/2.
 :- use_module(library(process)).     % process_create/3.
 :- use_module(library(readutil)).    % read_line_to_codes/2.
@@ -407,7 +408,7 @@ debug_on( Topic ) :-
 debug_portray( Topic, Term ) :-
     debugging_topic( Topic ),
     !,
-    portray_clause( Term ).
+    portray_clause( Term ).  % library(listing)
 debug_portray( _Topic, _Term ).
 
 %% debug_call( +Topic, +DebuGoal, +Arg ).

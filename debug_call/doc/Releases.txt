@@ -5,6 +5,9 @@ TBD
    17.03.10   debug_call with Success/failure by colour too (see SWI installation)
 ---
 
+2.4 
+     26.03.04  DEPS:     library(listing) for portray_clause/1
+
 2.3         @  26.02.08
      26.02.02  IFACE:    added debugoal duh, similar opts to "stat" + sub(f/t)
      26.01.31  DEPS:     to prolog_pack for pack_property/2 used in debugoal session

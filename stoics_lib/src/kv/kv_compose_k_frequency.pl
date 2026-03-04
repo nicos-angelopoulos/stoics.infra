@@ -6,6 +6,7 @@
 kv_compose_k_frequency_defaults( Defs ) :-
                                    Defs = [
                                              drop_k(false),
+                                             drop_v(false),
                                              keysort(true)
                                              | Checks
                                           ],
@@ -29,7 +30,9 @@ works fine without it.
 
 Opts
   * drop_k(DropK=false)
-    whether to return F-Vs instead of F-K-Vs
+    whether to drop K from answer
+  * drop_v(DropV=false)
+    whether to drop Vs from answer
   * keysort(Ksort=true)
     whether to use keysort, instead of sort/2
 
