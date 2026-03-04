@@ -6,23 +6,22 @@
 % the predicate does nothing if a matching predicate is defined in memory,
 % else it prints a warning.
 %
-% The raison d'être is to flag upstream loading one from possibly many alternatives
-% implementation of a predicate that the current predicate depends on.
+% The raison d'être is to ensure upstream loading of an expected predicate has happened. 
+% For instance the loading of one, from possibly many alternative implementations of a predicate that the current predicate depends on, has happened.
 % 
-% For example, see k_sub_graph/5. There, the native predicate
-% depends on sub_graph/3. Irrespective of how graphs are represented k_sub_graph/5
-% only needs access to sub_graph/3 to do its job. Therefore the 
-% following directive is added to the source of k_sub_graph/5:
-%
 %==
-% :- lib_expects( sub_graph/3 ).
-%==
-%
-%==
-% ?- lib_expects( nothing/0 ).
-% % Warning: Expected predicate nothing/0, not in memory
-% ?- use_module( library(lists) ).
-% ?- lib_expects( append/3 ).
+% ?- lib:lib_expects(nothing/0).
+% % Warning: Expected predicate nothing/0, not in memory.
+% true
+% 
+% ?-  lib:lib_expects(mtx/2).
+% Warning: Expected predicate mtx/2, not in memory.
+% true.
+% 
+% ?- use_module( library(mtx) ).
+% true.
+% 
+% ?- lib:lib_expects(mtx/2).
 % true.
 %==
 %
@@ -99,9 +98,10 @@ lib_expects_spec( Indi ) :-
     !.
     */
 lib_expects_spec( Indi ) :-
-    Mess = 'Expected predicate ~w, not in memory',
+    Mess = 'Expected predicate ~w, not in memory.',
     lib_message_report( Mess, [Indi], warning ).
 
 lib_expects_module( Mod ) :-
-    once( requires_module_context(Mod) ).
+    % once( requires_module_context(Mod) ). ? 26.03.04, this isn't defined anywhere
+    context_module( Mod ).
 lib_expects_module( user ).

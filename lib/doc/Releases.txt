@@ -5,6 +5,7 @@ Tbd: document @, & (remove fixme: code that might have been needed due to MAIN i
 
 3.0   
       26.03.04 DEPS:     r_call/2 -> real:r_call/2,  and declared dynamic (also r_send/1,r_library_codes/4,r_library/1)
+               FIXED:    dangling call to requires_module_context/1
       25.12.8  VERS:     lib(version(V,D)) was carrying the wrong number
       25.09.27 IFACE:    promise/2 -> now also recognises r libraries and arbitrary calls as second argument
                IFACE:    lib_r_promised/1

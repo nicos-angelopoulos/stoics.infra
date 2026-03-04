@@ -1,4 +1,5 @@
 
+:- lib(stoics_lib:mod_goal/3).
 :- lib(stoics_lib:mod_goal/4).
 :- lib(stoics_lib:en_list/3).
 :- lib(stoics_lib:io_streams/3).
