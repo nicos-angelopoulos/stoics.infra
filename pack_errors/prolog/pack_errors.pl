@@ -154,7 +154,7 @@ ERROR: os:os_term/2: Cannot cast: abc(file.csv), to type: atom
 Examples from other packs:
 ==
 ?- map_list_options( plus_one, In, [2,3,4,5], [add_options(maybe),on_fail(skip)] ).
-ERROR: false:map_list_options/4 @ option(add_options): Object of type: boolean, expected but found term: maybe
+ERROR: false:map_list_options/4 @ option(add_options): Object of type: boolean expected, but found term: maybe.
 ==
 
 ---+++ Defining new pack errors
@@ -596,25 +596,25 @@ Opts (unlisted is ok)
 
 ==
 ?- type( boolean, maybe ).
-ERROR: Object of type: boolean, expected but found term: maybe
+ERROR: Object of type: boolean expected, but found term: maybe.
 
 ?- type( boolean, maybe, error(false) ).
 false.
 
 ?- type( boolean, maybe, pack(sure) ).
-ERROR: pack(sure): Object of type: boolean, expected but found term: maybe
+ERROR: pack(sure): Object of type: boolean expected, but found term: maybe.
 
 ?- type( boolean, maybe, [pack(sure),pred(lost/2)] ).
-ERROR: sure:lost/2: Object of type: boolean, expected but found term: maybe
+ERROR: sure:lost/2: Object of type: boolean expected, but found term: maybe.
 
 ?- type( boolean, maybe, [pack(sure),pred(lost/2+3)] ).
-ERROR: sure:lost/2+3: Object of type: boolean, expected but found term: maybe
+ERROR: sure:lost/2+3: Object of type: boolean expected, but found term: maybe.
 
 ?- type( boolean, maybe, [pack(sure),pred(1+lost/2)] ).
-ERROR: sure:1+lost/2: Object of type: boolean, expected but found term: maybe
+ERROR: sure:1+lost/2: Object of type: boolean expected, but found term: maybe.
 
 ?- type( boolean, maybe, [pack(sure),pred(lost(arg1)/2)] ).
-ERROR: sure:lost(arg1)/2: Object of type: boolean, expected but found term: maybe
+ERROR: sure:lost(arg1)/2: Object of type: boolean expected, but found term: maybe.
 ==
 */
 type( Type, Term ) :-
@@ -1053,11 +1053,11 @@ message( cast(Term,From,To) ) -->
 message( cast(Term,To) ) -->
     ['Cannot cast: ~w, to type: ~w'-[Term,To]].
 message( type_error(false,Type,Term) ) -->
-    ['Object of type: ~w, expected but found term: ~w'-[Type,Term]].
+    ['Object of type: ~w expected, but found term: ~w.'-[Type,Term]].
 message( type_error(Pos,Type,Term) ) -->
-    ['Object of type: ~w, expected at position:~w but found: ~w'-[Type,Pos,Term]].
+    ['Object of type: ~w expected at position:~w, but found: ~w.'-[Type,Pos,Term]].
 message( type_error(Type,Term) ) -->
-    ['Object of type: ~w, expected but found term: ~w'-[Type,Term]].
+    ['Object of type: ~w expected, but found term: ~w.'-[Type,Term]].
 message( wrong_token(Tkn,Cat) ) -->  % was: unknown_token/2
     ['Token: ~w, is not a recognisable: ~w'-[Tkn,Cat]].
 message( expected_from(_,Pid,false) ) -->
