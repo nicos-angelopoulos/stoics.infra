@@ -1,9 +1,9 @@
 %% kvo_k_memberchk( +Key, +KVord, -Val ).
 % 
-% Select each Val corresponding to a single Key in a ordered (but not uniquely sorted) pairs list KVord.<br>
-% KVord can be a list of any N-ary terms, Key is taken to be the first arg/3 and Val the second.
+% Select each Val corresponding to a single Key in a ordered (but not uniquely sorted) pairs list KVord.
 %
-% In contrast to kvs_k_memberchk/3, this assumes non-unique keys. <br>
+% KVord can be a list of any N-ary terms, Key is taken to be the first arg/3 and Val the second.
+% In contrast to kvs_k_memberchk/3, this assumes non-unique keys.
 % In both cases KVset is assumed ordered.
 %
 %==
