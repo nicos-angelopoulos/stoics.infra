@@ -30,6 +30,8 @@ lib_pack_index :-
 Load PackF and make an index of where do its exported predicates 
 come from.
 
+@tbd add internal predicates, maybe from src/LibIndex.man
+
 */
 lib_pack_index( RelPackF ) :-
     use_module( RelPackF ), 
