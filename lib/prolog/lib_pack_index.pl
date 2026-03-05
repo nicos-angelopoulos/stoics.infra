@@ -33,8 +33,8 @@ come from.
 lib_pack_index( RelPackF ) :-
     use_module( RelPackF ), 
     absolute_file_name( RelPackF, PackF ),
-    directory_file_path( Dir, PackFile, PackF ),
-    directory_file_path( Root, prolog, Dir ),
+    directory_file_path( PlDir, PackFile, PackF ),
+    directory_file_path( Root, prolog, PlDir ),
     file_name_extension( Pack, pl, PackFile ),
     directory_file_path( Root, src, SrcD ),
     directory_file_path( SrcD, 'LibIndex.pl', LibF ),
@@ -56,10 +56,18 @@ lib_pack_index( RelPackF ) :-
                         predicate_property(Phead,imported_from(Pack)),
                         predicate_property(Phead,file(File)),
                         functor(Phead,Pa,Pn),
-                        directory_file_path( SrcD, RelF, File ),
+                        lib_pack_rel_file( File, SrcD, Root, Pfx, RelF ),
                         file_name_extension( RelStem, pl, RelF ),
-                        portray_clause( Out, lib_index(Pa,Pn,any,Pack,RelStem) )
+                        atom_concat( Pfx, RelStem, PfxStem ),
+                        portray_clause( Out, lib_index(Pa,Pn,any,Pack,PfxStem) )
                     ),
                              _LITerms ),
     set_prolog_flag( allow_dot_in_atom, OldADA ),
     close( Out ).
+
+lib_pack_rel_file( File, SrcD, _Root, Pfx, RelF ) :-
+     directory_file_path( SrcD, RelF, File ),
+     Pfx = ''.
+lib_pack_rel_file( File, _SrcD, Root, Pfx, RelF ) :-
+     directory_file_path( Root, RelF, File ),
+     Pfx = '../'.
