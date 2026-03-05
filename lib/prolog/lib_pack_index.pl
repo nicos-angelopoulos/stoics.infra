@@ -2,6 +2,7 @@
 :- module( lib_pack_index, [lib_pack_index/0,lib_pack_index/1] ).
 
 :- use_module(library(date)).
+:- use_module(library(apply)).
 :- use_module(library(listing)).
 
 /** lib_pack_index.
@@ -52,16 +53,17 @@ lib_pack_index( RelPackF ) :-
     date_time_value( date, Datime, Date ),
     write( Out, '% ' ),
     writeq( Out, Date ), nl( Out ), nl( Out ),
-    findall( lib_index(Pa,Pn,any,Pack,File), ( 
+    findall( lib_index(Pa,Pn,any,Pack,PfxStem), ( 
                         predicate_property(Phead,imported_from(Pack)),
                         predicate_property(Phead,file(File)),
                         functor(Phead,Pa,Pn),
                         lib_pack_rel_file( File, SrcD, Root, Pfx, RelF ),
                         file_name_extension( RelStem, pl, RelF ),
-                        atom_concat( Pfx, RelStem, PfxStem ),
-                        portray_clause( Out, lib_index(Pa,Pn,any,Pack,PfxStem) )
+                        atom_concat( Pfx, RelStem, PfxStem )
                     ),
-                             _LITerms ),
+                             LITerms ),
+    sort( LITerms, LITo ),
+    maplist( portray_clause(Out), LITo ),
     set_prolog_flag( allow_dot_in_atom, OldADA ),
     close( Out ).
 
