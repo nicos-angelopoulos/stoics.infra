@@ -53,6 +53,8 @@
               kv_ks/2,                 % +KVs, -Ks
               kv_transpose/2,          % +KVs, -VKs
               kv_vs/2,                 % +KVs, -Vs
+              kvo_k_until_vs/3,        % +KVo, +MaxK, -Vs
+              kvo_k_until_vs/4,        % +KVo, +MaxK, -Vs, +Opts
               kvo_k_memberchk/3,       % +K, +KVs, -V
               kvs_k_memberchk/3,       % +K, +KVs, -V
             % list/
@@ -258,6 +260,8 @@
 :- lib(kv_compose_k_nth/3).
 :- lib(kv_compose_k_frequency/2).
 :- lib(kv_compose_k_frequency/3).
+:- lib(kvo_k_until_vs/3).
+:- lib(kvo_k_until_vs/4).
 :- lib(io_section/3).  % also io_section_open/3, io_section_close/1.
 
 :- lib( end(stoics_lib) ).

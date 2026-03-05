@@ -66,6 +66,8 @@ lib_index(kv_decompose, 3, any, stoics_lib, 'kv/kv_decompose').
 lib_index(kv_ks, 2, any, stoics_lib, 'kv/kv_ks').
 lib_index(kv_transpose, 2, any, stoics_lib, 'kv/kv_transpose').
 lib_index(kv_vs, 2, any, stoics_lib, 'kv/kv_vs').
+lib_index(kvo_k_until_vs,3, any, stoics_lib, 'kv/kvo_k_until_vs' ).
+lib_index(kvo_k_until_vs,4, any, stoics_lib, 'kv/kvo_k_until_vs' ).
 lib_index(kvo_k_memberchk, 3, any, stoics_lib, 'kv/kvo_k_memberchk').
 lib_index(kvs_k_memberchk, 3, any, stoics_lib, 'kv/kvs_k_memberchk').
 lib_index(latex_colour, 4, any, stoics_lib, 'colour/latex_colour').

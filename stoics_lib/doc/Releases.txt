@@ -1,6 +1,7 @@
 ---   Releases   ---
 --------------------
 2.2  
+     26.03.05   IFACE:  kvo_k_until_vs/3,4 with full docs
      26.03.04   DEPS:   library(debug) in locate.pl
                 FIXED:  removed superfluous call to old directory_contents/4
      26.03.02   IFACE:  kv_compose_k_nth/3, kv_compose_k_frequency/2,3
