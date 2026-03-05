@@ -75,7 +75,7 @@ FKVs = [2-[no(1, 2, 3), no(4, 2, 6)], 1-no(7, 8, 9)].
 If pack(pack_errors) is installed (the predicate just checks, it does not require the pack): 
 ==
 ?- kv_compose_k_frequency([1-a,1-x,2-b], FKVs, [keysort(maybe)]).
-ERROR: stoics_lib:kv_compose_k_frequency/3 @ option(keysort): Object of type: boolean, expected but found term: maybe
+ERROR: stoics_lib:kv_compose_k_frequency/3 @ option(keysort): Object of type: boolean expected, but found term: maybe.
 ==
 
 If pack(pack_errors) is not installed: 
