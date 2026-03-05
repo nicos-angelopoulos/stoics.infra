@@ -1,6 +1,8 @@
 
 :- module( lib_pack_index, [lib_pack_index/0,lib_pack_index/1] ).
 
+:- use_module(library(listing)).
+
 /** lib_pack_index.
 
 Creates a src/LibIndex.pl with interface predicates for a pack.
