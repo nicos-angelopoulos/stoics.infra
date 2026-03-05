@@ -1,5 +1,4 @@
-
-:- use_module(library(lists)).    % memberchk/2.
+:- use_module(library(lists)).          % memberchk/2.
 
 /** kvo_k_until_vs(+KVo, +UntilK, -Vs).
     kvo_k_until_vs(+KVo, +UntilK, -Vs, +Opts).

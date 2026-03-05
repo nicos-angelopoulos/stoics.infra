@@ -1,5 +1,4 @@
 
-                                   library() 
 :- use_module(library(prolog_pack)).    % pack_property/2.
 :- use_module(library(lists)).          % reverse/2.
 
