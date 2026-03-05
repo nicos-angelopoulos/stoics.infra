@@ -1,6 +1,7 @@
 
 :- module( lib_pack_index, [lib_pack_index/0,lib_pack_index/1] ).
 
+:- use_module(library(date)).
 :- use_module(library(listing)).
 
 /** lib_pack_index.
@@ -46,6 +47,11 @@ lib_pack_index( RelPackF ) :-
     current_prolog_flag( allow_dot_in_atom, OldADA ),
     set_prolog_flag( allow_dot_in_atom, false ),
     open( LibF, write, Out ),
+    get_time( Stamp ),
+    stamp_date_time( Stamp, Datime, local ),
+    date_time_value( date, Datime, Date ),
+    write( Out, '% ' ),
+    writeq( Out, Date ), nl( Out ), nl( Out ),
     findall( lib_index(Pa,Pn,any,Pack,File), ( 
                         predicate_property(Phead,imported_from(Pack)),
                         predicate_property(Phead,file(File)),
