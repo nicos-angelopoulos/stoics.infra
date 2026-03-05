@@ -69,7 +69,8 @@ lib_pack_index( RelPackF ) :-
 
 lib_pack_rel_file( File, SrcD, _Root, Pfx, RelF ) :-
      directory_file_path( SrcD, RelF, File ),
-     Pfx = ''.
+     Pfx = '',
+     !.
 lib_pack_rel_file( File, _SrcD, Root, Pfx, RelF ) :-
      directory_file_path( Root, RelF, File ),
      Pfx = '../'.

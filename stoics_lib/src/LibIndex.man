@@ -1,0 +1,6 @@
+% manual: 
+lib_index(day_trailer, 2, any, stoics_lib, 'date_time/day_trailer').
+lib_index(get_date_time, 1, any, stoics_lib, 'date_time/get_date_time').
+lib_index(int_trailer, 2, any, stoics_lib, 'number/int_trailer').
+lib_index(stoics_lib_throw, 2, any, stoics_lib, 'auxil/stoics_lib_throw').
+lib_index(three_letter_months, 1, any, stoics_lib, 'date_time/three_letter_months').
