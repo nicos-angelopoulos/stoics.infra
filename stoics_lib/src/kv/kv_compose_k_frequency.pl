@@ -81,7 +81,7 @@ ERROR: stoics_lib:kv_compose_k_frequency/3 @ option(keysort): Object of type: bo
 If pack(pack_errors) is not installed: 
 ==
 ?- kv_compose_k_frequency([1-a,1-x,2-b], FKVs, [keysort(maybe)]).
-ERROR: Unhandled exception: Unknown message: value(for_option(keysort),should_be_boolean_found(maybe))
+ERROR: Unhandled exception: Unknown message: type_error(for_option(keysort),should_be(boolean),found(maybe))
 ==
 
 @author nicos angelopoulos
@@ -152,4 +152,4 @@ kv_compose_k_frequency_drop_k_v(falsefalse, Fa, K, V, Fa-K-V).
 kv_compose_k_frequency_option_value(true, _OptNm) :- !.
 kv_compose_k_frequency_option_value(false, _OptNm) :- !.
 kv_compose_k_frequency_option_value(Etc, OptNm) :-
-     throw( value(for_option(OptNm),should_be_boolean_found(Etc)) ).
+     throw( type_error(for_option(OptNm),should_be(boolean),found(Etc)) ).
