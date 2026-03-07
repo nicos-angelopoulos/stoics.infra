@@ -2,6 +2,8 @@
 :- use_module(library(prolog_pack)).    % pack_property/2.
 :- use_module(library(lists)).          % reverse/2.
 
+:- lib(promise(options_append/4,options)).
+
 kv_compose_k_frequency_defaults( Defs ) :-
                                    Defs = [
                                              drop_f(false),
@@ -125,8 +127,8 @@ kv_compose_k_frequency( KVs, FKVs ) :-
      kv_compose_k_frequency_order( KVoT, K, 1, [V], 1, 2, falsefalsefalse, FKVs ).
 
 kv_compose_k_frequency( KVs, FKVs, Args ) :-
-     lib( options ),
      Self = kv_compose_k_frequency,
+     lib_promised( options_append/4, stoics_lib, kv_compose_k_frequency/3 ),
      OAOpts = [pack(stoics_lib),arity(3)],
      options_append( Self, Args, Opts, OAOpts ),
      options( keysort(Sort), Opts ),
