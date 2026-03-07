@@ -1,9 +1,7 @@
 
 :- use_module(library(lists)).     % memberchk/2.
-:- lib(promise(options_append/4,options)).
 
-% :- lib(depends(kv_compose/4,pack(options)).
-% :- lib(depends(kv_compose/4,pack(options),lib(local_option_check_pred/n)).
+:- lib(promise(options_append/4,options)).
 
 kv_compose_defaults( Defs ) :-
                          Defs = [
@@ -31,6 +29,8 @@ KVs = [a-1, b-2, c-3].
 Ks = [a, b, c],
 Vs = [1, 2, 3].
 ==
+
+Arity 4 version depends on pack(options), whereas arity 3 one works fine without it.
 
 In kv_compose/4 version provides some flexibility on how to construct the KVs. 
 Ks and Vs can be lists of terms from which specific arguments can be selected
