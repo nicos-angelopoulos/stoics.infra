@@ -30,7 +30,7 @@ in the order they appear in KVs as keysort/2 does not use them for sorting.
 The predicate uses a first pass through keysort/2 or sort/4 before it walks through the input KVs.
 It can be used to return the groups only (see option drop_f(DropF)).
 
-kv_compose_k_frequency/3 requires pack(options), wheres kv_compose_k_frequency/2 
+kv_compose_k_frequency/3 requires pack(options), whereas kv_compose_k_frequency/2 
 works fine without it.
 
 Opts
@@ -51,9 +51,9 @@ Opts
 Examples
 ==
 ?- kv_compose_k_frequency([1-a,1-x,2-b], FKVs).
-FKVs = [2-1-[a, x], 1-2-b].
+FKVs = [3-1-[y, x, a], 1-2-b].
 
-?- kv_compose_k_frequency([2-b,1-x,1-a], FKVs).
+?- kv_compose_k_frequency([1-y,2-b,1-x,1-a], FKVs).
 FKVs = [2-1-[x, a], 1-2-b].
 
 ?- kv_compose_k_frequency([2-b,1-x,1-a], FKVs), keysort( FKVs, FKVo ).
