@@ -508,7 +508,10 @@ When Repo =|homonym(Repository)|= then only the homonims of local dir
        case for lib_mkindex/1)
     * suggests(Lib)
     * suggests(Lib,SugOpts)
-       it is likely you need Lib for full functionalilty. If Lib is a known library it is loaded other wise nothing is loaded. This is useful for fringe functionalities that depend on external libraries, where we do not want the average user to do anything if library (Lib) is not there. See lib_suggests/2 for details of how to enable warning messages.
+       it is likely you need Lib for full functionalilty. If Lib is a known library it is loaded otherwise
+       nothing is loaded. This is useful for fringe functionalities that depend on external libraries, where
+       we do not want the average user to do anything if library (Lib) is not there. See lib_suggests/2 for
+       details of how to enable warning messages.
     * promise(DepPID,Load)
        DepPID is a predicate id for predicate that is provided by library Load.
        When DepPID called for the first time Load will be loaded. 

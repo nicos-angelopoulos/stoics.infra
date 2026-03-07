@@ -1,10 +1,13 @@
-/** lib_promise( +Tid, +Did, +Cxt, +Load ).
+/** lib_promise( +PidS, +Cxt, +Load ).
 
-    Pid is a predicate id that triggers promised code loaded by Load. That is, no code is loaded until the first call
-    to Pid. Did is the dependant predicate (its F/A id), which is not used by lib_promise/4 for loading.
+    PidS is a predicate id, or list of predicate ids,  that trigger(s) promised code loaded by Load. 
+
+    That is, no code is loaded until the first call to one of the Pids. 
+    Cxt is the context in which the code will be loaded.
+
+    Load can be the name of an installed library (which also supports packs). Or, r(RFunction) for loading _R_ code. 
+    Or, _call(Goal)_ that is called as =|Cxt:call(Goal)|=.
      
-    Currently Dep is not used or checked. Could be later on be part of reporting why things are promised reports.
-
 ==
 :- lib(promise(testo/2,pesto/0,real)).
 
@@ -12,7 +15,7 @@
 
 :- lib(promise(resto/2,nesto/0,r(pheatmap))).
 
-% Loads R library pheatmpa, when resto/2 is called which contains a reference to undefined nesto/0.
+% Loads R library pheatmap, when resto/2 is called which contains a reference to undefined nesto/0.
 
 ==
 
