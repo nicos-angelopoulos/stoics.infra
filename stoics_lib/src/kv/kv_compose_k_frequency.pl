@@ -140,7 +140,7 @@ kv_compose_k_frequency( KVs, FKVs, Args ) :-
      KVo = [KV|KVoT],
      arg( Ki, KV, K ),
      arg( Vi, KV, V ),
-     kv_compose_k_frequency_order( KVoT, K, 1, V, Ki, Vi, Dfkv, FKVs ).
+     kv_compose_k_frequency_order( KVoT, K, 1, [V], Ki, Vi, Dfkv, FKVs ).
 
 kv_compose_k_frequency_sort(true, Ki, KVs, KVo) :-
      ( KVs = [_-_|_] -> 
