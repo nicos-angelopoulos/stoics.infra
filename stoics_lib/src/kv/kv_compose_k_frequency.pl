@@ -4,6 +4,7 @@
 
 kv_compose_k_frequency_defaults( Defs ) :-
                                    Defs = [
+                                             drop_f(false),
                                              drop_k(false),
                                              drop_v(false),
                                              keysort(true),
@@ -12,7 +13,7 @@ kv_compose_k_frequency_defaults( Defs ) :-
                                              | Checks
                                           ],
                                    ( pack_property(pack_errors,version(_V)) -> 
-                                        Checks = [options_types([drop_k-boolean,keysort-boolean])]
+                                        Checks = [options_types([drop_f-boolean,drop_k-boolean,keysort-boolean])]
                                         ;
                                         Checks = []
                                    ).
@@ -26,11 +27,15 @@ The resulting FKVs are of the form F-K-Vs, where Vs is a list of Vs iff F > 1
 and a single (unlisted) V when F =:= 1.
 FKVs are returned in sorted order for K as per keysort/2 and Vs are 
 in the order they appear in KVs as keysort/2 does not use them for sorting.
+The predicate uses a first pass through keysort/2 or sort/4 before it walks through the input KVs.
+It can be used to return the groups only (see option drop_f(DropF)).
 
 kv_compose_k_frequency/3 requires pack(options), wheres kv_compose_k_frequency/2 
 works fine without it.
 
 Opts
+  * drop_f(Dropf=false)
+    set to =|true|= to return the K-Groups only
   * drop_k(DropK=false)
     whether to drop K from answer
   * drop_v(DropV=false)
@@ -41,6 +46,7 @@ Opts
     the argument position for Keys
   * vi(Vindex=2)
     the argument position for Values
+
 
 Examples
 ==
@@ -123,15 +129,17 @@ kv_compose_k_frequency( KVs, FKVs, Args ) :-
      options( [ki(Ki),vi(Vi)], Opts ),
      kv_compose_k_frequency_option_value( Sort, keysort ),
      kv_compose_k_frequency_sort( Sort, Ki, KVs, KVo ),
+     options( drop_f(Df), Opts ),
      options( drop_k(Dk), Opts ),
      options( drop_v(Dv), Opts ),
-     atom_concat( Dk, Dv, DkDv ),
+     kv_compose_k_frequency_option_value( Df, drop_f ),
      kv_compose_k_frequency_option_value( Dk, drop_k ),
      kv_compose_k_frequency_option_value( Dv, drop_v ),
+     atomic_list_concat( [Df,Dk,Dv], '', Dfkv ),
      KVo = [KV|KVoT],
      arg( Ki, KV, K ),
      arg( Vi, KV, V ),
-     kv_compose_k_frequency_order( KVoT, K, 1, V, Ki, Vi, DkDv, FKVs ).
+     kv_compose_k_frequency_order( KVoT, K, 1, V, Ki, Vi, Dfkv, FKVs ).
 
 kv_compose_k_frequency_sort(true, Ki, KVs, KVo) :-
      ( KVs = [_-_|_] -> 
@@ -142,15 +150,15 @@ kv_compose_k_frequency_sort(true, Ki, KVs, KVo) :-
 kv_compose_k_frequency_sort(false, Ki, KVs, KVo) :-
      sort( Ki, @=<, KVs, KVo ).
 
-kv_compose_k_frequency_order( [], K, Fa, V, _Ki, _Vi, DkDv, [FKV] ) :-
+kv_compose_k_frequency_order( [], K, Fa, V, _Ki, _Vi, Dfkv, [FKV] ) :-
      ( Fa =:= 1 ->
           ReV = V
           ;
           reverse( V, ReV )
      ),
-     kv_compose_k_frequency_drop_k_v( DkDv, Fa, K, ReV, FKV ).
+     kv_compose_k_frequency_drop_k_v( Dfkv, Fa, K, ReV, FKV ).
      
-kv_compose_k_frequency_order( [KV1|KVs], K, Fa, V, Ki, Vi, DkDv, FKVs ) :-
+kv_compose_k_frequency_order( [KV1|KVs], K, Fa, V, Ki, Vi, Dfkv, FKVs ) :-
      arg( Ki, KV1, K1 ),
      arg( Vi, KV1, V1 ),
      ( K1 == K -> 
@@ -167,17 +175,21 @@ kv_compose_k_frequency_order( [KV1|KVs], K, Fa, V, Ki, Vi, DkDv, FKVs ) :-
                ;
                reverse( V, ReV )
           ),
-          kv_compose_k_frequency_drop_k_v( DkDv, Fa, K, ReV, FKV ),
+          kv_compose_k_frequency_drop_k_v( Dfkv, Fa, K, ReV, FKV ),
           FKVs = [FKV|TFKVs],
           Fx is 1,
           NxV = V1
      ),
-     kv_compose_k_frequency_order( KVs, K1, Fx, NxV, Ki, Vi, DkDv, TFKVs ).
+     kv_compose_k_frequency_order( KVs, K1, Fx, NxV, Ki, Vi, Dfkv, TFKVs ).
 
-kv_compose_k_frequency_drop_k_v(truetrue, Fa, _K, _V, Fa).
-kv_compose_k_frequency_drop_k_v(truefalse, Fa, _K, V, Fa-V).
-kv_compose_k_frequency_drop_k_v(falsetrue, Fa, K, _V, Fa-K).
-kv_compose_k_frequency_drop_k_v(falsefalse, Fa, K, V, Fa-K-V).
+kv_compose_k_frequency_drop_k_v(truetruetrue, _F, _K, _V, []).
+kv_compose_k_frequency_drop_k_v(truetruefalse, _F, _K, V, V).
+kv_compose_k_frequency_drop_k_v(truefalsetrue, _F, K, _V, K).
+kv_compose_k_frequency_drop_k_v(truefalsefalse, _F, K, V, K-V).
+kv_compose_k_frequency_drop_k_v(falsetruetrue, F, _K, _V, F).
+kv_compose_k_frequency_drop_k_v(falsetruefalse, F, _K, V, F-V).
+kv_compose_k_frequency_drop_k_v(falsefalsetrue, F, K, _V, F-K).
+kv_compose_k_frequency_drop_k_v(falsefalsefalse, F, K, V, F-K-V).
 
 kv_compose_k_frequency_option_value(true, _OptNm) :- !.
 kv_compose_k_frequency_option_value(false, _OptNm) :- !.
