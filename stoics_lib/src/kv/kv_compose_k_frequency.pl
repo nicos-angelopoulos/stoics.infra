@@ -21,10 +21,9 @@ kv_compose_k_frequency_defaults( Defs ) :-
 /** kv_compose_k_frequency(+KVs, -FKVs).
     kv_compose_k_frequency(+KVs, -FKVs, +Opts).
 
-Aggregate on Frequency of Keys in Key-Value terms KVs.
+Aggregate  Key-Value terms KVs, on Frequency of Keys.
 
-The resulting FKVs are of the form F-K-Vs, where Vs is a list of Vs iff F > 1
-and a single (unlisted) V when F =:= 1.
+The resulting FKVs are of the form F-K-Vs, where Vs is a list of V elements.
 FKVs are returned in sorted order for K as per keysort/2 and Vs are 
 in the order they appear in KVs as keysort/2 does not use them for sorting.
 The predicate uses a first pass through keysort/2 or sort/4 before it walks through the input KVs.
@@ -50,11 +49,8 @@ Opts
 
 Examples
 ==
-?- kv_compose_k_frequency([1-a,1-x,2-b], FKVs).
-FKVs = [3-1-[y, x, a], 1-2-b].
-
 ?- kv_compose_k_frequency([1-y,2-b,1-x,1-a], FKVs).
-FKVs = [2-1-[x, a], 1-2-b].
+FKVs = [3-1-[y, x, a], 1-2-b].
 
 ?- kv_compose_k_frequency([2-b,1-x,1-a], FKVs), keysort( FKVs, FKVo ).
 FKVs = [2-1-[x, a], 1-2-b],
@@ -83,6 +79,11 @@ FKVs = [2, 1].
 KVs = [2-no(1, 2, 3), 2-no(4, 2, 6), 8-no(7, 8, 9)],
 FKVs = [2-[no(1, 2, 3), no(4, 2, 6)], 1-no(7, 8, 9)].
 
+This predicate can be used to return the groupings only.
+==
+?- 
+
+==
 
 If pack(pack_errors) is installed (the predicate just checks, it does not require the pack): 
 ==
@@ -118,7 +119,7 @@ kv_compose_k_frequency( KVs, FKVs ) :-
      KVo = [KV|KVoT],
      arg( 1, KV, K ),
      arg( 2, KV, V ),
-     kv_compose_k_frequency_order( KVoT, K, 1, V, 1, 2, falsefalsefalse, FKVs ).
+     kv_compose_k_frequency_order( KVoT, K, 1, [V], 1, 2, falsefalsefalse, FKVs ).
 
 kv_compose_k_frequency( KVs, FKVs, Args ) :-
      lib( options ),
@@ -162,19 +163,11 @@ kv_compose_k_frequency_order( [KV1|KVs], K, Fa, V, Ki, Vi, Dfkv, FKVs ) :-
      arg( Ki, KV1, K1 ),
      arg( Vi, KV1, V1 ),
      ( K1 == K -> 
-          ( Fa =:= 1 -> 
-               NxV = [V1,V]  % we will be reversing
-               ;
-               NxV = [V1|V]
-          ),
+          NxV = [V1|V],
           Fx is Fa + 1,
           TFKVs = FKVs
           ; % we are assuming K1 cannot be < K
-          ( Fa =:= 1 ->
-               V = ReV 
-               ;
-               reverse( V, ReV )
-          ),
+          reverse( V, ReV ),
           kv_compose_k_frequency_drop_k_v( Dfkv, Fa, K, ReV, FKV ),
           FKVs = [FKV|TFKVs],
           Fx is 1,
