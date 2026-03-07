@@ -152,11 +152,7 @@ kv_compose_k_frequency_sort(false, Ki, KVs, KVo) :-
      sort( Ki, @=<, KVs, KVo ).
 
 kv_compose_k_frequency_order( [], K, Fa, V, _Ki, _Vi, Dfkv, [FKV] ) :-
-     ( Fa =:= 1 ->
-          ReV = V
-          ;
-          reverse( V, ReV )
-     ),
+     reverse( V, ReV ),
      kv_compose_k_frequency_drop_k_v( Dfkv, Fa, K, ReV, FKV ).
      
 kv_compose_k_frequency_order( [KV1|KVs], K, Fa, V, Ki, Vi, Dfkv, FKVs ) :-
