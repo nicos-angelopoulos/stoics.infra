@@ -6,7 +6,9 @@ kv_compose_k_frequency_defaults( Defs ) :-
                                    Defs = [
                                              drop_k(false),
                                              drop_v(false),
-                                             keysort(true)
+                                             keysort(true),
+                                             ki(1),
+                                             vi(2)
                                              | Checks
                                           ],
                                    ( pack_property(pack_errors,version(_V)) -> 
@@ -20,7 +22,8 @@ kv_compose_k_frequency_defaults( Defs ) :-
 
 Aggregate on Frequency of Keys in Key-Value terms KVs.
 
-The resulting FKVs are of the form F-K-Vs, where Vs is a list of Vs iff F > 1.
+The resulting FKVs are of the form F-K-Vs, where Vs is a list of Vs iff F > 1
+and a single (unlisted) V when F =:= 1.
 FKVs are returned in sorted order for K as per keysort/2 and Vs are 
 in the order they appear in KVs as keysort/2 does not use them for sorting.
 
@@ -34,6 +37,10 @@ Opts
     whether to drop Vs from answer
   * keysort(Ksort=true)
     whether to use keysort, instead of sort/2
+  * ki(Kindex=1)
+    the argument position for Keys
+  * vi(Vindex=2)
+    the argument position for Values
 
 Examples
 ==
@@ -83,14 +90,29 @@ If pack(pack_errors) is not installed:
 ERROR: Unhandled exception: Unknown message: type_error(for_option(keysort),should_be(boolean),found(maybe))
 ==
 
+The predicate can extract frequency and KVs on more general input structures by passing it options ki(Ki) and vi(Vi).
+==
+?- Abet = [lt('1st',a,en),lt('1st',alpha,gr),lt('2nd',b,en),lt('2nd',beta,gr),lt('3rd',c,en),lt('3rd',gamma,gr)], assert(a_bet(Abet)).
+?- a_bet(Abet), kv_compose_k_frequency(Abet,FKVs,[ki(1),vi(2)]).
+FKVs = [2-'1st'-[a, alpha], 2-'2nd'-[b, beta], 2-'3rd'-[c, gamma]].
+
+?- a_bet(Abet), kv_compose_k_frequency(Abet,FKVs,[ki(3),vi(2)]).
+?- Abet = [en(1,a,xe),gr(1,alpha,xr),en(2,b,ye),gr(2,beta,yg),en(3,c,ze),gr(3,gamma,zg)], assert(a_bet(Abet)).
+
+==
+
 @author nicos angelopoulos
 @version  0.1 2026/03/02
-*/
 
+*/
 kv_compose_k_frequency( KVs, FKVs ) :-
-     keysort( KVs, KVo ),   % built-in
-     KVo = [K-V|KVoT],
-     kv_compose_k_frequency_order( KVoT, K, 1, V, falsefalse, FKVs ).
+     ( KVs = [_-_|_] -> keysort( KVs, KVo )
+                     ;     sort( KVs, KVo )
+     ),
+     KVo = [KV|KVoT],
+     arg( 1, KV, K ),
+     arg( 2, KV, V ),
+     kv_compose_k_frequency_order( KVoT, K, 1, V, 1, 2, falsefalse, FKVs ).
 
 kv_compose_k_frequency( KVs, FKVs, Args ) :-
      lib( options ),
@@ -98,22 +120,29 @@ kv_compose_k_frequency( KVs, FKVs, Args ) :-
      OAOpts = [pack(stoics_lib),arity(3)],
      options_append( Self, Args, Opts, OAOpts ),
      options( keysort(Sort), Opts ),
+     options( [ki(Ki),vi(Vi)], Opts ),
      kv_compose_k_frequency_option_value( Sort, keysort ),
-     kv_compose_k_frequency_sort( Sort, KVs, KVo ),
+     kv_compose_k_frequency_sort( Sort, Ki, KVs, KVo ),
      options( drop_k(Dk), Opts ),
      options( drop_v(Dv), Opts ),
      atom_concat( Dk, Dv, DkDv ),
      kv_compose_k_frequency_option_value( Dk, drop_k ),
      kv_compose_k_frequency_option_value( Dv, drop_v ),
-     KVo = [K-V|KVoT],
-     kv_compose_k_frequency_order( KVoT, K, 1, V, DkDv, FKVs ).
+     KVo = [KV|KVoT],
+     arg( Ki, KV, K ),
+     arg( Vi, KV, V ),
+     kv_compose_k_frequency_order( KVoT, K, 1, V, Ki, Vi, DkDv, FKVs ).
 
-kv_compose_k_frequency_sort(true, KVs, KVo) :-
-     keysort( KVs, KVo ).
-kv_compose_k_frequency_sort(false, KVs, KVo) :-
-     sort( KVs, KVo ).
+kv_compose_k_frequency_sort(true, Ki, KVs, KVo) :-
+     ( KVs = [_-_|_] -> 
+          keysort( KVs, KVo )
+          ;
+          sort( Ki, @=<, KVs, KVo )
+     ).
+kv_compose_k_frequency_sort(false, Ki, KVs, KVo) :-
+     sort( Ki, @=<, KVs, KVo ).
 
-kv_compose_k_frequency_order( [], K, Fa, V, DkDv, [FKV] ) :-
+kv_compose_k_frequency_order( [], K, Fa, V, _Ki, _Vi, DkDv, [FKV] ) :-
      ( Fa =:= 1 ->
           ReV = V
           ;
@@ -121,7 +150,9 @@ kv_compose_k_frequency_order( [], K, Fa, V, DkDv, [FKV] ) :-
      ),
      kv_compose_k_frequency_drop_k_v( DkDv, Fa, K, ReV, FKV ).
      
-kv_compose_k_frequency_order( [K1-V1|KVs], K, Fa, V, DkDv, FKVs ) :-
+kv_compose_k_frequency_order( [KV1|KVs], K, Fa, V, Ki, Vi, DkDv, FKVs ) :-
+     arg( Ki, KV1, K1 ),
+     arg( Vi, KV1, V1 ),
      ( K1 == K -> 
           ( Fa =:= 1 -> 
                NxV = [V1,V]  % we will be reversing
@@ -141,7 +172,7 @@ kv_compose_k_frequency_order( [K1-V1|KVs], K, Fa, V, DkDv, FKVs ) :-
           Fx is 1,
           NxV = V1
      ),
-     kv_compose_k_frequency_order( KVs, K1, Fx, NxV, DkDv, TFKVs ).
+     kv_compose_k_frequency_order( KVs, K1, Fx, NxV, Ki, Vi, DkDv, TFKVs ).
 
 kv_compose_k_frequency_drop_k_v(truetrue, Fa, _K, _V, Fa).
 kv_compose_k_frequency_drop_k_v(truefalse, Fa, _K, V, Fa-V).

@@ -1,3 +1,13 @@
+% :- lib(depends(kv_compose/4,pack(options)).
+
+/** kv_compose( +Ks, +Vs, -KVs, +Opts ).
+kv_compose( Ks, Vs, KVs, Args ) :-
+     lib( options ),
+     Self = kv_compose,
+     OAOpts = [pack(stoics_lib),arity(4)],
+     options_append( Self, Args, Opts, OAOpts ),
+*/
+
 /** kv_compose( +Ks, +Vs, -KVs ).
     kv_compose( +Ks, +Vs, -KVsCont, -Tkvs ).
 
