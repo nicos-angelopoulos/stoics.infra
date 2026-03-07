@@ -1,5 +1,6 @@
 
 :- use_module(library(lists)).     % memberchk/2.
+:- lib(promise(options_append/4,options)).
 
 % :- lib(depends(kv_compose/4,pack(options)).
 % :- lib(depends(kv_compose/4,pack(options),lib(local_option_check_pred/n)).
@@ -64,7 +65,7 @@ KVs = [a+1, b+2, c+3|Y].
 KVs = [a-a, b-b, c-c].
 ==
 
-To keep things efficient the predicate implements four different constructor predicates.
+To keep things efficient, the predicate implements four different constructor predicates.
 If all Opts are in default values, the vanilla kv_compose/3 is used. If tail(Tai) is given
 but all other Opts are in default, then an extra argument is added to the vanilla implementation.
 Otherwise, two flexible version are used, depending on single input on not, and which are bound to be somewhat slower.
@@ -75,10 +76,9 @@ Otherwise, two flexible version are used, depending on single input on not, and 
 
 */
 kv_compose( Ks, Vs, KVs, Args ) :-
-     % lib( pack(options), dependant(stoics_lib:kv_compose/4) ),
-     lib( options ),
      Self = kv_compose,
      OAOpts = [pack(stoics_lib),arity(4)],
+     lib_promised( options_append/4, stoics_lib, kv_compose/4 ),
      options_append( Self, Args, Opts, OAOpts ),
      options( [ki(Ki),vi(Vi)], Opts ),
      options( single_input(Sin), Opts ),

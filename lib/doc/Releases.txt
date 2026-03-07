@@ -4,6 +4,7 @@
 Tbd: document @, & (remove fixme: code that might have been needed due to MAIN instead of PACK variable bug.).
 
 3.0   
+      26.03.07 IFACE     lib_promised/3 + lib_r_promised/1 -> 2 for contextual info in promised loading
       26.03.04 DEPS:     r_call/2 -> real:r_call/2,  and declared dynamic (also r_send/1,r_library_codes/4,r_library/1)
                FIXED:    dangling call to requires_module_context/1
                CHANGE:   create a timestamp and allow files outside src/ (lib_pack_index.pl)

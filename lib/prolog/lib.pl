@@ -1,7 +1,8 @@
 :- module( lib, [
                     op( 200, fy, & ),
                     lib/1, lib/2,   % +Repo[, +Opts]
-                    lib_r_promised/1
+                    lib_promised/3,
+                    lib_r_promised/2
         ] ).
                      % lib_suggests/1,  % fixme: feature()
                      % lib_promise/2,
@@ -512,8 +513,8 @@ When Repo =|homonym(Repository)|= then only the homonims of local dir
        nothing is loaded. This is useful for fringe functionalities that depend on external libraries, where
        we do not want the average user to do anything if library (Lib) is not there. See lib_suggests/2 for
        details of how to enable warning messages.
-    * promise(DepPID,Load)
-       DepPID is a predicate id for predicate that is provided by library Load.
+    * promise(DepPID,Load,ReqPID)
+       DepPID is a predicate id for predicate that is provided by library Load and is required by ReqPID.
        When DepPID called for the first time Load will be loaded. 
        This is a mechanism to avoid loading into memory Load at loading time, and only do so if that bit of code is reached.
        Load can be a loadable library name, or a callable of the form =|call(G)|=, where =|Cxt:call(G)|= is called.
@@ -848,12 +849,16 @@ lib_sys( SysLib, AbsLib, ExplicitTkn, Cxt  ) :-
     setup_call_cleanup(Assert, Goal, Retract),
     debug( lib, 'System~w library: ~w, loaded in: ~w', [ExplicitTkn,SysLib,Cxt] ).
 
+% fixme: shouldn't this be failing after the message ?
 lib_not_found( self, Repo, _Cxt ) :-
     Mess = 'Failed to locate library:~w, (no local lib, local pack or remote pack)',
     lib_message_report( Mess, [Repo], informational ).
+% fixme: shouldn't this be failing after the message ?
 lib_not_found( suggests, Repo, _Cxt ) :-
     Mess = 'Failed to locate suggested library:~w, (no local lib, local pack or remote pack)',
     lib_message_report( Mess, [Repo], informational ).
+lib_not_found( promised, _Repo, _Cxt ) :-
+     fail.
 
 lib_explicit( Repo, Pn, Pa, Cxt, _Opts ) :-
     lib_tables:lib_full(Repo,_),
