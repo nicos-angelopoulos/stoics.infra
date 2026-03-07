@@ -50,7 +50,7 @@ Opts
 Examples
 ==
 ?- kv_compose_k_frequency([1-y,2-b,1-x,1-a], FKVs).
-FKVs = [3-1-[y, x, a], 1-2-b].
+FKVs = [3-1-[y, x, a], 1-2-[b]].
 
 ?- kv_compose_k_frequency([2-b,1-x,1-a], FKVs), keysort( FKVs, FKVo ).
 FKVs = [2-1-[x, a], 1-2-b],
@@ -152,7 +152,7 @@ kv_compose_k_frequency_sort(false, Ki, KVs, KVo) :-
      sort( Ki, @=<, KVs, KVo ).
 
 kv_compose_k_frequency_order( [], K, Fa, V, _Ki, _Vi, Dfkv, [FKV] ) :-
-     reverse( V, ReV )
+     reverse( V, ReV ),
      kv_compose_k_frequency_drop_k_v( Dfkv, Fa, K, ReV, FKV ).
      
 kv_compose_k_frequency_order( [KV1|KVs], K, Fa, V, Ki, Vi, Dfkv, FKVs ) :-
