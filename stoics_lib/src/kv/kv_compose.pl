@@ -46,7 +46,7 @@ Opts
     the argument position for Keys (=|0|= means whole term)
   * single_input(Sin=false)
     wheter to take both Key and Values from Ks
-  * vi(Vindex=2)
+  * vi(Vindex=0)
     the argument position for Values (=|0|= means whole term)
   * tail(Tail)
     make KVs a difference list with Tail as its tail
