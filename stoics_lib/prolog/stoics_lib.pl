@@ -50,6 +50,8 @@
               kv_compose_k_frequency/3,% +KVs, -FKVs, +Opts
               kv_compose_k_nth/3,      % +Terms, +N, -KVs
               kv_decompose/3,          % +Pairs, -Ks, -Vs
+              kv_k_vs/2,               % +KVs, -KGvs
+              kv_k_vs/3,               % +KVs, -KGvs, +Opts
               kv_ks/2,                 % +KVs, -Ks
               kv_transpose/2,          % +KVs, -VKs
               kv_vs/2,                 % +KVs, -Vs
@@ -262,6 +264,8 @@
 :- lib(kv_compose_k_frequency/3).
 :- lib(kvo_k_until_vs/3).
 :- lib(kvo_k_until_vs/4).
+:- lib(kv_k_vs/2).
+:- lib(kv_k_vs/3).
 :- lib(io_section/3).  % also io_section_open/3, io_section_close/1.
 
 :- lib( end(stoics_lib) ).

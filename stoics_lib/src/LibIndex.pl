@@ -63,6 +63,8 @@ lib_index(kv_compose_k_frequency, 2, any, stoics_lib, 'kv/kv_compose_k_frequency
 lib_index(kv_compose_k_frequency, 3, any, stoics_lib, 'kv/kv_compose_k_frequency').
 lib_index(kv_compose_k_nth, 3, any, stoics_lib, 'kv/kv_compose_k_nth').
 lib_index(kv_decompose, 3, any, stoics_lib, 'kv/kv_decompose').
+lib_index(kv_k_vs, 2, any, stoics_lib, 'kv/kv_k_vs').
+lib_index(kv_k_vs, 3, any, stoics_lib, 'kv/kv_k_vs').
 lib_index(kv_ks, 2, any, stoics_lib, 'kv/kv_ks').
 lib_index(kv_transpose, 2, any, stoics_lib, 'kv/kv_transpose').
 lib_index(kv_vs, 2, any, stoics_lib, 'kv/kv_vs').
