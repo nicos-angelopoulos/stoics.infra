@@ -1,6 +1,7 @@
 ---   Releases   ---
 --------------------
 2.2  
+     26.03.08   IFACE:  kv_k_vs/2,3
      26.03.07   OPTS:   drop_f(DropF) in kv_compose_k_frequency/3
                 IFACE:  kv_compose/4 now expects Opts. added much new functionality via those
      26.03.05   IFACE:  kvo_k_until_vs/3,4 with full docs
