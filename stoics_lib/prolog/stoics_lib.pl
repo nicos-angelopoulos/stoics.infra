@@ -59,6 +59,7 @@
               kvo_k_until_vs/4,        % +KVo, +MaxK, -Vs, +Opts
               kvo_k_memberchk/3,       % +K, +KVs, -V
               kvs_k_memberchk/3,       % +K, +KVs, -V
+              kvs_k_update_v/7,        % +KVset, +K, +GoalNew, GoalUpd, -V, -NewV, -NVset
             % list/
               break_on_list/4,         % +List, +Partial, -Left, -Right
               break_nth/4,             % +Nth, +List, -Left, -Right
@@ -264,6 +265,7 @@
 :- lib(kv_compose_k_frequency/3).
 :- lib(kvo_k_until_vs/3).
 :- lib(kvo_k_until_vs/4).
+:- lib(kvs_k_update_v/7).
 :- lib(kv_k_vs/2).
 :- lib(kv_k_vs/3).
 :- lib(io_section/3).  % also io_section_open/3, io_section_close/1.

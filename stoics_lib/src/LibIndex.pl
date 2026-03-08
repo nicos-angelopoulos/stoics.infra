@@ -72,6 +72,7 @@ lib_index(kvo_k_until_vs,3, any, stoics_lib, 'kv/kvo_k_until_vs' ).
 lib_index(kvo_k_until_vs,4, any, stoics_lib, 'kv/kvo_k_until_vs' ).
 lib_index(kvo_k_memberchk, 3, any, stoics_lib, 'kv/kvo_k_memberchk').
 lib_index(kvs_k_memberchk, 3, any, stoics_lib, 'kv/kvs_k_memberchk').
+lib_index(kvs_k_update_v, 7, any, stoics_lib, 'kv/kvs_k_update_v').
 lib_index(latex_colour, 4, any, stoics_lib, 'colour/latex_colour').
 lib_index(letter_strings, 3, any, stoics_lib, 'string/letter_strings').
 lib_index(lexi, 2, any, stoics_lib, 'codes/lexi').
