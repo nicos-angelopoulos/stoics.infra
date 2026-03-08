@@ -15,7 +15,7 @@ kv_compose_defaults( Defs ) :-
     kv_compose( -Ks, -Vs, +KVs ).
     kv_compose( +Ks, +Vs, -KVs, +Opts ).
 
-Construct arity two terms by selecting terms from two input lists.
+Construct arity two terms by selecting terms from input list(s).
 
 In kv_compose/3 version Ks and Vs are lists and KVs are -(K,V) pairs. 
 This version can be used to also de-construct a KVs to its constituent lists.
