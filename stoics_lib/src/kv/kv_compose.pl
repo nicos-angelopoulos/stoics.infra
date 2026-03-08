@@ -68,7 +68,8 @@ KVs = [a-a, b-b, c-c].
 To keep things efficient, the predicate implements four different constructor predicates.
 If all Opts are in default values, the vanilla kv_compose/3 is used. If tail(Tai) is given
 but all other Opts are in default, then an extra argument is added to the vanilla implementation.
-Otherwise, two flexible version are used, depending on single input on not, and which are bound to be somewhat slower.
+Otherwise, two flexible version are used, depending on single input on not.
+These latter version are bound to be somewhat slower.
 
 @author nicos angelopoulos
 @version  0.2 2017/2/24    added /4 version.
